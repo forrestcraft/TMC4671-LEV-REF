@@ -27,7 +27,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
-//#include "TMCM.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -38,10 +37,10 @@
 //extern void UART3Irq(void);
 //extern void Timer1CommutationInterruptHandler(void);
 
-//extern PIrqFunction CanTxUsbHpIrqVector;
-//extern PIrqFunction CanRx0UsbLpIrqVector;
-//extern PIrqFunction CanRx1IrqVector;
-//extern PIrqFunction CanSceIrqVector;
+extern PIrqFunction CanTxUsbHpIrqVector;
+extern PIrqFunction CanRx0UsbLpIrqVector;
+extern PIrqFunction CanRx1IrqVector;
+extern PIrqFunction CanSceIrqVector;
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -367,10 +366,9 @@ void ADC_IRQHandler(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void __attribute__ ((weak)) USB_HP_CAN_TX_IRQHandler(void)
-//void USB_HP_CAN_TX_IRQHandler(void)
+void USB_HP_CAN_TX_IRQHandler(void)
 {
-//  (*CanTxUsbHpIrqVector)();
+  (*CanTxUsbHpIrqVector)();
 }
 
 /*******************************************************************************
@@ -381,10 +379,9 @@ void __attribute__ ((weak)) USB_HP_CAN_TX_IRQHandler(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void __attribute__ ((weak)) USB_LP_CAN_RX0_IRQHandler(void)
-//void USB_LP_CAN_RX0_IRQHandler(void)
+void USB_LP_CAN_RX0_IRQHandler(void)
 {
-//  (*CanRx0UsbLpIrqVector)();
+  (*CanRx0UsbLpIrqVector)();
 }
 
 /*******************************************************************************
@@ -394,10 +391,9 @@ void __attribute__ ((weak)) USB_LP_CAN_RX0_IRQHandler(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void __attribute__ ((weak)) CAN_RX1_IRQHandler(void)
-//void __attribute__ ((interrupt)) CAN_RX1_IRQHandler(void)
+void __attribute__ ((interrupt)) CAN_RX1_IRQHandler(void)
 {
-//  (*CanRx1IrqVector)();
+  (*CanRx1IrqVector)();
 }
 
 /*******************************************************************************
@@ -407,10 +403,9 @@ void __attribute__ ((weak)) CAN_RX1_IRQHandler(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void __attribute__ ((weak)) CAN_SCE_IRQHandler(void)
-//void CAN_SCE_IRQHandler(void)
+void CAN_SCE_IRQHandler(void)
 {
-//	(*CanSceIrqVector)();
+	(*CanSceIrqVector)();
 }
 
 /*******************************************************************************

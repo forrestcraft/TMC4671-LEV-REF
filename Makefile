@@ -79,42 +79,35 @@ SRC += $(CPU_INC_DIR)/stm32f10x_it.c
 SRC += $(CPU_INC_DIR)/stm32f10x_vector.c
 	
 # modules
-#SRC += hal/modules/TMC4671-LEV-REV_v1.0.c
+SRC += hal/modules/TMC4671-LEV-REF_v1.0.c
 
 # hal parts
-#SRC += Debug.c
-#SRC += Flags.c
-#SRC += Functions.c
-#SRC += LinearRamp.c
-#SRC += IO.c
-#SRC += system/Systick.c
-#SRC += system/SystemInfo.c
-#SRC += comm/CAN.c
-#SRC += comm/UART.c
-#SRC += comm/Eeprom.c
-#SRC += comm/SPI.c
-#SRC += TMCM.c
-#SRC += ic/Weasel_st.c
-#SRC += ic/TMC4671.c
-#SRC += ic/Dragon_st.c
-#SRC += ic/TMC6200.c
-#SRC += ic/LIS2DH12.c
-#SRC += Sensor.c
-#SRC += Led.c
-#SRC += LedRear.c
-#SRC += Button.c
-#SRC += Bike_error.c
+SRC += hal/comm/CAN.c
+SRC += hal/comm/SPI.c
+SRC += hal/comm/UART.c
+SRC += hal/comm/Eeprom.c
+SRC += hal/ic/LIS2DH12.c
+SRC += hal/system/Cpu.c
+SRC += hal/system/IO.c
+SRC += hal/system/SystemInfo.c
+SRC += hal/system/Systick.c
+SRC += hal/Flags.c
+SRC += hal/Debug.c
 
 # general motor control and interfacing
-#SRC += TMCL.c
-#SRC += BLDC.c
-#SRC += main.c
+SRC += TMCL.c
+SRC += BLDC.c
+SRC += Sensor.c
+SRC += Button.c
+SRC += Led.c
+SRC += LedRear.c
+SRC += main.c
 
 # TMC_API
-#SRC += TMC-API/tmc/helpers/Functions.c
-#SRC += TMC-API/tmc/ramp/LinearRamp.c
-#SRC	+= TMC-API/tmc/ic/TMC4671/TMC4671.c
-#SRC	+= TMC-API/tmc/ic/TMC6200/TMC6200.c
+SRC += TMC-API/tmc/helpers/Functions.c
+SRC += TMC-API/tmc/ramp/LinearRamp.c
+SRC	+= TMC-API/tmc/ic/TMC4671/TMC4671.c
+SRC	+= TMC-API/tmc/ic/TMC6200/TMC6200.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -135,11 +128,8 @@ ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-#EXTRAINCDIRS  = $(CPU_INC_DIR)
-#EXTRAINCDIRS += ./hal
-#EXTRAINCDIRS += ./tmc
-#EXTRAINCDIRS  += ./TMC-API
-#EXTRAINCDIRS  += ./TMC-API/tmc/helpers
+EXTRAINCDIRS  += ./TMC-API
+EXTRAINCDIRS  += ./TMC-API/tmc/helpers
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -376,11 +366,9 @@ gccversion :
 	$(OBJCOPY) -O binary $< $@
 
 # Create extended listing file/disassambly from ELF output file.
-# using objdump testing: option -C
 %.lss: %.elf
 	@echo $(MSG_EXTENDED_LISTING) $@
 	$(OBJDUMP) -h -S -C -r $< > $@
-#	$(OBJDUMP) -x -S $< > $@
 
 # Create a symbol table from ELF output file.
 %.sym: %.elf
@@ -455,7 +443,7 @@ $(SRCARM:.c=.s) : %.s : %.c
 	@echo $(MSG_ASMFROMC_ARM) $< to $@
 	$(CC) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
 
-# Target: clean project.
+# Target: clean project
 clean: begin clean_list end
 
 clean_list :
