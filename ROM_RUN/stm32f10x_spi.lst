@@ -1,0 +1,2210 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"stm32f10x_spi.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	SPI_I2S_DeInit
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	SPI_I2S_DeInit:
+  25              	.LVL0:
+  26              	.LFB0:
+  27              		.file 1 "cpu/STM32F103/stm32f10x_spi.c"
+   1:cpu/STM32F103/stm32f10x_spi.c **** /******************** (C) COPYRIGHT 2008 STMicroelectronics ********************
+   2:cpu/STM32F103/stm32f10x_spi.c **** * File Name          : stm32f10x_spi.c
+   3:cpu/STM32F103/stm32f10x_spi.c **** * Author             : MCD Application Team
+   4:cpu/STM32F103/stm32f10x_spi.c **** * Version            : V2.0 
+   5:cpu/STM32F103/stm32f10x_spi.c **** * Date               : 05/23/2008
+   6:cpu/STM32F103/stm32f10x_spi.c **** * Description        : This file provides all the SPI firmware functions.
+   7:cpu/STM32F103/stm32f10x_spi.c **** ********************************************************************************
+   8:cpu/STM32F103/stm32f10x_spi.c **** * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+   9:cpu/STM32F103/stm32f10x_spi.c **** * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+  10:cpu/STM32F103/stm32f10x_spi.c **** * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+  11:cpu/STM32F103/stm32f10x_spi.c **** * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+  12:cpu/STM32F103/stm32f10x_spi.c **** * CONTENT OF SUCH SOFTWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+  13:cpu/STM32F103/stm32f10x_spi.c **** * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  14:cpu/STM32F103/stm32f10x_spi.c **** * FOR MORE INFORMATION PLEASE CAREFULLY READ THE LICENSE AGREEMENT FILE LOCATED 
+  15:cpu/STM32F103/stm32f10x_spi.c **** * IN THE ROOT DIRECTORY OF THIS FIRMWARE PACKAGE.
+  16:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+  17:cpu/STM32F103/stm32f10x_spi.c **** 
+  18:cpu/STM32F103/stm32f10x_spi.c **** /* Includes ------------------------------------------------------------------*/
+  19:cpu/STM32F103/stm32f10x_spi.c **** #include "stm32f10x_spi.h"
+  20:cpu/STM32F103/stm32f10x_spi.c **** #include "stm32f10x_rcc.h"
+  21:cpu/STM32F103/stm32f10x_spi.c **** 
+  22:cpu/STM32F103/stm32f10x_spi.c **** /* Private typedef -----------------------------------------------------------*/
+  23:cpu/STM32F103/stm32f10x_spi.c **** /* Private define ------------------------------------------------------------*/
+  24:cpu/STM32F103/stm32f10x_spi.c **** /* SPI SPE mask */
+  25:cpu/STM32F103/stm32f10x_spi.c **** #define CR1_SPE_Set          ((u16)0x0040)
+  26:cpu/STM32F103/stm32f10x_spi.c **** #define CR1_SPE_Reset        ((u16)0xFFBF)
+  27:cpu/STM32F103/stm32f10x_spi.c **** 
+  28:cpu/STM32F103/stm32f10x_spi.c **** /* I2S I2SE mask */
+  29:cpu/STM32F103/stm32f10x_spi.c **** #define I2SCFGR_I2SE_Set     ((u16)0x0400)
+  30:cpu/STM32F103/stm32f10x_spi.c **** #define I2SCFGR_I2SE_Reset   ((u16)0xFBFF)
+  31:cpu/STM32F103/stm32f10x_spi.c **** 
+  32:cpu/STM32F103/stm32f10x_spi.c **** /* SPI CRCNext mask */
+  33:cpu/STM32F103/stm32f10x_spi.c **** #define CR1_CRCNext_Set      ((u16)0x1000)
+  34:cpu/STM32F103/stm32f10x_spi.c **** 
+  35:cpu/STM32F103/stm32f10x_spi.c **** /* SPI CRCEN mask */
+  36:cpu/STM32F103/stm32f10x_spi.c **** #define CR1_CRCEN_Set        ((u16)0x2000)
+  37:cpu/STM32F103/stm32f10x_spi.c **** #define CR1_CRCEN_Reset      ((u16)0xDFFF)
+  38:cpu/STM32F103/stm32f10x_spi.c **** 
+  39:cpu/STM32F103/stm32f10x_spi.c **** /* SPI SSOE mask */
+  40:cpu/STM32F103/stm32f10x_spi.c **** #define CR2_SSOE_Set         ((u16)0x0004)
+  41:cpu/STM32F103/stm32f10x_spi.c **** #define CR2_SSOE_Reset       ((u16)0xFFFB)
+  42:cpu/STM32F103/stm32f10x_spi.c **** 
+  43:cpu/STM32F103/stm32f10x_spi.c **** /* SPI registers Masks */
+  44:cpu/STM32F103/stm32f10x_spi.c **** #define CR1_CLEAR_Mask       ((u16)0x3040)
+  45:cpu/STM32F103/stm32f10x_spi.c **** #define I2SCFGR_CLEAR_Mask   ((u16)0xF040)
+  46:cpu/STM32F103/stm32f10x_spi.c **** 
+  47:cpu/STM32F103/stm32f10x_spi.c **** /* SPI or I2S mode selection masks */
+  48:cpu/STM32F103/stm32f10x_spi.c **** #define SPI_Mode_Select      ((u16)0xF7FF)
+  49:cpu/STM32F103/stm32f10x_spi.c **** #define I2S_Mode_Select      ((u16)0x0800)   
+  50:cpu/STM32F103/stm32f10x_spi.c **** 
+  51:cpu/STM32F103/stm32f10x_spi.c **** /* Private macro -------------------------------------------------------------*/
+  52:cpu/STM32F103/stm32f10x_spi.c **** /* Private variables ---------------------------------------------------------*/
+  53:cpu/STM32F103/stm32f10x_spi.c **** /* Private function prototypes -----------------------------------------------*/
+  54:cpu/STM32F103/stm32f10x_spi.c **** /* Private functions ---------------------------------------------------------*/
+  55:cpu/STM32F103/stm32f10x_spi.c **** 
+  56:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+  57:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_I2S_DeInit
+  58:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Deinitializes the SPIx peripheral registers to their default
+  59:cpu/STM32F103/stm32f10x_spi.c **** *                  reset values (Affects also the I2Ss).
+  60:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+  61:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+  62:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+  63:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+  64:cpu/STM32F103/stm32f10x_spi.c **** void SPI_I2S_DeInit(SPI_TypeDef* SPIx)
+  65:cpu/STM32F103/stm32f10x_spi.c **** {
+  28              		.loc 1 65 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  66:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+  67:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+  32              		.loc 1 67 3 view .LVU1
+  68:cpu/STM32F103/stm32f10x_spi.c ****   
+  69:cpu/STM32F103/stm32f10x_spi.c ****   switch (*(u32*)&SPIx)
+  33              		.loc 1 69 3 view .LVU2
+  65:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+  34              		.loc 1 65 1 is_stmt 0 view .LVU3
+  35 0000 08B5     		push	{r3, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 3, -8
+  39              		.cfi_offset 14, -4
+  40              		.loc 1 69 3 view .LVU4
+  41 0002 184B     		ldr	r3, .L10
+  42 0004 9842     		cmp	r0, r3
+  43 0006 08D0     		beq	.L2
+  44 0008 03F57443 		add	r3, r3, #62464
+  45 000c 9842     		cmp	r0, r3
+  46 000e 1CD0     		beq	.L3
+  47 0010 A3F57843 		sub	r3, r3, #63488
+  48 0014 9842     		cmp	r0, r3
+  49 0016 0CD0     		beq	.L9
+  70:cpu/STM32F103/stm32f10x_spi.c ****   {
+  71:cpu/STM32F103/stm32f10x_spi.c ****     case SPI1_BASE:
+  72:cpu/STM32F103/stm32f10x_spi.c ****       /* Enable SPI1 reset state */
+  73:cpu/STM32F103/stm32f10x_spi.c ****       RCC_APB2PeriphResetCmd(RCC_APB2Periph_SPI1, ENABLE);
+  74:cpu/STM32F103/stm32f10x_spi.c ****       /* Release SPI1 from reset state */
+  75:cpu/STM32F103/stm32f10x_spi.c ****       RCC_APB2PeriphResetCmd(RCC_APB2Periph_SPI1, DISABLE);
+  76:cpu/STM32F103/stm32f10x_spi.c ****       break;
+  77:cpu/STM32F103/stm32f10x_spi.c **** 
+  78:cpu/STM32F103/stm32f10x_spi.c ****     case SPI2_BASE:
+  79:cpu/STM32F103/stm32f10x_spi.c ****       /* Enable SPI2 reset state */
+  80:cpu/STM32F103/stm32f10x_spi.c ****       RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPI2, ENABLE);
+  81:cpu/STM32F103/stm32f10x_spi.c ****       /* Release SPI2 from reset state */
+  82:cpu/STM32F103/stm32f10x_spi.c ****       RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPI2, DISABLE);
+  83:cpu/STM32F103/stm32f10x_spi.c ****       break;
+  84:cpu/STM32F103/stm32f10x_spi.c **** 
+  85:cpu/STM32F103/stm32f10x_spi.c ****     case SPI3_BASE:
+  86:cpu/STM32F103/stm32f10x_spi.c ****       /* Enable SPI3 reset state */
+  87:cpu/STM32F103/stm32f10x_spi.c ****       RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPI3, ENABLE);
+  88:cpu/STM32F103/stm32f10x_spi.c ****       /* Release SPI3 from reset state */
+  89:cpu/STM32F103/stm32f10x_spi.c ****       RCC_APB1PeriphResetCmd(RCC_APB1Periph_SPI3, DISABLE);
+  90:cpu/STM32F103/stm32f10x_spi.c ****       break;
+  91:cpu/STM32F103/stm32f10x_spi.c **** 
+  92:cpu/STM32F103/stm32f10x_spi.c ****     default:
+  93:cpu/STM32F103/stm32f10x_spi.c ****       break;
+  94:cpu/STM32F103/stm32f10x_spi.c ****   }
+  95:cpu/STM32F103/stm32f10x_spi.c **** }
+  50              		.loc 1 95 1 view .LVU5
+  51 0018 08BD     		pop	{r3, pc}
+  52              	.L2:
+  87:cpu/STM32F103/stm32f10x_spi.c ****       /* Release SPI3 from reset state */
+  53              		.loc 1 87 7 is_stmt 1 view .LVU6
+  54 001a 0121     		movs	r1, #1
+  55 001c 4FF40040 		mov	r0, #32768
+  56              	.LVL1:
+  87:cpu/STM32F103/stm32f10x_spi.c ****       /* Release SPI3 from reset state */
+  57              		.loc 1 87 7 is_stmt 0 view .LVU7
+  58 0020 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  59              	.LVL2:
+  89:cpu/STM32F103/stm32f10x_spi.c ****       break;
+  60              		.loc 1 89 7 is_stmt 1 view .LVU8
+  61              		.loc 1 95 1 is_stmt 0 view .LVU9
+  62 0024 BDE80840 		pop	{r3, lr}
+  63              	.LCFI1:
+  64              		.cfi_remember_state
+  65              		.cfi_restore 14
+  66              		.cfi_restore 3
+  67              		.cfi_def_cfa_offset 0
+  89:cpu/STM32F103/stm32f10x_spi.c ****       break;
+  68              		.loc 1 89 7 view .LVU10
+  69 0028 0021     		movs	r1, #0
+  70 002a 4FF40040 		mov	r0, #32768
+  71 002e FFF7FEBF 		b	RCC_APB1PeriphResetCmd
+  72              	.LVL3:
+  73              	.L9:
+  74              	.LCFI2:
+  75              		.cfi_restore_state
+  80:cpu/STM32F103/stm32f10x_spi.c ****       /* Release SPI2 from reset state */
+  76              		.loc 1 80 7 is_stmt 1 view .LVU11
+  77 0032 0121     		movs	r1, #1
+  78 0034 4FF48040 		mov	r0, #16384
+  79              	.LVL4:
+  80:cpu/STM32F103/stm32f10x_spi.c ****       /* Release SPI2 from reset state */
+  80              		.loc 1 80 7 is_stmt 0 view .LVU12
+  81 0038 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  82              	.LVL5:
+  82:cpu/STM32F103/stm32f10x_spi.c ****       break;
+  83              		.loc 1 82 7 is_stmt 1 view .LVU13
+  84              		.loc 1 95 1 is_stmt 0 view .LVU14
+  85 003c BDE80840 		pop	{r3, lr}
+  86              	.LCFI3:
+  87              		.cfi_remember_state
+  88              		.cfi_restore 14
+  89              		.cfi_restore 3
+  90              		.cfi_def_cfa_offset 0
+  82:cpu/STM32F103/stm32f10x_spi.c ****       break;
+  91              		.loc 1 82 7 view .LVU15
+  92 0040 0021     		movs	r1, #0
+  93 0042 4FF48040 		mov	r0, #16384
+  94 0046 FFF7FEBF 		b	RCC_APB1PeriphResetCmd
+  95              	.LVL6:
+  96              	.L3:
+  97              	.LCFI4:
+  98              		.cfi_restore_state
+  73:cpu/STM32F103/stm32f10x_spi.c ****       /* Release SPI1 from reset state */
+  99              		.loc 1 73 7 is_stmt 1 view .LVU16
+ 100 004a 0121     		movs	r1, #1
+ 101 004c 4FF48050 		mov	r0, #4096
+ 102              	.LVL7:
+  73:cpu/STM32F103/stm32f10x_spi.c ****       /* Release SPI1 from reset state */
+ 103              		.loc 1 73 7 is_stmt 0 view .LVU17
+ 104 0050 FFF7FEFF 		bl	RCC_APB2PeriphResetCmd
+ 105              	.LVL8:
+  75:cpu/STM32F103/stm32f10x_spi.c ****       break;
+ 106              		.loc 1 75 7 is_stmt 1 view .LVU18
+ 107              		.loc 1 95 1 is_stmt 0 view .LVU19
+ 108 0054 BDE80840 		pop	{r3, lr}
+ 109              	.LCFI5:
+ 110              		.cfi_restore 14
+ 111              		.cfi_restore 3
+ 112              		.cfi_def_cfa_offset 0
+  75:cpu/STM32F103/stm32f10x_spi.c ****       break;
+ 113              		.loc 1 75 7 view .LVU20
+ 114 0058 0021     		movs	r1, #0
+ 115 005a 4FF48050 		mov	r0, #4096
+ 116 005e FFF7FEBF 		b	RCC_APB2PeriphResetCmd
+ 117              	.LVL9:
+ 118              	.L11:
+ 119 0062 00BF     		.align	2
+ 120              	.L10:
+ 121 0064 003C0040 		.word	1073757184
+ 122              		.cfi_endproc
+ 123              	.LFE0:
+ 125              		.align	1
+ 126              		.p2align 2,,3
+ 127              		.global	SPI_Init
+ 128              		.syntax unified
+ 129              		.thumb
+ 130              		.thumb_func
+ 132              	SPI_Init:
+ 133              	.LVL10:
+ 134              	.LFB1:
+  96:cpu/STM32F103/stm32f10x_spi.c **** 
+  97:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+  98:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_Init
+  99:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Initializes the SPIx peripheral according to the specified 
+ 100:cpu/STM32F103/stm32f10x_spi.c **** *                  parameters in the SPI_InitStruct.
+ 101:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 102:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_InitStruct: pointer to a SPI_InitTypeDef structure that
+ 103:cpu/STM32F103/stm32f10x_spi.c **** *                    contains the configuration information for the specified
+ 104:cpu/STM32F103/stm32f10x_spi.c **** *                    SPI peripheral.
+ 105:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 106:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 107:cpu/STM32F103/stm32f10x_spi.c **** ******************************************************************************/
+ 108:cpu/STM32F103/stm32f10x_spi.c **** void SPI_Init(SPI_TypeDef* SPIx, SPI_InitTypeDef* SPI_InitStruct)
+ 109:cpu/STM32F103/stm32f10x_spi.c **** {
+ 135              		.loc 1 109 1 is_stmt 1 view -0
+ 136              		.cfi_startproc
+ 137              		@ args = 0, pretend = 0, frame = 0
+ 138              		@ frame_needed = 0, uses_anonymous_args = 0
+ 110:cpu/STM32F103/stm32f10x_spi.c ****   u16 tmpreg = 0;
+ 139              		.loc 1 110 3 view .LVU22
+ 111:cpu/STM32F103/stm32f10x_spi.c ****   
+ 112:cpu/STM32F103/stm32f10x_spi.c ****   /* check the parameters */
+ 113:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));   
+ 140              		.loc 1 113 3 view .LVU23
+ 114:cpu/STM32F103/stm32f10x_spi.c ****   
+ 115:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the SPI parameters */
+ 116:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_DIRECTION_MODE(SPI_InitStruct->SPI_Direction));
+ 141              		.loc 1 116 3 view .LVU24
+ 117:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_MODE(SPI_InitStruct->SPI_Mode));
+ 142              		.loc 1 117 3 view .LVU25
+ 118:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_DATASIZE(SPI_InitStruct->SPI_DataSize));
+ 143              		.loc 1 118 3 view .LVU26
+ 119:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_CPOL(SPI_InitStruct->SPI_CPOL));
+ 144              		.loc 1 119 3 view .LVU27
+ 120:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_CPHA(SPI_InitStruct->SPI_CPHA));
+ 145              		.loc 1 120 3 view .LVU28
+ 121:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_NSS(SPI_InitStruct->SPI_NSS));
+ 146              		.loc 1 121 3 view .LVU29
+ 122:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_BAUDRATE_PRESCALER(SPI_InitStruct->SPI_BaudRatePrescaler));
+ 147              		.loc 1 122 3 view .LVU30
+ 123:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_FIRST_BIT(SPI_InitStruct->SPI_FirstBit));
+ 148              		.loc 1 123 3 view .LVU31
+ 124:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_CRC_POLYNOMIAL(SPI_InitStruct->SPI_CRCPolynomial));
+ 149              		.loc 1 124 3 view .LVU32
+ 125:cpu/STM32F103/stm32f10x_spi.c **** 
+ 126:cpu/STM32F103/stm32f10x_spi.c **** /*---------------------------- SPIx CR1 Configuration ------------------------*/
+ 127:cpu/STM32F103/stm32f10x_spi.c ****   /* Get the SPIx CR1 value */
+ 128:cpu/STM32F103/stm32f10x_spi.c ****   tmpreg = SPIx->CR1;
+ 150              		.loc 1 128 3 view .LVU33
+ 129:cpu/STM32F103/stm32f10x_spi.c ****   /* Clear BIDIMode, BIDIOE, RxONLY, SSM, SSI, LSBFirst, BR, MSTR, CPOL and CPHA bits */
+ 130:cpu/STM32F103/stm32f10x_spi.c ****   tmpreg &= CR1_CLEAR_Mask;
+ 131:cpu/STM32F103/stm32f10x_spi.c ****   /* Configure SPIx: direction, NSS management, first transmitted bit, BaudRate prescaler
+ 132:cpu/STM32F103/stm32f10x_spi.c ****      master/salve mode, CPOL and CPHA */
+ 133:cpu/STM32F103/stm32f10x_spi.c ****   /* Set BIDImode, BIDIOE and RxONLY bits according to SPI_Direction value */
+ 134:cpu/STM32F103/stm32f10x_spi.c ****   /* Set SSM, SSI and MSTR bits according to SPI_Mode and SPI_NSS values */
+ 135:cpu/STM32F103/stm32f10x_spi.c ****   /* Set LSBFirst bit according to SPI_FirstBit value */
+ 136:cpu/STM32F103/stm32f10x_spi.c ****   /* Set BR bits according to SPI_BaudRatePrescaler value */
+ 137:cpu/STM32F103/stm32f10x_spi.c ****   /* Set CPOL bit according to SPI_CPOL value */
+ 138:cpu/STM32F103/stm32f10x_spi.c ****   /* Set CPHA bit according to SPI_CPHA value */
+ 139:cpu/STM32F103/stm32f10x_spi.c ****   tmpreg |= (u16)((u32)SPI_InitStruct->SPI_Direction | SPI_InitStruct->SPI_Mode |
+ 151              		.loc 1 139 13 is_stmt 0 view .LVU34
+ 152 0068 B1F802C0 		ldrh	ip, [r1, #2]
+ 153 006c 0B88     		ldrh	r3, [r1]
+ 154 006e 8A88     		ldrh	r2, [r1, #4]
+ 155 0070 43EA0C03 		orr	r3, r3, ip
+ 156 0074 B1F806C0 		ldrh	ip, [r1, #6]
+ 157 0078 1343     		orrs	r3, r3, r2
+ 158 007a 0A89     		ldrh	r2, [r1, #8]
+ 159 007c 43EA0C03 		orr	r3, r3, ip
+ 109:cpu/STM32F103/stm32f10x_spi.c ****   u16 tmpreg = 0;
+ 160              		.loc 1 109 1 view .LVU35
+ 161 0080 00B5     		push	{lr}
+ 162              	.LCFI6:
+ 163              		.cfi_def_cfa_offset 4
+ 164              		.cfi_offset 14, -4
+ 165              		.loc 1 139 13 view .LVU36
+ 166 0082 B1F80AE0 		ldrh	lr, [r1, #10]
+ 167 0086 B1F80CC0 		ldrh	ip, [r1, #12]
+ 168 008a 1343     		orrs	r3, r3, r2
+ 169 008c 43EA0E03 		orr	r3, r3, lr
+ 128:cpu/STM32F103/stm32f10x_spi.c ****   /* Clear BIDIMode, BIDIOE, RxONLY, SSM, SSI, LSBFirst, BR, MSTR, CPOL and CPHA bits */
+ 170              		.loc 1 128 10 view .LVU37
+ 171 0090 0288     		ldrh	r2, [r0]
+ 172              	.LVL11:
+ 130:cpu/STM32F103/stm32f10x_spi.c ****   /* Configure SPIx: direction, NSS management, first transmitted bit, BaudRate prescaler
+ 173              		.loc 1 130 3 is_stmt 1 view .LVU38
+ 174              		.loc 1 139 13 is_stmt 0 view .LVU39
+ 175 0092 43EA0C03 		orr	r3, r3, ip
+ 176 0096 B1F80EC0 		ldrh	ip, [r1, #14]
+ 130:cpu/STM32F103/stm32f10x_spi.c ****   /* Configure SPIx: direction, NSS management, first transmitted bit, BaudRate prescaler
+ 177              		.loc 1 130 10 view .LVU40
+ 178 009a 02F44152 		and	r2, r2, #12352
+ 179              	.LVL12:
+ 180              		.loc 1 139 3 is_stmt 1 view .LVU41
+ 181              		.loc 1 139 13 is_stmt 0 view .LVU42
+ 182 009e 43EA0C03 		orr	r3, r3, ip
+ 183              		.loc 1 139 10 view .LVU43
+ 184 00a2 1343     		orrs	r3, r3, r2
+ 185 00a4 9BB2     		uxth	r3, r3
+ 186              	.LVL13:
+ 140:cpu/STM32F103/stm32f10x_spi.c ****                   SPI_InitStruct->SPI_DataSize | SPI_InitStruct->SPI_CPOL |  
+ 141:cpu/STM32F103/stm32f10x_spi.c ****                   SPI_InitStruct->SPI_CPHA | SPI_InitStruct->SPI_NSS |  
+ 142:cpu/STM32F103/stm32f10x_spi.c ****                   SPI_InitStruct->SPI_BaudRatePrescaler | SPI_InitStruct->SPI_FirstBit);
+ 143:cpu/STM32F103/stm32f10x_spi.c ****   /* Write to SPIx CR1 */
+ 144:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->CR1 = tmpreg;
+ 187              		.loc 1 144 3 is_stmt 1 view .LVU44
+ 188              		.loc 1 144 13 is_stmt 0 view .LVU45
+ 189 00a6 0380     		strh	r3, [r0]	@ movhi
+ 145:cpu/STM32F103/stm32f10x_spi.c ****   
+ 146:cpu/STM32F103/stm32f10x_spi.c ****   /* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
+ 147:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->I2SCFGR &= SPI_Mode_Select;		
+ 190              		.loc 1 147 3 is_stmt 1 view .LVU46
+ 191              		.loc 1 147 17 is_stmt 0 view .LVU47
+ 192 00a8 838B     		ldrh	r3, [r0, #28]
+ 193              	.LVL14:
+ 148:cpu/STM32F103/stm32f10x_spi.c **** 
+ 149:cpu/STM32F103/stm32f10x_spi.c **** /*---------------------------- SPIx CRCPOLY Configuration --------------------*/
+ 150:cpu/STM32F103/stm32f10x_spi.c ****   /* Write to SPIx CRCPOLY */
+ 151:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->CRCPR = SPI_InitStruct->SPI_CRCPolynomial;
+ 194              		.loc 1 151 31 view .LVU48
+ 195 00aa 0A8A     		ldrh	r2, [r1, #16]
+ 147:cpu/STM32F103/stm32f10x_spi.c **** 
+ 196              		.loc 1 147 17 view .LVU49
+ 197 00ac 23F40063 		bic	r3, r3, #2048
+ 198 00b0 1B04     		lsls	r3, r3, #16
+ 199 00b2 1B0C     		lsrs	r3, r3, #16
+ 200 00b4 8383     		strh	r3, [r0, #28]	@ movhi
+ 201              	.LVL15:
+ 202              		.loc 1 151 3 is_stmt 1 view .LVU50
+ 203              		.loc 1 151 15 is_stmt 0 view .LVU51
+ 204 00b6 0282     		strh	r2, [r0, #16]	@ movhi
+ 152:cpu/STM32F103/stm32f10x_spi.c **** }
+ 205              		.loc 1 152 1 view .LVU52
+ 206 00b8 5DF804FB 		ldr	pc, [sp], #4
+ 207              		.cfi_endproc
+ 208              	.LFE1:
+ 210              		.align	1
+ 211              		.p2align 2,,3
+ 212              		.global	I2S_Init
+ 213              		.syntax unified
+ 214              		.thumb
+ 215              		.thumb_func
+ 217              	I2S_Init:
+ 218              	.LVL16:
+ 219              	.LFB2:
+ 153:cpu/STM32F103/stm32f10x_spi.c **** 
+ 154:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 155:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : I2S_Init
+ 156:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Initializes the SPIx peripheral according to the specified 
+ 157:cpu/STM32F103/stm32f10x_spi.c **** *                  parameters in the I2S_InitStruct.
+ 158:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be  2 or 3 to select the SPI peripheral
+ 159:cpu/STM32F103/stm32f10x_spi.c **** *                     (configured in I2S mode).
+ 160:cpu/STM32F103/stm32f10x_spi.c **** *                  - I2S_InitStruct: pointer to an I2S_InitTypeDef structure that
+ 161:cpu/STM32F103/stm32f10x_spi.c **** *                    contains the configuration information for the specified
+ 162:cpu/STM32F103/stm32f10x_spi.c **** *                    SPI peripheral configured in I2S mode.
+ 163:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 164:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 165:cpu/STM32F103/stm32f10x_spi.c **** ******************************************************************************/
+ 166:cpu/STM32F103/stm32f10x_spi.c **** void I2S_Init(SPI_TypeDef* SPIx, I2S_InitTypeDef* I2S_InitStruct)
+ 167:cpu/STM32F103/stm32f10x_spi.c **** {
+ 220              		.loc 1 167 1 is_stmt 1 view -0
+ 221              		.cfi_startproc
+ 222              		@ args = 0, pretend = 0, frame = 24
+ 223              		@ frame_needed = 0, uses_anonymous_args = 0
+ 168:cpu/STM32F103/stm32f10x_spi.c ****   u16 tmpreg = 0, i2sdiv = 2, i2sodd = 0, packetlength = 1;
+ 224              		.loc 1 168 3 view .LVU54
+ 169:cpu/STM32F103/stm32f10x_spi.c ****   u32 tmp = 0;
+ 225              		.loc 1 169 3 view .LVU55
+ 170:cpu/STM32F103/stm32f10x_spi.c ****   RCC_ClocksTypeDef RCC_Clocks;
+ 226              		.loc 1 170 3 view .LVU56
+ 171:cpu/STM32F103/stm32f10x_spi.c ****    
+ 172:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the I2S parameters */
+ 173:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_23_PERIPH(SPIx));
+ 227              		.loc 1 173 3 view .LVU57
+ 174:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_I2S_MODE(I2S_InitStruct->I2S_Mode));
+ 228              		.loc 1 174 3 view .LVU58
+ 175:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_I2S_STANDARD(I2S_InitStruct->I2S_Standard));
+ 229              		.loc 1 175 3 view .LVU59
+ 176:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_I2S_DATA_FORMAT(I2S_InitStruct->I2S_DataFormat));
+ 230              		.loc 1 176 3 view .LVU60
+ 177:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_I2S_MCLK_OUTPUT(I2S_InitStruct->I2S_MCLKOutput));
+ 231              		.loc 1 177 3 view .LVU61
+ 178:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_I2S_AUDIO_FREQ(I2S_InitStruct->I2S_AudioFreq));
+ 232              		.loc 1 178 3 view .LVU62
+ 179:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_I2S_CPOL(I2S_InitStruct->I2S_CPOL));  
+ 233              		.loc 1 179 3 view .LVU63
+ 180:cpu/STM32F103/stm32f10x_spi.c **** 
+ 181:cpu/STM32F103/stm32f10x_spi.c **** /*----------------------- SPIx I2SCFGR & I2SPR Configuration -----------------*/
+ 182:cpu/STM32F103/stm32f10x_spi.c **** 
+ 183:cpu/STM32F103/stm32f10x_spi.c ****   /* Clear I2SMOD, I2SE, I2SCFG, PCMSYNC, I2SSTD, CKPOL, DATLEN and CHLEN bits */
+ 184:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->I2SCFGR &= I2SCFGR_CLEAR_Mask; 
+ 234              		.loc 1 184 3 view .LVU64
+ 167:cpu/STM32F103/stm32f10x_spi.c ****   u16 tmpreg = 0, i2sdiv = 2, i2sodd = 0, packetlength = 1;
+ 235              		.loc 1 167 1 is_stmt 0 view .LVU65
+ 236 00bc F0B5     		push	{r4, r5, r6, r7, lr}
+ 237              	.LCFI7:
+ 238              		.cfi_def_cfa_offset 20
+ 239              		.cfi_offset 4, -20
+ 240              		.cfi_offset 5, -16
+ 241              		.cfi_offset 6, -12
+ 242              		.cfi_offset 7, -8
+ 243              		.cfi_offset 14, -4
+ 185:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->I2SPR = 0x0002;
+ 244              		.loc 1 185 15 view .LVU66
+ 245 00be 0224     		movs	r4, #2
+ 184:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->I2SPR = 0x0002;
+ 246              		.loc 1 184 17 view .LVU67
+ 247 00c0 828B     		ldrh	r2, [r0, #28]
+ 186:cpu/STM32F103/stm32f10x_spi.c ****   
+ 187:cpu/STM32F103/stm32f10x_spi.c ****   /* Get the I2SCFGR register value */
+ 188:cpu/STM32F103/stm32f10x_spi.c ****   tmpreg = SPIx->I2SCFGR;
+ 189:cpu/STM32F103/stm32f10x_spi.c ****   
+ 190:cpu/STM32F103/stm32f10x_spi.c ****   /* If the default value has to be written, reinitialize i2sdiv and i2sodd*/
+ 191:cpu/STM32F103/stm32f10x_spi.c ****   if(I2S_InitStruct->I2S_AudioFreq == I2S_AudioFreq_Default)
+ 248              		.loc 1 191 20 view .LVU68
+ 249 00c2 0B89     		ldrh	r3, [r1, #8]
+ 184:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->I2SPR = 0x0002;
+ 250              		.loc 1 184 17 view .LVU69
+ 251 00c4 22F47B62 		bic	r2, r2, #4016
+ 252 00c8 22F00F02 		bic	r2, r2, #15
+ 253 00cc 1204     		lsls	r2, r2, #16
+ 254 00ce 120C     		lsrs	r2, r2, #16
+ 255 00d0 8283     		strh	r2, [r0, #28]	@ movhi
+ 185:cpu/STM32F103/stm32f10x_spi.c ****   
+ 256              		.loc 1 185 3 is_stmt 1 view .LVU70
+ 185:cpu/STM32F103/stm32f10x_spi.c ****   
+ 257              		.loc 1 185 15 is_stmt 0 view .LVU71
+ 258 00d2 0484     		strh	r4, [r0, #32]	@ movhi
+ 188:cpu/STM32F103/stm32f10x_spi.c ****   
+ 259              		.loc 1 188 3 is_stmt 1 view .LVU72
+ 188:cpu/STM32F103/stm32f10x_spi.c ****   
+ 260              		.loc 1 188 10 is_stmt 0 view .LVU73
+ 261 00d4 848B     		ldrh	r4, [r0, #28]
+ 262              		.loc 1 191 5 view .LVU74
+ 263 00d6 022B     		cmp	r3, #2
+ 167:cpu/STM32F103/stm32f10x_spi.c ****   u16 tmpreg = 0, i2sdiv = 2, i2sodd = 0, packetlength = 1;
+ 264              		.loc 1 167 1 view .LVU75
+ 265 00d8 0546     		mov	r5, r0
+ 266 00da 0E46     		mov	r6, r1
+ 267 00dc 87B0     		sub	sp, sp, #28
+ 268              	.LCFI8:
+ 269              		.cfi_def_cfa_offset 48
+ 188:cpu/STM32F103/stm32f10x_spi.c ****   
+ 270              		.loc 1 188 10 view .LVU76
+ 271 00de A4B2     		uxth	r4, r4
+ 272              	.LVL17:
+ 273              		.loc 1 191 3 is_stmt 1 view .LVU77
+ 274              		.loc 1 191 5 is_stmt 0 view .LVU78
+ 275 00e0 3ED0     		beq	.L23
+ 192:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 193:cpu/STM32F103/stm32f10x_spi.c ****     i2sodd = (u16)0;
+ 194:cpu/STM32F103/stm32f10x_spi.c ****     i2sdiv = (u16)2;   
+ 195:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 196:cpu/STM32F103/stm32f10x_spi.c ****   /* If the requested audio frequency is not the default, compute the prescaler */
+ 197:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 198:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 199:cpu/STM32F103/stm32f10x_spi.c ****     /* Check the frame length (For the Prescaler computing) */
+ 200:cpu/STM32F103/stm32f10x_spi.c ****     if(I2S_InitStruct->I2S_DataFormat == I2S_DataFormat_16b)
+ 276              		.loc 1 200 5 is_stmt 1 view .LVU79
+ 277              		.loc 1 200 7 is_stmt 0 view .LVU80
+ 278 00e2 8B88     		ldrh	r3, [r1, #4]
+ 201:cpu/STM32F103/stm32f10x_spi.c ****     {
+ 202:cpu/STM32F103/stm32f10x_spi.c ****       /* Packet length is 16 bits */
+ 203:cpu/STM32F103/stm32f10x_spi.c ****       packetlength = 1;
+ 204:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 205:cpu/STM32F103/stm32f10x_spi.c ****     else
+ 206:cpu/STM32F103/stm32f10x_spi.c ****     {
+ 207:cpu/STM32F103/stm32f10x_spi.c ****       /* Packet length is 32 bits */
+ 208:cpu/STM32F103/stm32f10x_spi.c ****       packetlength = 2;
+ 209:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 210:cpu/STM32F103/stm32f10x_spi.c ****     /* Get System Clock frequency */
+ 211:cpu/STM32F103/stm32f10x_spi.c ****     RCC_GetClocksFreq(&RCC_Clocks);
+ 279              		.loc 1 211 5 view .LVU81
+ 280 00e4 01A8     		add	r0, sp, #4
+ 281              	.LVL18:
+ 208:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 282              		.loc 1 208 20 view .LVU82
+ 283 00e6 002B     		cmp	r3, #0
+ 284 00e8 0CBF     		ite	eq
+ 285 00ea 0127     		moveq	r7, #1
+ 286 00ec 0227     		movne	r7, #2
+ 287              	.LVL19:
+ 288              		.loc 1 211 5 is_stmt 1 view .LVU83
+ 289 00ee FFF7FEFF 		bl	RCC_GetClocksFreq
+ 290              	.LVL20:
+ 212:cpu/STM32F103/stm32f10x_spi.c ****     
+ 213:cpu/STM32F103/stm32f10x_spi.c ****     /* Compute the Real divider depending on the MCLK output state with a flaoting point */
+ 214:cpu/STM32F103/stm32f10x_spi.c ****     if(I2S_InitStruct->I2S_MCLKOutput == I2S_MCLKOutput_Enable)
+ 291              		.loc 1 214 5 view .LVU84
+ 292              		.loc 1 214 22 is_stmt 0 view .LVU85
+ 293 00f2 F188     		ldrh	r1, [r6, #6]
+ 294              		.loc 1 214 7 view .LVU86
+ 295 00f4 B1F5007F 		cmp	r1, #512
+ 296 00f8 27D0     		beq	.L24
+ 215:cpu/STM32F103/stm32f10x_spi.c ****     {
+ 216:cpu/STM32F103/stm32f10x_spi.c ****       /* MCLK output is enabled */
+ 217:cpu/STM32F103/stm32f10x_spi.c ****       tmp = (u16)(((10 * RCC_Clocks.SYSCLK_Frequency) / (256 * I2S_InitStruct->I2S_AudioFreq)) + 5)
+ 218:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 219:cpu/STM32F103/stm32f10x_spi.c ****     else
+ 220:cpu/STM32F103/stm32f10x_spi.c ****     {
+ 221:cpu/STM32F103/stm32f10x_spi.c ****       /* MCLK output is disabled */
+ 222:cpu/STM32F103/stm32f10x_spi.c ****       tmp = (u16)(((10 * RCC_Clocks.SYSCLK_Frequency) / (32 * packetlength * I2S_InitStruct->I2S_Au
+ 297              		.loc 1 222 7 is_stmt 1 view .LVU87
+ 298              		.loc 1 222 92 is_stmt 0 view .LVU88
+ 299 00fa 3389     		ldrh	r3, [r6, #8]
+ 300              		.loc 1 222 76 view .LVU89
+ 301 00fc 07FB03F3 		mul	r3, r7, r3
+ 302 0100 5801     		lsls	r0, r3, #5
+ 303              		.loc 1 222 24 view .LVU90
+ 304 0102 019B     		ldr	r3, [sp, #4]
+ 305 0104 03EB8303 		add	r3, r3, r3, lsl #2
+ 306 0108 5B00     		lsls	r3, r3, #1
+ 307              		.loc 1 222 55 view .LVU91
+ 308 010a B3FBF0F3 		udiv	r3, r3, r0
+ 309              		.loc 1 222 13 view .LVU92
+ 310 010e 0533     		adds	r3, r3, #5
+ 311              		.loc 1 222 11 view .LVU93
+ 312 0110 9BB2     		uxth	r3, r3
+ 313              	.LVL21:
+ 314              	.L19:
+ 223:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 224:cpu/STM32F103/stm32f10x_spi.c ****     
+ 225:cpu/STM32F103/stm32f10x_spi.c ****     /* Remove the flaoting point */
+ 226:cpu/STM32F103/stm32f10x_spi.c ****     tmp = tmp/10;  
+ 315              		.loc 1 226 5 is_stmt 1 view .LVU94
+ 316              		.loc 1 226 9 is_stmt 0 view .LVU95
+ 317 0112 144A     		ldr	r2, .L25
+ 318 0114 A2FB0323 		umull	r2, r3, r2, r3
+ 319              	.LVL22:
+ 227:cpu/STM32F103/stm32f10x_spi.c ****       
+ 228:cpu/STM32F103/stm32f10x_spi.c ****     /* Check the parity of the divider */
+ 229:cpu/STM32F103/stm32f10x_spi.c ****     i2sodd = (u16)(tmp & (u16)0x0001);
+ 320              		.loc 1 229 5 is_stmt 1 view .LVU96
+ 230:cpu/STM32F103/stm32f10x_spi.c ****    
+ 231:cpu/STM32F103/stm32f10x_spi.c ****     /* Compute the i2sdiv prescaler */
+ 232:cpu/STM32F103/stm32f10x_spi.c ****     i2sdiv = (u16)((tmp - i2sodd) / 2);
+ 321              		.loc 1 232 5 view .LVU97
+ 322              		.loc 1 232 12 is_stmt 0 view .LVU98
+ 323 0118 1A09     		lsrs	r2, r3, #4
+ 324              	.LVL23:
+ 233:cpu/STM32F103/stm32f10x_spi.c ****    
+ 234:cpu/STM32F103/stm32f10x_spi.c ****     /* Get the Mask for the Odd bit (SPI_I2SPR[8]) register */
+ 235:cpu/STM32F103/stm32f10x_spi.c ****     i2sodd = (u16) (i2sodd << 8);
+ 325              		.loc 1 235 5 is_stmt 1 view .LVU99
+ 236:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 237:cpu/STM32F103/stm32f10x_spi.c ****   
+ 238:cpu/STM32F103/stm32f10x_spi.c ****   /* Test if the divider is 1 or 0 */
+ 239:cpu/STM32F103/stm32f10x_spi.c ****   if ((i2sdiv < 2) || (i2sdiv > 0xFF))
+ 326              		.loc 1 239 6 is_stmt 0 view .LVU100
+ 327 011a 901E     		subs	r0, r2, #2
+ 328 011c FD28     		cmp	r0, #253
+ 232:cpu/STM32F103/stm32f10x_spi.c ****    
+ 329              		.loc 1 232 25 view .LVU101
+ 330 011e C3F3C003 		ubfx	r3, r3, #3, #1
+ 331              	.LVL24:
+ 332              		.loc 1 239 3 is_stmt 1 view .LVU102
+ 333 0122 8CBF     		ite	hi
+ 334 0124 0223     		movhi	r3, #2
+ 335              	.LVL25:
+ 240:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 241:cpu/STM32F103/stm32f10x_spi.c ****     /* Set the default values */
+ 242:cpu/STM32F103/stm32f10x_spi.c ****     i2sdiv = 2;
+ 243:cpu/STM32F103/stm32f10x_spi.c ****     i2sodd = 0;
+ 244:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 245:cpu/STM32F103/stm32f10x_spi.c **** 
+ 246:cpu/STM32F103/stm32f10x_spi.c ****   /* Write to SPIx I2SPR register the computed value */
+ 247:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->I2SPR = (u16)(i2sdiv | i2sodd | I2S_InitStruct->I2S_MCLKOutput);  
+ 336              		.loc 1 247 17 is_stmt 0 view .LVU103
+ 337 0126 42EA0323 		orrls	r3, r2, r3, lsl #8
+ 338              	.LVL26:
+ 339              	.L16:
+ 340              		.loc 1 247 3 is_stmt 1 view .LVU104
+ 341              		.loc 1 247 17 is_stmt 0 view .LVU105
+ 342 012a 0B43     		orrs	r3, r3, r1
+ 248:cpu/STM32F103/stm32f10x_spi.c ****  
+ 249:cpu/STM32F103/stm32f10x_spi.c ****   /* Configure the I2S with the SPI_InitStruct values */
+ 250:cpu/STM32F103/stm32f10x_spi.c ****   tmpreg |= (u16)(I2S_Mode_Select | I2S_InitStruct->I2S_Mode | \
+ 343              		.loc 1 250 10 view .LVU106
+ 344 012c 3288     		ldrh	r2, [r6]
+ 247:cpu/STM32F103/stm32f10x_spi.c ****  
+ 345              		.loc 1 247 15 view .LVU107
+ 346 012e 2B84     		strh	r3, [r5, #32]	@ movhi
+ 347              		.loc 1 250 3 is_stmt 1 view .LVU108
+ 348              		.loc 1 250 10 is_stmt 0 view .LVU109
+ 349 0130 7388     		ldrh	r3, [r6, #2]
+ 350 0132 B188     		ldrh	r1, [r6, #4]
+ 351 0134 1343     		orrs	r3, r3, r2
+ 352 0136 2343     		orrs	r3, r3, r4
+ 353 0138 7289     		ldrh	r2, [r6, #10]
+ 354 013a 0B43     		orrs	r3, r3, r1
+ 355 013c 1343     		orrs	r3, r3, r2
+ 356 013e 9BB2     		uxth	r3, r3
+ 357 0140 43F40063 		orr	r3, r3, #2048
+ 358              	.LVL27:
+ 251:cpu/STM32F103/stm32f10x_spi.c ****                   I2S_InitStruct->I2S_Standard | I2S_InitStruct->I2S_DataFormat | \
+ 252:cpu/STM32F103/stm32f10x_spi.c ****                   I2S_InitStruct->I2S_CPOL);
+ 253:cpu/STM32F103/stm32f10x_spi.c ****  
+ 254:cpu/STM32F103/stm32f10x_spi.c ****   /* Write to SPIx I2SCFGR */  
+ 255:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->I2SCFGR = tmpreg;                                    
+ 359              		.loc 1 255 3 is_stmt 1 view .LVU110
+ 360              		.loc 1 255 17 is_stmt 0 view .LVU111
+ 361 0144 AB83     		strh	r3, [r5, #28]	@ movhi
+ 256:cpu/STM32F103/stm32f10x_spi.c **** }
+ 362              		.loc 1 256 1 view .LVU112
+ 363 0146 07B0     		add	sp, sp, #28
+ 364              	.LCFI9:
+ 365              		.cfi_remember_state
+ 366              		.cfi_def_cfa_offset 20
+ 367              		@ sp needed
+ 368 0148 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 369              	.LVL28:
+ 370              	.L24:
+ 371              	.LCFI10:
+ 372              		.cfi_restore_state
+ 217:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 373              		.loc 1 217 7 is_stmt 1 view .LVU113
+ 217:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 374              		.loc 1 217 24 is_stmt 0 view .LVU114
+ 375 014a 019B     		ldr	r3, [sp, #4]
+ 217:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 376              		.loc 1 217 78 view .LVU115
+ 377 014c 3289     		ldrh	r2, [r6, #8]
+ 217:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 378              		.loc 1 217 24 view .LVU116
+ 379 014e 03EB8303 		add	r3, r3, r3, lsl #2
+ 380 0152 5B00     		lsls	r3, r3, #1
+ 217:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 381              		.loc 1 217 62 view .LVU117
+ 382 0154 1202     		lsls	r2, r2, #8
+ 217:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 383              		.loc 1 217 55 view .LVU118
+ 384 0156 B3FBF2F3 		udiv	r3, r3, r2
+ 217:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 385              		.loc 1 217 13 view .LVU119
+ 386 015a 0533     		adds	r3, r3, #5
+ 217:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 387              		.loc 1 217 11 view .LVU120
+ 388 015c 9BB2     		uxth	r3, r3
+ 389              	.LVL29:
+ 217:cpu/STM32F103/stm32f10x_spi.c ****     }
+ 390              		.loc 1 217 11 view .LVU121
+ 391 015e D8E7     		b	.L19
+ 392              	.LVL30:
+ 393              	.L23:
+ 247:cpu/STM32F103/stm32f10x_spi.c ****  
+ 394              		.loc 1 247 55 view .LVU122
+ 395 0160 C988     		ldrh	r1, [r1, #6]
+ 396              	.LVL31:
+ 247:cpu/STM32F103/stm32f10x_spi.c ****  
+ 397              		.loc 1 247 55 view .LVU123
+ 398 0162 E2E7     		b	.L16
+ 399              	.L26:
+ 400              		.align	2
+ 401              	.L25:
+ 402 0164 CDCCCCCC 		.word	-858993459
+ 403              		.cfi_endproc
+ 404              	.LFE2:
+ 406              		.align	1
+ 407              		.p2align 2,,3
+ 408              		.global	SPI_StructInit
+ 409              		.syntax unified
+ 410              		.thumb
+ 411              		.thumb_func
+ 413              	SPI_StructInit:
+ 414              	.LVL32:
+ 415              	.LFB3:
+ 257:cpu/STM32F103/stm32f10x_spi.c **** 
+ 258:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 259:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_StructInit
+ 260:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Fills each SPI_InitStruct member with its default value.
+ 261:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPI_InitStruct : pointer to a SPI_InitTypeDef structure
+ 262:cpu/STM32F103/stm32f10x_spi.c **** *                    which will be initialized.
+ 263:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 264:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 265:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 266:cpu/STM32F103/stm32f10x_spi.c **** void SPI_StructInit(SPI_InitTypeDef* SPI_InitStruct)
+ 267:cpu/STM32F103/stm32f10x_spi.c **** {
+ 416              		.loc 1 267 1 is_stmt 1 view -0
+ 417              		.cfi_startproc
+ 418              		@ args = 0, pretend = 0, frame = 0
+ 419              		@ frame_needed = 0, uses_anonymous_args = 0
+ 420              		@ link register save eliminated.
+ 268:cpu/STM32F103/stm32f10x_spi.c **** /*--------------- Reset SPI init structure parameters values -----------------*/
+ 269:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the SPI_Direction member */
+ 270:cpu/STM32F103/stm32f10x_spi.c ****   SPI_InitStruct->SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+ 421              		.loc 1 270 3 view .LVU125
+ 422              		.loc 1 270 33 is_stmt 0 view .LVU126
+ 423 0168 0023     		movs	r3, #0
+ 271:cpu/STM32F103/stm32f10x_spi.c **** 
+ 272:cpu/STM32F103/stm32f10x_spi.c ****   /* initialize the SPI_Mode member */
+ 273:cpu/STM32F103/stm32f10x_spi.c ****   SPI_InitStruct->SPI_Mode = SPI_Mode_Slave;
+ 274:cpu/STM32F103/stm32f10x_spi.c **** 
+ 275:cpu/STM32F103/stm32f10x_spi.c ****   /* initialize the SPI_DataSize member */
+ 276:cpu/STM32F103/stm32f10x_spi.c ****   SPI_InitStruct->SPI_DataSize = SPI_DataSize_8b;
+ 277:cpu/STM32F103/stm32f10x_spi.c **** 
+ 278:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the SPI_CPOL member */
+ 279:cpu/STM32F103/stm32f10x_spi.c ****   SPI_InitStruct->SPI_CPOL = SPI_CPOL_Low;
+ 280:cpu/STM32F103/stm32f10x_spi.c **** 
+ 281:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the SPI_CPHA member */
+ 282:cpu/STM32F103/stm32f10x_spi.c ****   SPI_InitStruct->SPI_CPHA = SPI_CPHA_1Edge;
+ 283:cpu/STM32F103/stm32f10x_spi.c **** 
+ 284:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the SPI_NSS member */
+ 285:cpu/STM32F103/stm32f10x_spi.c ****   SPI_InitStruct->SPI_NSS = SPI_NSS_Hard;
+ 286:cpu/STM32F103/stm32f10x_spi.c **** 
+ 287:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the SPI_BaudRatePrescaler member */
+ 288:cpu/STM32F103/stm32f10x_spi.c ****   SPI_InitStruct->SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
+ 289:cpu/STM32F103/stm32f10x_spi.c **** 
+ 290:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the SPI_FirstBit member */
+ 291:cpu/STM32F103/stm32f10x_spi.c ****   SPI_InitStruct->SPI_FirstBit = SPI_FirstBit_MSB;
+ 292:cpu/STM32F103/stm32f10x_spi.c **** 
+ 293:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the SPI_CRCPolynomial member */
+ 294:cpu/STM32F103/stm32f10x_spi.c ****   SPI_InitStruct->SPI_CRCPolynomial = 7;
+ 424              		.loc 1 294 37 view .LVU127
+ 425 016a 0722     		movs	r2, #7
+ 270:cpu/STM32F103/stm32f10x_spi.c **** 
+ 426              		.loc 1 270 33 view .LVU128
+ 427 016c 0380     		strh	r3, [r0]	@ movhi
+ 273:cpu/STM32F103/stm32f10x_spi.c **** 
+ 428              		.loc 1 273 3 is_stmt 1 view .LVU129
+ 273:cpu/STM32F103/stm32f10x_spi.c **** 
+ 429              		.loc 1 273 28 is_stmt 0 view .LVU130
+ 430 016e 4380     		strh	r3, [r0, #2]	@ movhi
+ 276:cpu/STM32F103/stm32f10x_spi.c **** 
+ 431              		.loc 1 276 3 is_stmt 1 view .LVU131
+ 276:cpu/STM32F103/stm32f10x_spi.c **** 
+ 432              		.loc 1 276 32 is_stmt 0 view .LVU132
+ 433 0170 8380     		strh	r3, [r0, #4]	@ movhi
+ 279:cpu/STM32F103/stm32f10x_spi.c **** 
+ 434              		.loc 1 279 3 is_stmt 1 view .LVU133
+ 279:cpu/STM32F103/stm32f10x_spi.c **** 
+ 435              		.loc 1 279 28 is_stmt 0 view .LVU134
+ 436 0172 C380     		strh	r3, [r0, #6]	@ movhi
+ 282:cpu/STM32F103/stm32f10x_spi.c **** 
+ 437              		.loc 1 282 3 is_stmt 1 view .LVU135
+ 282:cpu/STM32F103/stm32f10x_spi.c **** 
+ 438              		.loc 1 282 28 is_stmt 0 view .LVU136
+ 439 0174 0381     		strh	r3, [r0, #8]	@ movhi
+ 285:cpu/STM32F103/stm32f10x_spi.c **** 
+ 440              		.loc 1 285 3 is_stmt 1 view .LVU137
+ 285:cpu/STM32F103/stm32f10x_spi.c **** 
+ 441              		.loc 1 285 27 is_stmt 0 view .LVU138
+ 442 0176 4381     		strh	r3, [r0, #10]	@ movhi
+ 288:cpu/STM32F103/stm32f10x_spi.c **** 
+ 443              		.loc 1 288 3 is_stmt 1 view .LVU139
+ 288:cpu/STM32F103/stm32f10x_spi.c **** 
+ 444              		.loc 1 288 41 is_stmt 0 view .LVU140
+ 445 0178 8381     		strh	r3, [r0, #12]	@ movhi
+ 291:cpu/STM32F103/stm32f10x_spi.c **** 
+ 446              		.loc 1 291 3 is_stmt 1 view .LVU141
+ 291:cpu/STM32F103/stm32f10x_spi.c **** 
+ 447              		.loc 1 291 32 is_stmt 0 view .LVU142
+ 448 017a C381     		strh	r3, [r0, #14]	@ movhi
+ 449              		.loc 1 294 3 is_stmt 1 view .LVU143
+ 450              		.loc 1 294 37 is_stmt 0 view .LVU144
+ 451 017c 0282     		strh	r2, [r0, #16]	@ movhi
+ 295:cpu/STM32F103/stm32f10x_spi.c **** }
+ 452              		.loc 1 295 1 view .LVU145
+ 453 017e 7047     		bx	lr
+ 454              		.cfi_endproc
+ 455              	.LFE3:
+ 457              		.align	1
+ 458              		.p2align 2,,3
+ 459              		.global	I2S_StructInit
+ 460              		.syntax unified
+ 461              		.thumb
+ 462              		.thumb_func
+ 464              	I2S_StructInit:
+ 465              	.LVL33:
+ 466              	.LFB4:
+ 296:cpu/STM32F103/stm32f10x_spi.c **** 
+ 297:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 298:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : I2S_StructInit
+ 299:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Fills each I2S_InitStruct member with its default value.
+ 300:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - I2S_InitStruct : pointer to a I2S_InitTypeDef structure
+ 301:cpu/STM32F103/stm32f10x_spi.c **** *                    which will be initialized.
+ 302:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 303:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 304:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 305:cpu/STM32F103/stm32f10x_spi.c **** void I2S_StructInit(I2S_InitTypeDef* I2S_InitStruct)
+ 306:cpu/STM32F103/stm32f10x_spi.c **** {
+ 467              		.loc 1 306 1 is_stmt 1 view -0
+ 468              		.cfi_startproc
+ 469              		@ args = 0, pretend = 0, frame = 0
+ 470              		@ frame_needed = 0, uses_anonymous_args = 0
+ 471              		@ link register save eliminated.
+ 307:cpu/STM32F103/stm32f10x_spi.c **** /*--------------- Reset I2S init structure parameters values -----------------*/
+ 308:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the I2S_Mode member */
+ 309:cpu/STM32F103/stm32f10x_spi.c ****   I2S_InitStruct->I2S_Mode = I2S_Mode_SlaveTx;
+ 472              		.loc 1 309 3 view .LVU147
+ 473              		.loc 1 309 28 is_stmt 0 view .LVU148
+ 474 0180 0023     		movs	r3, #0
+ 310:cpu/STM32F103/stm32f10x_spi.c ****   
+ 311:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the I2S_Standard member */
+ 312:cpu/STM32F103/stm32f10x_spi.c ****   I2S_InitStruct->I2S_Standard = I2S_Standard_Phillips;
+ 313:cpu/STM32F103/stm32f10x_spi.c ****   
+ 314:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the I2S_DataFormat member */
+ 315:cpu/STM32F103/stm32f10x_spi.c ****   I2S_InitStruct->I2S_DataFormat = I2S_DataFormat_16b;
+ 316:cpu/STM32F103/stm32f10x_spi.c ****   
+ 317:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the I2S_MCLKOutput member */
+ 318:cpu/STM32F103/stm32f10x_spi.c ****   I2S_InitStruct->I2S_MCLKOutput = I2S_MCLKOutput_Disable;
+ 319:cpu/STM32F103/stm32f10x_spi.c ****   
+ 320:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the I2S_AudioFreq member */
+ 321:cpu/STM32F103/stm32f10x_spi.c ****   I2S_InitStruct->I2S_AudioFreq = I2S_AudioFreq_Default;
+ 475              		.loc 1 321 33 view .LVU149
+ 476 0182 0222     		movs	r2, #2
+ 309:cpu/STM32F103/stm32f10x_spi.c ****   
+ 477              		.loc 1 309 28 view .LVU150
+ 478 0184 0380     		strh	r3, [r0]	@ movhi
+ 312:cpu/STM32F103/stm32f10x_spi.c ****   
+ 479              		.loc 1 312 3 is_stmt 1 view .LVU151
+ 312:cpu/STM32F103/stm32f10x_spi.c ****   
+ 480              		.loc 1 312 32 is_stmt 0 view .LVU152
+ 481 0186 4380     		strh	r3, [r0, #2]	@ movhi
+ 315:cpu/STM32F103/stm32f10x_spi.c ****   
+ 482              		.loc 1 315 3 is_stmt 1 view .LVU153
+ 315:cpu/STM32F103/stm32f10x_spi.c ****   
+ 483              		.loc 1 315 34 is_stmt 0 view .LVU154
+ 484 0188 8380     		strh	r3, [r0, #4]	@ movhi
+ 318:cpu/STM32F103/stm32f10x_spi.c ****   
+ 485              		.loc 1 318 3 is_stmt 1 view .LVU155
+ 318:cpu/STM32F103/stm32f10x_spi.c ****   
+ 486              		.loc 1 318 34 is_stmt 0 view .LVU156
+ 487 018a C380     		strh	r3, [r0, #6]	@ movhi
+ 488              		.loc 1 321 3 is_stmt 1 view .LVU157
+ 489              		.loc 1 321 33 is_stmt 0 view .LVU158
+ 490 018c 0281     		strh	r2, [r0, #8]	@ movhi
+ 322:cpu/STM32F103/stm32f10x_spi.c ****   
+ 323:cpu/STM32F103/stm32f10x_spi.c ****   /* Initialize the I2S_CPOL member */
+ 324:cpu/STM32F103/stm32f10x_spi.c ****   I2S_InitStruct->I2S_CPOL = I2S_CPOL_Low;
+ 491              		.loc 1 324 3 is_stmt 1 view .LVU159
+ 492              		.loc 1 324 28 is_stmt 0 view .LVU160
+ 493 018e 4381     		strh	r3, [r0, #10]	@ movhi
+ 325:cpu/STM32F103/stm32f10x_spi.c **** }
+ 494              		.loc 1 325 1 view .LVU161
+ 495 0190 7047     		bx	lr
+ 496              		.cfi_endproc
+ 497              	.LFE4:
+ 499              		.align	1
+ 500 0192 00BF     		.p2align 2,,3
+ 501              		.global	SPI_Cmd
+ 502              		.syntax unified
+ 503              		.thumb
+ 504              		.thumb_func
+ 506              	SPI_Cmd:
+ 507              	.LVL34:
+ 508              	.LFB5:
+ 326:cpu/STM32F103/stm32f10x_spi.c **** 
+ 327:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 328:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_Cmd
+ 329:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Enables or disables the specified SPI peripheral.
+ 330:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 331:cpu/STM32F103/stm32f10x_spi.c **** *                  - NewState: new state of the SPIx peripheral. 
+ 332:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 333:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 334:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 335:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 336:cpu/STM32F103/stm32f10x_spi.c **** void SPI_Cmd(SPI_TypeDef* SPIx, FunctionalState NewState)
+ 337:cpu/STM32F103/stm32f10x_spi.c **** {
+ 509              		.loc 1 337 1 is_stmt 1 view -0
+ 510              		.cfi_startproc
+ 511              		@ args = 0, pretend = 0, frame = 0
+ 512              		@ frame_needed = 0, uses_anonymous_args = 0
+ 513              		@ link register save eliminated.
+ 338:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 339:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 514              		.loc 1 339 3 view .LVU163
+ 340:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 515              		.loc 1 340 3 view .LVU164
+ 341:cpu/STM32F103/stm32f10x_spi.c **** 
+ 342:cpu/STM32F103/stm32f10x_spi.c ****   if (NewState != DISABLE)
+ 516              		.loc 1 342 3 view .LVU165
+ 343:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 344:cpu/STM32F103/stm32f10x_spi.c ****     /* Enable the selected SPI peripheral */
+ 345:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 |= CR1_SPE_Set;
+ 517              		.loc 1 345 15 is_stmt 0 view .LVU166
+ 518 0194 0388     		ldrh	r3, [r0]
+ 342:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 519              		.loc 1 342 6 view .LVU167
+ 520 0196 21B1     		cbz	r1, .L30
+ 521              		.loc 1 345 5 is_stmt 1 view .LVU168
+ 522              		.loc 1 345 15 is_stmt 0 view .LVU169
+ 523 0198 9BB2     		uxth	r3, r3
+ 524 019a 43F04003 		orr	r3, r3, #64
+ 525 019e 0380     		strh	r3, [r0]	@ movhi
+ 526 01a0 7047     		bx	lr
+ 527              	.L30:
+ 346:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 347:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 348:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 349:cpu/STM32F103/stm32f10x_spi.c ****     /* Disable the selected SPI peripheral */
+ 350:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 &= CR1_SPE_Reset;
+ 528              		.loc 1 350 5 is_stmt 1 view .LVU170
+ 529              		.loc 1 350 15 is_stmt 0 view .LVU171
+ 530 01a2 23F04003 		bic	r3, r3, #64
+ 531 01a6 1B04     		lsls	r3, r3, #16
+ 532 01a8 1B0C     		lsrs	r3, r3, #16
+ 533 01aa 0380     		strh	r3, [r0]	@ movhi
+ 351:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 352:cpu/STM32F103/stm32f10x_spi.c **** }
+ 534              		.loc 1 352 1 view .LVU172
+ 535 01ac 7047     		bx	lr
+ 536              		.cfi_endproc
+ 537              	.LFE5:
+ 539              		.align	1
+ 540 01ae 00BF     		.p2align 2,,3
+ 541              		.global	I2S_Cmd
+ 542              		.syntax unified
+ 543              		.thumb
+ 544              		.thumb_func
+ 546              	I2S_Cmd:
+ 547              	.LVL35:
+ 548              	.LFB6:
+ 353:cpu/STM32F103/stm32f10x_spi.c **** 
+ 354:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 355:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : I2S_Cmd
+ 356:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Enables or disables the specified SPI peripheral (in I2S mode).
+ 357:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 2 or 3 to select the SPI peripheral.
+ 358:cpu/STM32F103/stm32f10x_spi.c **** *                  - NewState: new state of the SPIx peripheral. 
+ 359:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 360:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 361:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 362:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 363:cpu/STM32F103/stm32f10x_spi.c **** void I2S_Cmd(SPI_TypeDef* SPIx, FunctionalState NewState)
+ 364:cpu/STM32F103/stm32f10x_spi.c **** {
+ 549              		.loc 1 364 1 is_stmt 1 view -0
+ 550              		.cfi_startproc
+ 551              		@ args = 0, pretend = 0, frame = 0
+ 552              		@ frame_needed = 0, uses_anonymous_args = 0
+ 553              		@ link register save eliminated.
+ 365:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 366:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_23_PERIPH(SPIx));
+ 554              		.loc 1 366 3 view .LVU174
+ 367:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 555              		.loc 1 367 3 view .LVU175
+ 368:cpu/STM32F103/stm32f10x_spi.c **** 
+ 369:cpu/STM32F103/stm32f10x_spi.c ****   if (NewState != DISABLE)
+ 556              		.loc 1 369 3 view .LVU176
+ 370:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 371:cpu/STM32F103/stm32f10x_spi.c ****     /* Enable the selected SPI peripheral (in I2S mode) */
+ 372:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->I2SCFGR |= I2SCFGR_I2SE_Set;
+ 557              		.loc 1 372 19 is_stmt 0 view .LVU177
+ 558 01b0 838B     		ldrh	r3, [r0, #28]
+ 369:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 559              		.loc 1 369 6 view .LVU178
+ 560 01b2 21B1     		cbz	r1, .L33
+ 561              		.loc 1 372 5 is_stmt 1 view .LVU179
+ 562              		.loc 1 372 19 is_stmt 0 view .LVU180
+ 563 01b4 9BB2     		uxth	r3, r3
+ 564 01b6 43F48063 		orr	r3, r3, #1024
+ 565 01ba 8383     		strh	r3, [r0, #28]	@ movhi
+ 566 01bc 7047     		bx	lr
+ 567              	.L33:
+ 373:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 374:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 375:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 376:cpu/STM32F103/stm32f10x_spi.c ****     /* Disable the selected SPI peripheral (in I2S mode) */
+ 377:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->I2SCFGR &= I2SCFGR_I2SE_Reset;
+ 568              		.loc 1 377 5 is_stmt 1 view .LVU181
+ 569              		.loc 1 377 19 is_stmt 0 view .LVU182
+ 570 01be 23F48063 		bic	r3, r3, #1024
+ 571 01c2 1B04     		lsls	r3, r3, #16
+ 572 01c4 1B0C     		lsrs	r3, r3, #16
+ 573 01c6 8383     		strh	r3, [r0, #28]	@ movhi
+ 378:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 379:cpu/STM32F103/stm32f10x_spi.c **** }
+ 574              		.loc 1 379 1 view .LVU183
+ 575 01c8 7047     		bx	lr
+ 576              		.cfi_endproc
+ 577              	.LFE6:
+ 579              		.align	1
+ 580 01ca 00BF     		.p2align 2,,3
+ 581              		.global	SPI_I2S_ITConfig
+ 582              		.syntax unified
+ 583              		.thumb
+ 584              		.thumb_func
+ 586              	SPI_I2S_ITConfig:
+ 587              	.LVL36:
+ 588              	.LFB7:
+ 380:cpu/STM32F103/stm32f10x_spi.c **** 
+ 381:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 382:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_I2S_ITConfig
+ 383:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Enables or disables the specified SPI/I2S interrupts.
+ 384:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be :
+ 385:cpu/STM32F103/stm32f10x_spi.c **** *                         - 1, 2 or 3 in SPI mode 
+ 386:cpu/STM32F103/stm32f10x_spi.c **** *                         - 2 or 3 in I2S mode
+ 387:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_I2S_IT: specifies the SPI/I2S interrupt source to be 
+ 388:cpu/STM32F103/stm32f10x_spi.c **** *                    enabled or disabled. 
+ 389:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be one of the following values:
+ 390:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_IT_TXE: Tx buffer empty interrupt mask
+ 391:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_IT_RXNE: Rx buffer not empty interrupt mask
+ 392:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_IT_ERR: Error interrupt mask
+ 393:cpu/STM32F103/stm32f10x_spi.c **** *                  - NewState: new state of the specified SPI/I2S interrupt.
+ 394:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 395:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 396:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 397:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 398:cpu/STM32F103/stm32f10x_spi.c **** void SPI_I2S_ITConfig(SPI_TypeDef* SPIx, u8 SPI_I2S_IT, FunctionalState NewState)
+ 399:cpu/STM32F103/stm32f10x_spi.c **** {
+ 589              		.loc 1 399 1 is_stmt 1 view -0
+ 590              		.cfi_startproc
+ 591              		@ args = 0, pretend = 0, frame = 0
+ 592              		@ frame_needed = 0, uses_anonymous_args = 0
+ 593              		@ link register save eliminated.
+ 400:cpu/STM32F103/stm32f10x_spi.c ****   u16 itpos = 0, itmask = 0 ;
+ 594              		.loc 1 400 3 view .LVU185
+ 401:cpu/STM32F103/stm32f10x_spi.c **** 
+ 402:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 403:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 595              		.loc 1 403 3 view .LVU186
+ 404:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 596              		.loc 1 404 3 view .LVU187
+ 405:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_I2S_CONFIG_IT(SPI_I2S_IT));
+ 597              		.loc 1 405 3 view .LVU188
+ 406:cpu/STM32F103/stm32f10x_spi.c **** 
+ 407:cpu/STM32F103/stm32f10x_spi.c ****   /* Get the SPI/I2S IT index */
+ 408:cpu/STM32F103/stm32f10x_spi.c ****   itpos = SPI_I2S_IT >> 4;
+ 598              		.loc 1 408 3 view .LVU189
+ 409:cpu/STM32F103/stm32f10x_spi.c ****   /* Set the IT mask */
+ 410:cpu/STM32F103/stm32f10x_spi.c ****   itmask = (u16)((u16)1 << itpos);
+ 599              		.loc 1 410 3 view .LVU190
+ 600              		.loc 1 410 25 is_stmt 0 view .LVU191
+ 601 01cc 0123     		movs	r3, #1
+ 602 01ce 0909     		lsrs	r1, r1, #4
+ 603              	.LVL37:
+ 604              		.loc 1 410 25 view .LVU192
+ 605 01d0 8B40     		lsls	r3, r3, r1
+ 606              		.loc 1 410 10 view .LVU193
+ 607 01d2 9BB2     		uxth	r3, r3
+ 608              	.LVL38:
+ 411:cpu/STM32F103/stm32f10x_spi.c **** 
+ 412:cpu/STM32F103/stm32f10x_spi.c ****   if (NewState != DISABLE)
+ 609              		.loc 1 412 3 is_stmt 1 view .LVU194
+ 610              		.loc 1 412 6 is_stmt 0 view .LVU195
+ 611 01d4 22B1     		cbz	r2, .L36
+ 413:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 414:cpu/STM32F103/stm32f10x_spi.c ****     /* Enable the selected SPI/I2S interrupt */
+ 415:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR2 |= itmask;
+ 612              		.loc 1 415 5 is_stmt 1 view .LVU196
+ 613              		.loc 1 415 15 is_stmt 0 view .LVU197
+ 614 01d6 8288     		ldrh	r2, [r0, #4]
+ 615              	.LVL39:
+ 616              		.loc 1 415 15 view .LVU198
+ 617 01d8 92B2     		uxth	r2, r2
+ 618 01da 1343     		orrs	r3, r3, r2
+ 619              	.LVL40:
+ 620              		.loc 1 415 15 view .LVU199
+ 621 01dc 8380     		strh	r3, [r0, #4]	@ movhi
+ 622 01de 7047     		bx	lr
+ 623              	.LVL41:
+ 624              	.L36:
+ 416:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 417:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 418:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 419:cpu/STM32F103/stm32f10x_spi.c ****     /* Disable the selected SPI/I2S interrupt */
+ 420:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR2 &= (u16)~itmask;
+ 625              		.loc 1 420 5 is_stmt 1 view .LVU200
+ 626              		.loc 1 420 15 is_stmt 0 view .LVU201
+ 627 01e0 8288     		ldrh	r2, [r0, #4]
+ 628              	.LVL42:
+ 629              		.loc 1 420 15 view .LVU202
+ 630 01e2 92B2     		uxth	r2, r2
+ 631 01e4 22EA0303 		bic	r3, r2, r3
+ 632              	.LVL43:
+ 633              		.loc 1 420 15 view .LVU203
+ 634 01e8 8380     		strh	r3, [r0, #4]	@ movhi
+ 421:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 422:cpu/STM32F103/stm32f10x_spi.c **** }
+ 635              		.loc 1 422 1 view .LVU204
+ 636 01ea 7047     		bx	lr
+ 637              		.cfi_endproc
+ 638              	.LFE7:
+ 640              		.align	1
+ 641              		.p2align 2,,3
+ 642              		.global	SPI_I2S_DMACmd
+ 643              		.syntax unified
+ 644              		.thumb
+ 645              		.thumb_func
+ 647              	SPI_I2S_DMACmd:
+ 648              	.LVL44:
+ 649              	.LFB8:
+ 423:cpu/STM32F103/stm32f10x_spi.c **** 
+ 424:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 425:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_I2S_DMACmd
+ 426:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Enables or disables the SPIx/I2Sx DMA interface.
+ 427:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be :
+ 428:cpu/STM32F103/stm32f10x_spi.c **** *                         - 1, 2 or 3 in SPI mode 
+ 429:cpu/STM32F103/stm32f10x_spi.c **** *                         - 2 or 3 in I2S mode
+ 430:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_I2S_DMAReq: specifies the SPI/I2S DMA transfer request 
+ 431:cpu/STM32F103/stm32f10x_spi.c **** *                    to be enabled or disabled. 
+ 432:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be any combination of the following values:
+ 433:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_DMAReq_Tx: Tx buffer DMA transfer request
+ 434:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_DMAReq_Rx: Rx buffer DMA transfer request
+ 435:cpu/STM32F103/stm32f10x_spi.c **** *                  - NewState: new state of the selected SPI/I2S DMA transfer 
+ 436:cpu/STM32F103/stm32f10x_spi.c **** *                    request.
+ 437:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 438:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 439:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 440:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 441:cpu/STM32F103/stm32f10x_spi.c **** void SPI_I2S_DMACmd(SPI_TypeDef* SPIx, u16 SPI_I2S_DMAReq, FunctionalState NewState)
+ 442:cpu/STM32F103/stm32f10x_spi.c **** {
+ 650              		.loc 1 442 1 is_stmt 1 view -0
+ 651              		.cfi_startproc
+ 652              		@ args = 0, pretend = 0, frame = 0
+ 653              		@ frame_needed = 0, uses_anonymous_args = 0
+ 654              		@ link register save eliminated.
+ 443:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 444:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 655              		.loc 1 444 3 view .LVU206
+ 445:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 656              		.loc 1 445 3 view .LVU207
+ 446:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_I2S_DMAREQ(SPI_I2S_DMAReq));
+ 657              		.loc 1 446 3 view .LVU208
+ 447:cpu/STM32F103/stm32f10x_spi.c **** 
+ 448:cpu/STM32F103/stm32f10x_spi.c ****   if (NewState != DISABLE)
+ 658              		.loc 1 448 3 view .LVU209
+ 449:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 450:cpu/STM32F103/stm32f10x_spi.c ****     /* Enable the selected SPI/I2S DMA requests */
+ 451:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR2 |= SPI_I2S_DMAReq;
+ 659              		.loc 1 451 15 is_stmt 0 view .LVU210
+ 660 01ec 8388     		ldrh	r3, [r0, #4]
+ 661 01ee 9BB2     		uxth	r3, r3
+ 448:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 662              		.loc 1 448 6 view .LVU211
+ 663 01f0 12B1     		cbz	r2, .L39
+ 664              		.loc 1 451 5 is_stmt 1 view .LVU212
+ 665              		.loc 1 451 15 is_stmt 0 view .LVU213
+ 666 01f2 1943     		orrs	r1, r1, r3
+ 667              	.LVL45:
+ 668              		.loc 1 451 15 view .LVU214
+ 669 01f4 8180     		strh	r1, [r0, #4]	@ movhi
+ 670 01f6 7047     		bx	lr
+ 671              	.LVL46:
+ 672              	.L39:
+ 452:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 453:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 454:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 455:cpu/STM32F103/stm32f10x_spi.c ****     /* Disable the selected SPI/I2S DMA requests */
+ 456:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR2 &= (u16)~SPI_I2S_DMAReq;
+ 673              		.loc 1 456 5 is_stmt 1 view .LVU215
+ 674              		.loc 1 456 15 is_stmt 0 view .LVU216
+ 675 01f8 23EA0101 		bic	r1, r3, r1
+ 676              	.LVL47:
+ 677              		.loc 1 456 15 view .LVU217
+ 678 01fc 8180     		strh	r1, [r0, #4]	@ movhi
+ 457:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 458:cpu/STM32F103/stm32f10x_spi.c **** }
+ 679              		.loc 1 458 1 view .LVU218
+ 680 01fe 7047     		bx	lr
+ 681              		.cfi_endproc
+ 682              	.LFE8:
+ 684              		.align	1
+ 685              		.p2align 2,,3
+ 686              		.global	SPI_I2S_SendData
+ 687              		.syntax unified
+ 688              		.thumb
+ 689              		.thumb_func
+ 691              	SPI_I2S_SendData:
+ 692              	.LVL48:
+ 693              	.LFB9:
+ 459:cpu/STM32F103/stm32f10x_spi.c **** 
+ 460:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 461:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_I2S_SendData
+ 462:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Transmits a Data through the SPIx/I2Sx peripheral.
+ 463:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be :
+ 464:cpu/STM32F103/stm32f10x_spi.c **** *                         - 1, 2 or 3 in SPI mode 
+ 465:cpu/STM32F103/stm32f10x_spi.c **** *                         - 2 or 3 in I2S mode
+ 466:cpu/STM32F103/stm32f10x_spi.c **** *                  - Data : Data to be transmitted..
+ 467:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 468:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 469:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 470:cpu/STM32F103/stm32f10x_spi.c **** void SPI_I2S_SendData(SPI_TypeDef* SPIx, u16 Data)
+ 471:cpu/STM32F103/stm32f10x_spi.c **** {
+ 694              		.loc 1 471 1 is_stmt 1 view -0
+ 695              		.cfi_startproc
+ 696              		@ args = 0, pretend = 0, frame = 0
+ 697              		@ frame_needed = 0, uses_anonymous_args = 0
+ 698              		@ link register save eliminated.
+ 472:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 473:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 699              		.loc 1 473 3 view .LVU220
+ 474:cpu/STM32F103/stm32f10x_spi.c ****   
+ 475:cpu/STM32F103/stm32f10x_spi.c ****   /* Write in the DR register the data to be sent */
+ 476:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->DR = Data;
+ 700              		.loc 1 476 3 view .LVU221
+ 701              		.loc 1 476 12 is_stmt 0 view .LVU222
+ 702 0200 8181     		strh	r1, [r0, #12]	@ movhi
+ 477:cpu/STM32F103/stm32f10x_spi.c **** }
+ 703              		.loc 1 477 1 view .LVU223
+ 704 0202 7047     		bx	lr
+ 705              		.cfi_endproc
+ 706              	.LFE9:
+ 708              		.align	1
+ 709              		.p2align 2,,3
+ 710              		.global	SPI_I2S_ReceiveData
+ 711              		.syntax unified
+ 712              		.thumb
+ 713              		.thumb_func
+ 715              	SPI_I2S_ReceiveData:
+ 716              	.LVL49:
+ 717              	.LFB10:
+ 478:cpu/STM32F103/stm32f10x_spi.c **** 
+ 479:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 480:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_I2S_ReceiveData
+ 481:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Returns the most recent received data by the SPIx/I2Sx peripheral. 
+ 482:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be :
+ 483:cpu/STM32F103/stm32f10x_spi.c **** *                         - 1, 2 or 3 in SPI mode 
+ 484:cpu/STM32F103/stm32f10x_spi.c **** *                         - 2 or 3 in I2S mode
+ 485:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 486:cpu/STM32F103/stm32f10x_spi.c **** * Return         : The value of the received data.
+ 487:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 488:cpu/STM32F103/stm32f10x_spi.c **** u16 SPI_I2S_ReceiveData(SPI_TypeDef* SPIx)
+ 489:cpu/STM32F103/stm32f10x_spi.c **** {
+ 718              		.loc 1 489 1 is_stmt 1 view -0
+ 719              		.cfi_startproc
+ 720              		@ args = 0, pretend = 0, frame = 0
+ 721              		@ frame_needed = 0, uses_anonymous_args = 0
+ 722              		@ link register save eliminated.
+ 490:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 491:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 723              		.loc 1 491 3 view .LVU225
+ 492:cpu/STM32F103/stm32f10x_spi.c ****   
+ 493:cpu/STM32F103/stm32f10x_spi.c ****   /* Return the data in the DR register */
+ 494:cpu/STM32F103/stm32f10x_spi.c ****   return SPIx->DR;
+ 724              		.loc 1 494 3 view .LVU226
+ 725              		.loc 1 494 14 is_stmt 0 view .LVU227
+ 726 0204 8089     		ldrh	r0, [r0, #12]
+ 727              	.LVL50:
+ 495:cpu/STM32F103/stm32f10x_spi.c **** }
+ 728              		.loc 1 495 1 view .LVU228
+ 729 0206 80B2     		uxth	r0, r0
+ 730 0208 7047     		bx	lr
+ 731              		.cfi_endproc
+ 732              	.LFE10:
+ 734              		.align	1
+ 735 020a 00BF     		.p2align 2,,3
+ 736              		.global	SPI_NSSInternalSoftwareConfig
+ 737              		.syntax unified
+ 738              		.thumb
+ 739              		.thumb_func
+ 741              	SPI_NSSInternalSoftwareConfig:
+ 742              	.LVL51:
+ 743              	.LFB11:
+ 496:cpu/STM32F103/stm32f10x_spi.c **** 
+ 497:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 498:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_NSSInternalSoftwareConfig
+ 499:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Configures internally by software the NSS pin for the selected 
+ 500:cpu/STM32F103/stm32f10x_spi.c **** *                  SPI.
+ 501:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 502:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_NSSInternalSoft: specifies the SPI NSS internal state.
+ 503:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be one of the following values:
+ 504:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_NSSInternalSoft_Set: Set NSS pin internally
+ 505:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_NSSInternalSoft_Reset: Reset NSS pin internally
+ 506:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 507:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 508:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 509:cpu/STM32F103/stm32f10x_spi.c **** void SPI_NSSInternalSoftwareConfig(SPI_TypeDef* SPIx, u16 SPI_NSSInternalSoft)
+ 510:cpu/STM32F103/stm32f10x_spi.c **** {
+ 744              		.loc 1 510 1 is_stmt 1 view -0
+ 745              		.cfi_startproc
+ 746              		@ args = 0, pretend = 0, frame = 0
+ 747              		@ frame_needed = 0, uses_anonymous_args = 0
+ 748              		@ link register save eliminated.
+ 511:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 512:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 749              		.loc 1 512 3 view .LVU230
+ 513:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_NSS_INTERNAL(SPI_NSSInternalSoft));
+ 750              		.loc 1 513 3 view .LVU231
+ 514:cpu/STM32F103/stm32f10x_spi.c **** 
+ 515:cpu/STM32F103/stm32f10x_spi.c ****   if (SPI_NSSInternalSoft != SPI_NSSInternalSoft_Reset)
+ 751              		.loc 1 515 3 view .LVU232
+ 752              		.loc 1 515 6 is_stmt 0 view .LVU233
+ 753 020c 4FF6FF63 		movw	r3, #65279
+ 754 0210 9942     		cmp	r1, r3
+ 516:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 517:cpu/STM32F103/stm32f10x_spi.c ****     /* Set NSS pin internally by software */
+ 518:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 |= SPI_NSSInternalSoft_Set;
+ 755              		.loc 1 518 15 view .LVU234
+ 756 0212 0388     		ldrh	r3, [r0]
+ 515:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 757              		.loc 1 515 6 view .LVU235
+ 758 0214 04D0     		beq	.L44
+ 759              		.loc 1 518 5 is_stmt 1 view .LVU236
+ 760              		.loc 1 518 15 is_stmt 0 view .LVU237
+ 761 0216 9BB2     		uxth	r3, r3
+ 762 0218 43F48073 		orr	r3, r3, #256
+ 763 021c 0380     		strh	r3, [r0]	@ movhi
+ 764 021e 7047     		bx	lr
+ 765              	.L44:
+ 519:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 520:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 521:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 522:cpu/STM32F103/stm32f10x_spi.c ****     /* Reset NSS pin internally by software */
+ 523:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 &= SPI_NSSInternalSoft_Reset;
+ 766              		.loc 1 523 5 is_stmt 1 view .LVU238
+ 767              		.loc 1 523 15 is_stmt 0 view .LVU239
+ 768 0220 23F48073 		bic	r3, r3, #256
+ 769 0224 1B04     		lsls	r3, r3, #16
+ 770 0226 1B0C     		lsrs	r3, r3, #16
+ 771 0228 0380     		strh	r3, [r0]	@ movhi
+ 524:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 525:cpu/STM32F103/stm32f10x_spi.c **** }
+ 772              		.loc 1 525 1 view .LVU240
+ 773 022a 7047     		bx	lr
+ 774              		.cfi_endproc
+ 775              	.LFE11:
+ 777              		.align	1
+ 778              		.p2align 2,,3
+ 779              		.global	SPI_SSOutputCmd
+ 780              		.syntax unified
+ 781              		.thumb
+ 782              		.thumb_func
+ 784              	SPI_SSOutputCmd:
+ 785              	.LVL52:
+ 786              	.LFB12:
+ 526:cpu/STM32F103/stm32f10x_spi.c **** 
+ 527:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 528:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_SSOutputCmd
+ 529:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Enables or disables the SS output for the selected SPI.
+ 530:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 531:cpu/STM32F103/stm32f10x_spi.c **** *                  - NewState: new state of the SPIx SS output. 
+ 532:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 533:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 534:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 535:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 536:cpu/STM32F103/stm32f10x_spi.c **** void SPI_SSOutputCmd(SPI_TypeDef* SPIx, FunctionalState NewState)
+ 537:cpu/STM32F103/stm32f10x_spi.c **** {
+ 787              		.loc 1 537 1 is_stmt 1 view -0
+ 788              		.cfi_startproc
+ 789              		@ args = 0, pretend = 0, frame = 0
+ 790              		@ frame_needed = 0, uses_anonymous_args = 0
+ 791              		@ link register save eliminated.
+ 538:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 539:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 792              		.loc 1 539 3 view .LVU242
+ 540:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 793              		.loc 1 540 3 view .LVU243
+ 541:cpu/STM32F103/stm32f10x_spi.c **** 
+ 542:cpu/STM32F103/stm32f10x_spi.c ****   if (NewState != DISABLE)
+ 794              		.loc 1 542 3 view .LVU244
+ 543:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 544:cpu/STM32F103/stm32f10x_spi.c ****     /* Enable the selected SPI SS output */
+ 545:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR2 |= CR2_SSOE_Set;
+ 795              		.loc 1 545 15 is_stmt 0 view .LVU245
+ 796 022c 8388     		ldrh	r3, [r0, #4]
+ 542:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 797              		.loc 1 542 6 view .LVU246
+ 798 022e 21B1     		cbz	r1, .L47
+ 799              		.loc 1 545 5 is_stmt 1 view .LVU247
+ 800              		.loc 1 545 15 is_stmt 0 view .LVU248
+ 801 0230 9BB2     		uxth	r3, r3
+ 802 0232 43F00403 		orr	r3, r3, #4
+ 803 0236 8380     		strh	r3, [r0, #4]	@ movhi
+ 804 0238 7047     		bx	lr
+ 805              	.L47:
+ 546:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 547:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 548:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 549:cpu/STM32F103/stm32f10x_spi.c ****     /* Disable the selected SPI SS output */
+ 550:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR2 &= CR2_SSOE_Reset;
+ 806              		.loc 1 550 5 is_stmt 1 view .LVU249
+ 807              		.loc 1 550 15 is_stmt 0 view .LVU250
+ 808 023a 23F00403 		bic	r3, r3, #4
+ 809 023e 1B04     		lsls	r3, r3, #16
+ 810 0240 1B0C     		lsrs	r3, r3, #16
+ 811 0242 8380     		strh	r3, [r0, #4]	@ movhi
+ 551:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 552:cpu/STM32F103/stm32f10x_spi.c **** }
+ 812              		.loc 1 552 1 view .LVU251
+ 813 0244 7047     		bx	lr
+ 814              		.cfi_endproc
+ 815              	.LFE12:
+ 817              		.align	1
+ 818 0246 00BF     		.p2align 2,,3
+ 819              		.global	SPI_DataSizeConfig
+ 820              		.syntax unified
+ 821              		.thumb
+ 822              		.thumb_func
+ 824              	SPI_DataSizeConfig:
+ 825              	.LVL53:
+ 826              	.LFB13:
+ 553:cpu/STM32F103/stm32f10x_spi.c **** 
+ 554:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 555:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_DataSizeConfig
+ 556:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Configures the data size for the selected SPI.
+ 557:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 558:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_DataSize: specifies the SPI data size.
+ 559:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be one of the following values:
+ 560:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_DataSize_16b: Set data frame format to 16bit
+ 561:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_DataSize_8b: Set data frame format to 8bit
+ 562:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 563:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 564:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 565:cpu/STM32F103/stm32f10x_spi.c **** void SPI_DataSizeConfig(SPI_TypeDef* SPIx, u16 SPI_DataSize)
+ 566:cpu/STM32F103/stm32f10x_spi.c **** {
+ 827              		.loc 1 566 1 is_stmt 1 view -0
+ 828              		.cfi_startproc
+ 829              		@ args = 0, pretend = 0, frame = 0
+ 830              		@ frame_needed = 0, uses_anonymous_args = 0
+ 831              		@ link register save eliminated.
+ 567:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 568:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 832              		.loc 1 568 3 view .LVU253
+ 569:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_DATASIZE(SPI_DataSize));
+ 833              		.loc 1 569 3 view .LVU254
+ 570:cpu/STM32F103/stm32f10x_spi.c **** 
+ 571:cpu/STM32F103/stm32f10x_spi.c ****   /* Clear DFF bit */
+ 572:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->CR1 &= (u16)~SPI_DataSize_16b;
+ 834              		.loc 1 572 3 view .LVU255
+ 835              		.loc 1 572 13 is_stmt 0 view .LVU256
+ 836 0248 0388     		ldrh	r3, [r0]
+ 837 024a 23F40063 		bic	r3, r3, #2048
+ 838 024e 1B04     		lsls	r3, r3, #16
+ 839 0250 1B0C     		lsrs	r3, r3, #16
+ 840 0252 0380     		strh	r3, [r0]	@ movhi
+ 573:cpu/STM32F103/stm32f10x_spi.c ****   /* Set new DFF bit value */
+ 574:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->CR1 |= SPI_DataSize;
+ 841              		.loc 1 574 3 is_stmt 1 view .LVU257
+ 842              		.loc 1 574 13 is_stmt 0 view .LVU258
+ 843 0254 0388     		ldrh	r3, [r0]
+ 844 0256 9BB2     		uxth	r3, r3
+ 845 0258 0B43     		orrs	r3, r3, r1
+ 846 025a 0380     		strh	r3, [r0]	@ movhi
+ 575:cpu/STM32F103/stm32f10x_spi.c **** }
+ 847              		.loc 1 575 1 view .LVU259
+ 848 025c 7047     		bx	lr
+ 849              		.cfi_endproc
+ 850              	.LFE13:
+ 852              		.align	1
+ 853 025e 00BF     		.p2align 2,,3
+ 854              		.global	SPI_TransmitCRC
+ 855              		.syntax unified
+ 856              		.thumb
+ 857              		.thumb_func
+ 859              	SPI_TransmitCRC:
+ 860              	.LVL54:
+ 861              	.LFB14:
+ 576:cpu/STM32F103/stm32f10x_spi.c **** 
+ 577:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 578:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_TransmitCRC
+ 579:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Transmit the SPIx CRC value.
+ 580:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 581:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 582:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 583:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 584:cpu/STM32F103/stm32f10x_spi.c **** void SPI_TransmitCRC(SPI_TypeDef* SPIx)
+ 585:cpu/STM32F103/stm32f10x_spi.c **** {
+ 862              		.loc 1 585 1 is_stmt 1 view -0
+ 863              		.cfi_startproc
+ 864              		@ args = 0, pretend = 0, frame = 0
+ 865              		@ frame_needed = 0, uses_anonymous_args = 0
+ 866              		@ link register save eliminated.
+ 586:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 587:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 867              		.loc 1 587 3 view .LVU261
+ 588:cpu/STM32F103/stm32f10x_spi.c ****   
+ 589:cpu/STM32F103/stm32f10x_spi.c ****   /* Enable the selected SPI CRC transmission */
+ 590:cpu/STM32F103/stm32f10x_spi.c ****   SPIx->CR1 |= CR1_CRCNext_Set;
+ 868              		.loc 1 590 3 view .LVU262
+ 869              		.loc 1 590 13 is_stmt 0 view .LVU263
+ 870 0260 0388     		ldrh	r3, [r0]
+ 871 0262 9BB2     		uxth	r3, r3
+ 872 0264 43F48053 		orr	r3, r3, #4096
+ 873 0268 0380     		strh	r3, [r0]	@ movhi
+ 591:cpu/STM32F103/stm32f10x_spi.c **** }
+ 874              		.loc 1 591 1 view .LVU264
+ 875 026a 7047     		bx	lr
+ 876              		.cfi_endproc
+ 877              	.LFE14:
+ 879              		.align	1
+ 880              		.p2align 2,,3
+ 881              		.global	SPI_CalculateCRC
+ 882              		.syntax unified
+ 883              		.thumb
+ 884              		.thumb_func
+ 886              	SPI_CalculateCRC:
+ 887              	.LVL55:
+ 888              	.LFB15:
+ 592:cpu/STM32F103/stm32f10x_spi.c **** 
+ 593:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 594:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_CalculateCRC
+ 595:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Enables or disables the CRC value calculation of the
+ 596:cpu/STM32F103/stm32f10x_spi.c **** *                  transfered bytes.
+ 597:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 598:cpu/STM32F103/stm32f10x_spi.c **** *                  - NewState: new state of the SPIx CRC value calculation.
+ 599:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 600:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 601:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 602:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 603:cpu/STM32F103/stm32f10x_spi.c **** void SPI_CalculateCRC(SPI_TypeDef* SPIx, FunctionalState NewState)
+ 604:cpu/STM32F103/stm32f10x_spi.c **** {
+ 889              		.loc 1 604 1 is_stmt 1 view -0
+ 890              		.cfi_startproc
+ 891              		@ args = 0, pretend = 0, frame = 0
+ 892              		@ frame_needed = 0, uses_anonymous_args = 0
+ 893              		@ link register save eliminated.
+ 605:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 606:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 894              		.loc 1 606 3 view .LVU266
+ 607:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 895              		.loc 1 607 3 view .LVU267
+ 608:cpu/STM32F103/stm32f10x_spi.c **** 
+ 609:cpu/STM32F103/stm32f10x_spi.c ****   if (NewState != DISABLE)
+ 896              		.loc 1 609 3 view .LVU268
+ 610:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 611:cpu/STM32F103/stm32f10x_spi.c ****     /* Enable the selected SPI CRC calculation */
+ 612:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 |= CR1_CRCEN_Set;
+ 897              		.loc 1 612 15 is_stmt 0 view .LVU269
+ 898 026c 0388     		ldrh	r3, [r0]
+ 609:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 899              		.loc 1 609 6 view .LVU270
+ 900 026e 21B1     		cbz	r1, .L52
+ 901              		.loc 1 612 5 is_stmt 1 view .LVU271
+ 902              		.loc 1 612 15 is_stmt 0 view .LVU272
+ 903 0270 9BB2     		uxth	r3, r3
+ 904 0272 43F40053 		orr	r3, r3, #8192
+ 905 0276 0380     		strh	r3, [r0]	@ movhi
+ 906 0278 7047     		bx	lr
+ 907              	.L52:
+ 613:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 614:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 615:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 616:cpu/STM32F103/stm32f10x_spi.c ****     /* Disable the selected SPI CRC calculation */
+ 617:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 &= CR1_CRCEN_Reset;
+ 908              		.loc 1 617 5 is_stmt 1 view .LVU273
+ 909              		.loc 1 617 15 is_stmt 0 view .LVU274
+ 910 027a 23F40053 		bic	r3, r3, #8192
+ 911 027e 1B04     		lsls	r3, r3, #16
+ 912 0280 1B0C     		lsrs	r3, r3, #16
+ 913 0282 0380     		strh	r3, [r0]	@ movhi
+ 618:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 619:cpu/STM32F103/stm32f10x_spi.c **** }
+ 914              		.loc 1 619 1 view .LVU275
+ 915 0284 7047     		bx	lr
+ 916              		.cfi_endproc
+ 917              	.LFE15:
+ 919              		.align	1
+ 920 0286 00BF     		.p2align 2,,3
+ 921              		.global	SPI_GetCRC
+ 922              		.syntax unified
+ 923              		.thumb
+ 924              		.thumb_func
+ 926              	SPI_GetCRC:
+ 927              	.LVL56:
+ 928              	.LFB16:
+ 620:cpu/STM32F103/stm32f10x_spi.c **** 
+ 621:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 622:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_GetCRC
+ 623:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Returns the transmit or the receive CRC register value for
+ 624:cpu/STM32F103/stm32f10x_spi.c **** *                  the specified SPI.
+ 625:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 626:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_CRC: specifies the CRC register to be read.
+ 627:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be one of the following values:
+ 628:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_CRC_Tx: Selects Tx CRC register
+ 629:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_CRC_Rx: Selects Rx CRC register
+ 630:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 631:cpu/STM32F103/stm32f10x_spi.c **** * Return         : The selected CRC register value..
+ 632:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 633:cpu/STM32F103/stm32f10x_spi.c **** u16 SPI_GetCRC(SPI_TypeDef* SPIx, u8 SPI_CRC)
+ 634:cpu/STM32F103/stm32f10x_spi.c **** {
+ 929              		.loc 1 634 1 is_stmt 1 view -0
+ 930              		.cfi_startproc
+ 931              		@ args = 0, pretend = 0, frame = 0
+ 932              		@ frame_needed = 0, uses_anonymous_args = 0
+ 933              		@ link register save eliminated.
+ 635:cpu/STM32F103/stm32f10x_spi.c ****   u16 crcreg = 0;
+ 934              		.loc 1 635 3 view .LVU277
+ 636:cpu/STM32F103/stm32f10x_spi.c **** 
+ 637:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 638:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 935              		.loc 1 638 3 view .LVU278
+ 639:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_CRC(SPI_CRC));
+ 936              		.loc 1 639 3 view .LVU279
+ 640:cpu/STM32F103/stm32f10x_spi.c **** 
+ 641:cpu/STM32F103/stm32f10x_spi.c ****   if (SPI_CRC != SPI_CRC_Rx)
+ 937              		.loc 1 641 3 view .LVU280
+ 938              		.loc 1 641 6 is_stmt 0 view .LVU281
+ 939 0288 0129     		cmp	r1, #1
+ 642:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 643:cpu/STM32F103/stm32f10x_spi.c ****     /* Get the Tx CRC register */
+ 644:cpu/STM32F103/stm32f10x_spi.c ****     crcreg = SPIx->TXCRCR;
+ 940              		.loc 1 644 5 is_stmt 1 view .LVU282
+ 941              		.loc 1 644 12 is_stmt 0 view .LVU283
+ 942 028a 14BF     		ite	ne
+ 943 028c 008B     		ldrhne	r0, [r0, #24]
+ 944              	.LVL57:
+ 645:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 646:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 647:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 648:cpu/STM32F103/stm32f10x_spi.c ****     /* Get the Rx CRC register */
+ 649:cpu/STM32F103/stm32f10x_spi.c ****     crcreg = SPIx->RXCRCR;
+ 945              		.loc 1 649 5 is_stmt 1 view .LVU284
+ 946              		.loc 1 649 12 is_stmt 0 view .LVU285
+ 947 028e 808A     		ldrheq	r0, [r0, #20]
+ 948 0290 80B2     		uxth	r0, r0
+ 949              	.LVL58:
+ 650:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 651:cpu/STM32F103/stm32f10x_spi.c **** 
+ 652:cpu/STM32F103/stm32f10x_spi.c ****   /* Return the selected CRC register */
+ 653:cpu/STM32F103/stm32f10x_spi.c ****   return crcreg;
+ 950              		.loc 1 653 3 is_stmt 1 view .LVU286
+ 654:cpu/STM32F103/stm32f10x_spi.c **** }
+ 951              		.loc 1 654 1 is_stmt 0 view .LVU287
+ 952 0292 7047     		bx	lr
+ 953              		.cfi_endproc
+ 954              	.LFE16:
+ 956              		.align	1
+ 957              		.p2align 2,,3
+ 958              		.global	SPI_GetCRCPolynomial
+ 959              		.syntax unified
+ 960              		.thumb
+ 961              		.thumb_func
+ 963              	SPI_GetCRCPolynomial:
+ 964              	.LVL59:
+ 965              	.LFB17:
+ 655:cpu/STM32F103/stm32f10x_spi.c **** 
+ 656:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 657:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_GetCRCPolynomial
+ 658:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Returns the CRC Polynomial register value for the specified SPI.
+ 659:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 660:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 661:cpu/STM32F103/stm32f10x_spi.c **** * Return         : The CRC Polynomial register value.
+ 662:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 663:cpu/STM32F103/stm32f10x_spi.c **** u16 SPI_GetCRCPolynomial(SPI_TypeDef* SPIx)
+ 664:cpu/STM32F103/stm32f10x_spi.c **** {
+ 966              		.loc 1 664 1 is_stmt 1 view -0
+ 967              		.cfi_startproc
+ 968              		@ args = 0, pretend = 0, frame = 0
+ 969              		@ frame_needed = 0, uses_anonymous_args = 0
+ 970              		@ link register save eliminated.
+ 665:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 666:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 971              		.loc 1 666 3 view .LVU289
+ 667:cpu/STM32F103/stm32f10x_spi.c ****   
+ 668:cpu/STM32F103/stm32f10x_spi.c ****   /* Return the CRC polynomial register */
+ 669:cpu/STM32F103/stm32f10x_spi.c ****   return SPIx->CRCPR;
+ 972              		.loc 1 669 3 view .LVU290
+ 973              		.loc 1 669 14 is_stmt 0 view .LVU291
+ 974 0294 008A     		ldrh	r0, [r0, #16]
+ 975              	.LVL60:
+ 670:cpu/STM32F103/stm32f10x_spi.c **** }
+ 976              		.loc 1 670 1 view .LVU292
+ 977 0296 80B2     		uxth	r0, r0
+ 978 0298 7047     		bx	lr
+ 979              		.cfi_endproc
+ 980              	.LFE17:
+ 982              		.align	1
+ 983 029a 00BF     		.p2align 2,,3
+ 984              		.global	SPI_BiDirectionalLineConfig
+ 985              		.syntax unified
+ 986              		.thumb
+ 987              		.thumb_func
+ 989              	SPI_BiDirectionalLineConfig:
+ 990              	.LVL61:
+ 991              	.LFB18:
+ 671:cpu/STM32F103/stm32f10x_spi.c **** 
+ 672:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 673:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_BiDirectionalLineConfig
+ 674:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Selects the data transfer direction in bi-directional mode
+ 675:cpu/STM32F103/stm32f10x_spi.c **** *                  for the specified SPI.
+ 676:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be 1, 2 or 3 to select the SPI peripheral.
+ 677:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_Direction: specifies the data transfer direction in
+ 678:cpu/STM32F103/stm32f10x_spi.c **** *                    bi-directional mode. 
+ 679:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be one of the following values:
+ 680:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_Direction_Tx: Selects Tx transmission direction
+ 681:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_Direction_Rx: Selects Rx receive direction
+ 682:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 683:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 684:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 685:cpu/STM32F103/stm32f10x_spi.c **** void SPI_BiDirectionalLineConfig(SPI_TypeDef* SPIx, u16 SPI_Direction)
+ 686:cpu/STM32F103/stm32f10x_spi.c **** {
+ 992              		.loc 1 686 1 is_stmt 1 view -0
+ 993              		.cfi_startproc
+ 994              		@ args = 0, pretend = 0, frame = 0
+ 995              		@ frame_needed = 0, uses_anonymous_args = 0
+ 996              		@ link register save eliminated.
+ 687:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 688:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 997              		.loc 1 688 3 view .LVU294
+ 689:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_DIRECTION(SPI_Direction));
+ 998              		.loc 1 689 3 view .LVU295
+ 690:cpu/STM32F103/stm32f10x_spi.c **** 
+ 691:cpu/STM32F103/stm32f10x_spi.c ****   if (SPI_Direction == SPI_Direction_Tx)
+ 999              		.loc 1 691 3 view .LVU296
+ 1000              		.loc 1 691 6 is_stmt 0 view .LVU297
+ 1001 029c B1F5804F 		cmp	r1, #16384
+ 692:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 693:cpu/STM32F103/stm32f10x_spi.c ****     /* Set the Tx only mode */
+ 694:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 |= SPI_Direction_Tx;
+ 1002              		.loc 1 694 15 view .LVU298
+ 1003 02a0 0388     		ldrh	r3, [r0]
+ 691:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 1004              		.loc 1 691 6 view .LVU299
+ 1005 02a2 05D0     		beq	.L61
+ 695:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 696:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 697:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 698:cpu/STM32F103/stm32f10x_spi.c ****     /* Set the Rx only mode */
+ 699:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 &= SPI_Direction_Rx;
+ 1006              		.loc 1 699 5 is_stmt 1 view .LVU300
+ 1007              		.loc 1 699 15 is_stmt 0 view .LVU301
+ 1008 02a4 23F48043 		bic	r3, r3, #16384
+ 1009 02a8 1B04     		lsls	r3, r3, #16
+ 1010 02aa 1B0C     		lsrs	r3, r3, #16
+ 1011 02ac 0380     		strh	r3, [r0]	@ movhi
+ 700:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 701:cpu/STM32F103/stm32f10x_spi.c **** }
+ 1012              		.loc 1 701 1 view .LVU302
+ 1013 02ae 7047     		bx	lr
+ 1014              	.L61:
+ 694:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 1015              		.loc 1 694 5 is_stmt 1 view .LVU303
+ 694:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 1016              		.loc 1 694 15 is_stmt 0 view .LVU304
+ 1017 02b0 9BB2     		uxth	r3, r3
+ 1018 02b2 43F48043 		orr	r3, r3, #16384
+ 1019 02b6 0380     		strh	r3, [r0]	@ movhi
+ 1020 02b8 7047     		bx	lr
+ 1021              		.cfi_endproc
+ 1022              	.LFE18:
+ 1024              		.align	1
+ 1025 02ba 00BF     		.p2align 2,,3
+ 1026              		.global	SPI_I2S_GetFlagStatus
+ 1027              		.syntax unified
+ 1028              		.thumb
+ 1029              		.thumb_func
+ 1031              	SPI_I2S_GetFlagStatus:
+ 1032              	.LVL62:
+ 1033              	.LFB19:
+ 702:cpu/STM32F103/stm32f10x_spi.c **** 
+ 703:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 704:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_I2S_GetFlagStatus
+ 705:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Checks whether the specified SPI/I2S flag is set or not.
+ 706:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be :
+ 707:cpu/STM32F103/stm32f10x_spi.c **** *                         - 1, 2 or 3 in SPI mode 
+ 708:cpu/STM32F103/stm32f10x_spi.c **** *                         - 2 or 3 in I2S mode
+ 709:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_I2S_FLAG: specifies the SPI/I2S flag to check. 
+ 710:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be one of the following values:
+ 711:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_FLAG_TXE: Transmit buffer empty flag.
+ 712:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_FLAG_RXNE: Receive buffer not empty flag.
+ 713:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_FLAG_BSY: Busy flag.
+ 714:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_FLAG_OVR: Overrun flag.
+ 715:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_FLAG_MODF: Mode Fault flag.
+ 716:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_FLAG_CRCERR: CRC Error flag.
+ 717:cpu/STM32F103/stm32f10x_spi.c **** *                       - I2S_FLAG_UDR: Underrun Error flag.
+ 718:cpu/STM32F103/stm32f10x_spi.c **** *                       - I2S_FLAG_CHSIDE: Channel Side flag.
+ 719:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 720:cpu/STM32F103/stm32f10x_spi.c **** * Return         : The new state of SPI_I2S_FLAG (SET or RESET).
+ 721:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 722:cpu/STM32F103/stm32f10x_spi.c **** FlagStatus SPI_I2S_GetFlagStatus(SPI_TypeDef* SPIx, u16 SPI_I2S_FLAG)
+ 723:cpu/STM32F103/stm32f10x_spi.c **** {
+ 1034              		.loc 1 723 1 is_stmt 1 view -0
+ 1035              		.cfi_startproc
+ 1036              		@ args = 0, pretend = 0, frame = 0
+ 1037              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1038              		@ link register save eliminated.
+ 724:cpu/STM32F103/stm32f10x_spi.c ****   FlagStatus bitstatus = RESET;
+ 1039              		.loc 1 724 3 view .LVU306
+ 725:cpu/STM32F103/stm32f10x_spi.c **** 
+ 726:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 727:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 1040              		.loc 1 727 3 view .LVU307
+ 728:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_I2S_GET_FLAG(SPI_I2S_FLAG));
+ 1041              		.loc 1 728 3 view .LVU308
+ 729:cpu/STM32F103/stm32f10x_spi.c **** 
+ 730:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the status of the specified SPI/I2S flag */
+ 731:cpu/STM32F103/stm32f10x_spi.c ****   if ((SPIx->SR & SPI_I2S_FLAG) != (u16)RESET)
+ 1042              		.loc 1 731 3 view .LVU309
+ 1043              		.loc 1 731 12 is_stmt 0 view .LVU310
+ 1044 02bc 0389     		ldrh	r3, [r0, #8]
+ 1045              	.LVL63:
+ 732:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 733:cpu/STM32F103/stm32f10x_spi.c ****     /* SPI_I2S_FLAG is set */
+ 734:cpu/STM32F103/stm32f10x_spi.c ****     bitstatus = SET;
+ 735:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 736:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 737:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 738:cpu/STM32F103/stm32f10x_spi.c ****     /* SPI_I2S_FLAG is reset */
+ 739:cpu/STM32F103/stm32f10x_spi.c ****     bitstatus = RESET;
+ 740:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 741:cpu/STM32F103/stm32f10x_spi.c ****   /* Return the SPI_I2S_FLAG status */
+ 742:cpu/STM32F103/stm32f10x_spi.c ****   return  bitstatus;
+ 1046              		.loc 1 742 3 is_stmt 1 view .LVU311
+ 731:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 1047              		.loc 1 731 6 is_stmt 0 view .LVU312
+ 1048 02be 1942     		tst	r1, r3
+ 743:cpu/STM32F103/stm32f10x_spi.c **** }
+ 1049              		.loc 1 743 1 view .LVU313
+ 1050 02c0 14BF     		ite	ne
+ 1051 02c2 0120     		movne	r0, #1
+ 1052              	.LVL64:
+ 1053              		.loc 1 743 1 view .LVU314
+ 1054 02c4 0020     		moveq	r0, #0
+ 1055 02c6 7047     		bx	lr
+ 1056              		.cfi_endproc
+ 1057              	.LFE19:
+ 1059              		.align	1
+ 1060              		.p2align 2,,3
+ 1061              		.global	SPI_I2S_ClearFlag
+ 1062              		.syntax unified
+ 1063              		.thumb
+ 1064              		.thumb_func
+ 1066              	SPI_I2S_ClearFlag:
+ 1067              	.LVL65:
+ 1068              	.LFB20:
+ 744:cpu/STM32F103/stm32f10x_spi.c **** 
+ 745:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 746:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_I2S_ClearFlag
+ 747:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Clears the SPIx/I2Sx pending flags.
+ 748:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be :
+ 749:cpu/STM32F103/stm32f10x_spi.c **** *                         - 1, 2 or 3 in SPI mode 
+ 750:cpu/STM32F103/stm32f10x_spi.c **** *                         - 2 or 3 in I2S mode
+ 751:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_I2S_FLAG: specifies the SPI/I2S flag to clear. 
+ 752:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be one of the following values:
+ 753:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_FLAG_OVR: Overrun flag 
+ 754:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_FLAG_MODF: Mode Fault flag.
+ 755:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_FLAG_CRCERR: CRC Error flag.
+ 756:cpu/STM32F103/stm32f10x_spi.c **** *                       - I2S_FLAG_UDR: Underrun Error flag.
+ 757:cpu/STM32F103/stm32f10x_spi.c **** *                    Note: Before clearing OVR flag, it is mandatory to read 
+ 758:cpu/STM32F103/stm32f10x_spi.c **** *                          SPI_I2S_DR register, so that the last data is not lost.
+ 759:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 760:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 761:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 762:cpu/STM32F103/stm32f10x_spi.c **** void SPI_I2S_ClearFlag(SPI_TypeDef* SPIx, u16 SPI_I2S_FLAG)
+ 763:cpu/STM32F103/stm32f10x_spi.c **** {
+ 1069              		.loc 1 763 1 is_stmt 1 view -0
+ 1070              		.cfi_startproc
+ 1071              		@ args = 0, pretend = 0, frame = 0
+ 1072              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1073              		@ link register save eliminated.
+ 764:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 765:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 1074              		.loc 1 765 3 view .LVU316
+ 766:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_I2S_CLEAR_FLAG(SPI_I2S_FLAG));
+ 1075              		.loc 1 766 3 view .LVU317
+ 767:cpu/STM32F103/stm32f10x_spi.c ****     
+ 768:cpu/STM32F103/stm32f10x_spi.c ****   /* SPI_FLAG_MODF flag clear */
+ 769:cpu/STM32F103/stm32f10x_spi.c ****   if(SPI_I2S_FLAG == SPI_FLAG_MODF)
+ 1076              		.loc 1 769 3 view .LVU318
+ 1077              		.loc 1 769 5 is_stmt 0 view .LVU319
+ 1078 02c8 2029     		cmp	r1, #32
+ 1079 02ca 09D0     		beq	.L71
+ 770:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 771:cpu/STM32F103/stm32f10x_spi.c ****     /* Read SR register */
+ 772:cpu/STM32F103/stm32f10x_spi.c ****     (void)SPIx->SR;
+ 773:cpu/STM32F103/stm32f10x_spi.c ****     
+ 774:cpu/STM32F103/stm32f10x_spi.c ****     /* Write on CR1 register */
+ 775:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 |= CR1_SPE_Set; 
+ 776:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 777:cpu/STM32F103/stm32f10x_spi.c ****   /* SPI_I2S_FLAG_OVR flag or I2S_FLAG_UDR flag clear */
+ 778:cpu/STM32F103/stm32f10x_spi.c ****   else if ((SPI_I2S_FLAG == SPI_I2S_FLAG_OVR) || (SPI_I2S_FLAG == I2S_FLAG_UDR))  
+ 1080              		.loc 1 778 8 is_stmt 1 view .LVU320
+ 1081              		.loc 1 778 11 is_stmt 0 view .LVU321
+ 1082 02cc 4029     		cmp	r1, #64
+ 1083 02ce 05D0     		beq	.L66
+ 1084              		.loc 1 778 47 discriminator 1 view .LVU322
+ 1085 02d0 0829     		cmp	r1, #8
+ 1086 02d2 03D0     		beq	.L66
+ 779:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 780:cpu/STM32F103/stm32f10x_spi.c ****     /* Read SR register  (Before clearing OVR flag, it is mandatory to read 
+ 781:cpu/STM32F103/stm32f10x_spi.c ****        SPI_I2S_DR register)*/
+ 782:cpu/STM32F103/stm32f10x_spi.c ****     (void)SPIx->SR;
+ 783:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 784:cpu/STM32F103/stm32f10x_spi.c ****   else /* SPI_FLAG_CRCERR flag clear */
+ 785:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 786:cpu/STM32F103/stm32f10x_spi.c ****     /* Clear the selected SPI flag */
+ 787:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->SR = (u16)~SPI_I2S_FLAG;
+ 1087              		.loc 1 787 5 is_stmt 1 view .LVU323
+ 1088              		.loc 1 787 16 is_stmt 0 view .LVU324
+ 1089 02d4 C943     		mvns	r1, r1
+ 1090              	.LVL66:
+ 1091              		.loc 1 787 16 view .LVU325
+ 1092 02d6 89B2     		uxth	r1, r1
+ 1093              		.loc 1 787 14 view .LVU326
+ 1094 02d8 0181     		strh	r1, [r0, #8]	@ movhi
+ 788:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 789:cpu/STM32F103/stm32f10x_spi.c **** }
+ 1095              		.loc 1 789 1 view .LVU327
+ 1096 02da 7047     		bx	lr
+ 1097              	.LVL67:
+ 1098              	.L66:
+ 782:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 1099              		.loc 1 782 5 is_stmt 1 view .LVU328
+ 1100 02dc 0389     		ldrh	r3, [r0, #8]
+ 1101 02de 7047     		bx	lr
+ 1102              	.L71:
+ 772:cpu/STM32F103/stm32f10x_spi.c ****     
+ 1103              		.loc 1 772 5 view .LVU329
+ 1104 02e0 0389     		ldrh	r3, [r0, #8]
+ 775:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 1105              		.loc 1 775 5 view .LVU330
+ 775:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 1106              		.loc 1 775 15 is_stmt 0 view .LVU331
+ 1107 02e2 0388     		ldrh	r3, [r0]
+ 1108 02e4 9BB2     		uxth	r3, r3
+ 1109 02e6 43F04003 		orr	r3, r3, #64
+ 1110 02ea 0380     		strh	r3, [r0]	@ movhi
+ 1111 02ec 7047     		bx	lr
+ 1112              		.cfi_endproc
+ 1113              	.LFE20:
+ 1115              		.align	1
+ 1116 02ee 00BF     		.p2align 2,,3
+ 1117              		.global	SPI_I2S_GetITStatus
+ 1118              		.syntax unified
+ 1119              		.thumb
+ 1120              		.thumb_func
+ 1122              	SPI_I2S_GetITStatus:
+ 1123              	.LVL68:
+ 1124              	.LFB21:
+ 790:cpu/STM32F103/stm32f10x_spi.c **** 
+ 791:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 792:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_I2S_GetITStatus
+ 793:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Checks whether the specified SPI/I2S interrupt has occurred or not.
+ 794:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be :
+ 795:cpu/STM32F103/stm32f10x_spi.c **** *                         - 1, 2 or 3 in SPI mode 
+ 796:cpu/STM32F103/stm32f10x_spi.c **** *                         - 2 or 3 in I2S mode
+ 797:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_I2S_IT: specifies the SPI/I2S interrupt source to check. 
+ 798:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be one of the following values:
+ 799:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_IT_TXE: Transmit buffer empty interrupt.
+ 800:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_IT_RXNE: Receive buffer not empty interrupt.
+ 801:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_IT_OVR: Overrun interrupt.
+ 802:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_IT_MODF: Mode Fault interrupt.
+ 803:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_IT_CRCERR: CRC Error interrupt.
+ 804:cpu/STM32F103/stm32f10x_spi.c **** *                       - I2S_IT_UDR: Underrun Error interrupt.
+ 805:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 806:cpu/STM32F103/stm32f10x_spi.c **** * Return         : The new state of SPI_I2S_IT (SET or RESET).
+ 807:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 808:cpu/STM32F103/stm32f10x_spi.c **** ITStatus SPI_I2S_GetITStatus(SPI_TypeDef* SPIx, u8 SPI_I2S_IT)
+ 809:cpu/STM32F103/stm32f10x_spi.c **** {
+ 1125              		.loc 1 809 1 is_stmt 1 view -0
+ 1126              		.cfi_startproc
+ 1127              		@ args = 0, pretend = 0, frame = 0
+ 1128              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1129              		@ link register save eliminated.
+ 810:cpu/STM32F103/stm32f10x_spi.c ****   ITStatus bitstatus = RESET;
+ 1130              		.loc 1 810 3 view .LVU333
+ 811:cpu/STM32F103/stm32f10x_spi.c ****   u16 itpos = 0, itmask = 0, enablestatus = 0;
+ 1131              		.loc 1 811 3 view .LVU334
+ 812:cpu/STM32F103/stm32f10x_spi.c **** 
+ 813:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 814:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 1132              		.loc 1 814 3 view .LVU335
+ 815:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_I2S_GET_IT(SPI_I2S_IT));
+ 1133              		.loc 1 815 3 view .LVU336
+ 816:cpu/STM32F103/stm32f10x_spi.c **** 
+ 817:cpu/STM32F103/stm32f10x_spi.c ****   /* Get the SPI/I2S IT index */
+ 818:cpu/STM32F103/stm32f10x_spi.c ****   itpos = (u16)((u16)0x01 << (SPI_I2S_IT & (u8)0x0F));
+ 1134              		.loc 1 818 3 view .LVU337
+ 1135              		.loc 1 818 27 is_stmt 0 view .LVU338
+ 1136 02f0 0122     		movs	r2, #1
+ 1137              	.LVL69:
+ 819:cpu/STM32F103/stm32f10x_spi.c **** 
+ 820:cpu/STM32F103/stm32f10x_spi.c ****   /* Get the SPI/I2S IT mask */
+ 821:cpu/STM32F103/stm32f10x_spi.c ****   itmask = SPI_I2S_IT >> 4;
+ 1138              		.loc 1 821 3 is_stmt 1 view .LVU339
+ 822:cpu/STM32F103/stm32f10x_spi.c ****   /* Set the IT mask */
+ 823:cpu/STM32F103/stm32f10x_spi.c ****   itmask = (u16)((u16)0x01 << itmask);
+ 1139              		.loc 1 823 3 view .LVU340
+ 824:cpu/STM32F103/stm32f10x_spi.c ****   /* Get the SPI_I2S_IT enable bit status */
+ 825:cpu/STM32F103/stm32f10x_spi.c ****   enablestatus = (SPIx->CR2 & itmask) ;
+ 1140              		.loc 1 825 3 view .LVU341
+ 1141              		.loc 1 825 23 is_stmt 0 view .LVU342
+ 1142 02f2 8388     		ldrh	r3, [r0, #4]
+ 826:cpu/STM32F103/stm32f10x_spi.c **** 
+ 827:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the status of the specified SPI/I2S interrupt */
+ 828:cpu/STM32F103/stm32f10x_spi.c ****   if (((SPIx->SR & itpos) != (u16)RESET) && enablestatus)
+ 1143              		.loc 1 828 13 view .LVU343
+ 1144 02f4 0089     		ldrh	r0, [r0, #8]
+ 1145              	.LVL70:
+ 825:cpu/STM32F103/stm32f10x_spi.c **** 
+ 1146              		.loc 1 825 23 view .LVU344
+ 1147 02f6 1FFA83FC 		uxth	ip, r3
+ 1148              	.LVL71:
+ 1149              		.loc 1 828 3 is_stmt 1 view .LVU345
+ 818:cpu/STM32F103/stm32f10x_spi.c **** 
+ 1150              		.loc 1 818 42 is_stmt 0 view .LVU346
+ 1151 02fa 01F00F03 		and	r3, r1, #15
+ 1152              		.loc 1 828 13 view .LVU347
+ 1153 02fe 80B2     		uxth	r0, r0
+ 818:cpu/STM32F103/stm32f10x_spi.c **** 
+ 1154              		.loc 1 818 27 view .LVU348
+ 1155 0300 02FA03F3 		lsl	r3, r2, r3
+ 1156              		.loc 1 828 6 view .LVU349
+ 1157 0304 1840     		ands	r0, r0, r3
+ 1158 0306 07D0     		beq	.L73
+ 823:cpu/STM32F103/stm32f10x_spi.c ****   /* Get the SPI_I2S_IT enable bit status */
+ 1159              		.loc 1 823 28 discriminator 1 view .LVU350
+ 1160 0308 0909     		lsrs	r1, r1, #4
+ 1161              	.LVL72:
+ 823:cpu/STM32F103/stm32f10x_spi.c ****   /* Get the SPI_I2S_IT enable bit status */
+ 1162              		.loc 1 823 28 discriminator 1 view .LVU351
+ 1163 030a 02FA01F1 		lsl	r1, r2, r1
+ 1164              		.loc 1 828 42 discriminator 1 view .LVU352
+ 1165 030e 1CEA010F 		tst	ip, r1
+ 829:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 830:cpu/STM32F103/stm32f10x_spi.c ****     /* SPI_I2S_IT is set */
+ 831:cpu/STM32F103/stm32f10x_spi.c ****     bitstatus = SET;
+ 832:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 833:cpu/STM32F103/stm32f10x_spi.c ****   else
+ 834:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 835:cpu/STM32F103/stm32f10x_spi.c ****     /* SPI_I2S_IT is reset */
+ 836:cpu/STM32F103/stm32f10x_spi.c ****     bitstatus = RESET;
+ 1166              		.loc 1 836 15 discriminator 1 view .LVU353
+ 1167 0312 14BF     		ite	ne
+ 1168 0314 1046     		movne	r0, r2
+ 1169 0316 0020     		moveq	r0, #0
+ 1170              	.L73:
+ 1171              	.LVL73:
+ 837:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 838:cpu/STM32F103/stm32f10x_spi.c ****   /* Return the SPI_I2S_IT status */
+ 839:cpu/STM32F103/stm32f10x_spi.c ****   return bitstatus;
+ 1172              		.loc 1 839 3 is_stmt 1 view .LVU354
+ 840:cpu/STM32F103/stm32f10x_spi.c **** }
+ 1173              		.loc 1 840 1 is_stmt 0 view .LVU355
+ 1174 0318 7047     		bx	lr
+ 1175              		.cfi_endproc
+ 1176              	.LFE21:
+ 1178              		.align	1
+ 1179 031a 00BF     		.p2align 2,,3
+ 1180              		.global	SPI_I2S_ClearITPendingBit
+ 1181              		.syntax unified
+ 1182              		.thumb
+ 1183              		.thumb_func
+ 1185              	SPI_I2S_ClearITPendingBit:
+ 1186              	.LVL74:
+ 1187              	.LFB22:
+ 841:cpu/STM32F103/stm32f10x_spi.c **** 
+ 842:cpu/STM32F103/stm32f10x_spi.c **** /*******************************************************************************
+ 843:cpu/STM32F103/stm32f10x_spi.c **** * Function Name  : SPI_I2S_ClearITPendingBit
+ 844:cpu/STM32F103/stm32f10x_spi.c **** * Description    : Clears the SPIx/I2Sx interrupt pending bits.
+ 845:cpu/STM32F103/stm32f10x_spi.c **** * Input          : - SPIx: where x can be :
+ 846:cpu/STM32F103/stm32f10x_spi.c **** *                         - 1, 2 or 3 in SPI mode 
+ 847:cpu/STM32F103/stm32f10x_spi.c **** *                         - 2 or 3 in I2S mode
+ 848:cpu/STM32F103/stm32f10x_spi.c **** *                  - SPI_I2S_IT: specifies the SPI/I2S interrupt pending bit to clear.
+ 849:cpu/STM32F103/stm32f10x_spi.c **** *                    This parameter can be one of the following values:
+ 850:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_I2S_IT_OVR: Overrun interrupt.
+ 851:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_IT_MODF: Mode Fault interrupt.
+ 852:cpu/STM32F103/stm32f10x_spi.c **** *                       - SPI_IT_CRCERR: CRC Error interrupt.
+ 853:cpu/STM32F103/stm32f10x_spi.c **** *                       - I2S_IT_UDR: Underrun Error interrupt.
+ 854:cpu/STM32F103/stm32f10x_spi.c **** * Output         : None
+ 855:cpu/STM32F103/stm32f10x_spi.c **** * Return         : None
+ 856:cpu/STM32F103/stm32f10x_spi.c **** *******************************************************************************/
+ 857:cpu/STM32F103/stm32f10x_spi.c **** void SPI_I2S_ClearITPendingBit(SPI_TypeDef* SPIx, u8 SPI_I2S_IT)
+ 858:cpu/STM32F103/stm32f10x_spi.c **** {
+ 1188              		.loc 1 858 1 is_stmt 1 view -0
+ 1189              		.cfi_startproc
+ 1190              		@ args = 0, pretend = 0, frame = 0
+ 1191              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1192              		@ link register save eliminated.
+ 859:cpu/STM32F103/stm32f10x_spi.c ****   u16 itpos = 0;
+ 1193              		.loc 1 859 3 view .LVU357
+ 860:cpu/STM32F103/stm32f10x_spi.c **** 
+ 861:cpu/STM32F103/stm32f10x_spi.c ****   /* Check the parameters */
+ 862:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_ALL_PERIPH(SPIx));
+ 1194              		.loc 1 862 3 view .LVU358
+ 863:cpu/STM32F103/stm32f10x_spi.c ****   assert_param(IS_SPI_I2S_CLEAR_IT(SPI_I2S_IT));
+ 1195              		.loc 1 863 3 view .LVU359
+ 864:cpu/STM32F103/stm32f10x_spi.c **** 
+ 865:cpu/STM32F103/stm32f10x_spi.c ****   /* SPI_IT_MODF pending bit clear */
+ 866:cpu/STM32F103/stm32f10x_spi.c ****   if(SPI_I2S_IT == SPI_IT_MODF)
+ 1196              		.loc 1 866 3 view .LVU360
+ 1197              		.loc 1 866 5 is_stmt 0 view .LVU361
+ 1198 031c 5529     		cmp	r1, #85
+ 1199 031e 0ED0     		beq	.L83
+ 867:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 868:cpu/STM32F103/stm32f10x_spi.c ****     /* Read SR register */
+ 869:cpu/STM32F103/stm32f10x_spi.c ****     (void)SPIx->SR;
+ 870:cpu/STM32F103/stm32f10x_spi.c ****     /* Write on CR1 register */
+ 871:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->CR1 |= CR1_SPE_Set; 
+ 872:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 873:cpu/STM32F103/stm32f10x_spi.c ****   /* SPI_I2S_IT_OVR or I2S_IT_UDR pending bit clear */ 
+ 874:cpu/STM32F103/stm32f10x_spi.c ****   else if((SPI_I2S_IT == SPI_I2S_IT_OVR) || (SPI_I2S_IT == I2S_IT_UDR))    
+ 1200              		.loc 1 874 8 is_stmt 1 view .LVU362
+ 1201              		.loc 1 874 10 is_stmt 0 view .LVU363
+ 1202 0320 5629     		cmp	r1, #86
+ 1203 0322 0AD0     		beq	.L78
+ 1204              		.loc 1 874 42 discriminator 1 view .LVU364
+ 1205 0324 5329     		cmp	r1, #83
+ 1206 0326 08D0     		beq	.L78
+ 875:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 876:cpu/STM32F103/stm32f10x_spi.c ****     /* Read SR register */
+ 877:cpu/STM32F103/stm32f10x_spi.c ****     (void)(SPIx->SR);
+ 878:cpu/STM32F103/stm32f10x_spi.c ****   }  
+ 879:cpu/STM32F103/stm32f10x_spi.c ****   else   /* SPI_IT_CRCERR pending bit clear */
+ 880:cpu/STM32F103/stm32f10x_spi.c ****   {
+ 881:cpu/STM32F103/stm32f10x_spi.c ****     /* Get the SPI/I2S IT index */
+ 882:cpu/STM32F103/stm32f10x_spi.c ****     itpos = (u16)((u16)0x01 << (SPI_I2S_IT & (u8)0x0F));
+ 1207              		.loc 1 882 5 is_stmt 1 view .LVU365
+ 1208              	.LVL75:
+ 883:cpu/STM32F103/stm32f10x_spi.c ****     /* Clear the selected SPI/I2S interrupt pending bits */
+ 884:cpu/STM32F103/stm32f10x_spi.c ****     SPIx->SR = (u16)~itpos;
+ 1209              		.loc 1 884 5 view .LVU366
+ 882:cpu/STM32F103/stm32f10x_spi.c ****     /* Clear the selected SPI/I2S interrupt pending bits */
+ 1210              		.loc 1 882 29 is_stmt 0 view .LVU367
+ 1211 0328 0123     		movs	r3, #1
+ 882:cpu/STM32F103/stm32f10x_spi.c ****     /* Clear the selected SPI/I2S interrupt pending bits */
+ 1212              		.loc 1 882 44 view .LVU368
+ 1213 032a 01F00F01 		and	r1, r1, #15
+ 1214              	.LVL76:
+ 882:cpu/STM32F103/stm32f10x_spi.c ****     /* Clear the selected SPI/I2S interrupt pending bits */
+ 1215              		.loc 1 882 29 view .LVU369
+ 1216 032e 03FA01F1 		lsl	r1, r3, r1
+ 1217              		.loc 1 884 16 view .LVU370
+ 1218 0332 C943     		mvns	r1, r1
+ 1219 0334 89B2     		uxth	r1, r1
+ 1220              		.loc 1 884 14 view .LVU371
+ 1221 0336 0181     		strh	r1, [r0, #8]	@ movhi
+ 885:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 886:cpu/STM32F103/stm32f10x_spi.c **** }
+ 1222              		.loc 1 886 1 view .LVU372
+ 1223 0338 7047     		bx	lr
+ 1224              	.LVL77:
+ 1225              	.L78:
+ 877:cpu/STM32F103/stm32f10x_spi.c ****   }  
+ 1226              		.loc 1 877 5 is_stmt 1 view .LVU373
+ 1227 033a 0389     		ldrh	r3, [r0, #8]
+ 1228 033c 7047     		bx	lr
+ 1229              	.L83:
+ 869:cpu/STM32F103/stm32f10x_spi.c ****     /* Write on CR1 register */
+ 1230              		.loc 1 869 5 view .LVU374
+ 1231 033e 0389     		ldrh	r3, [r0, #8]
+ 871:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 1232              		.loc 1 871 5 view .LVU375
+ 871:cpu/STM32F103/stm32f10x_spi.c ****   }
+ 1233              		.loc 1 871 15 is_stmt 0 view .LVU376
+ 1234 0340 0388     		ldrh	r3, [r0]
+ 1235 0342 9BB2     		uxth	r3, r3
+ 1236 0344 43F04003 		orr	r3, r3, #64
+ 1237 0348 0380     		strh	r3, [r0]	@ movhi
+ 1238 034a 7047     		bx	lr
+ 1239              		.cfi_endproc
+ 1240              	.LFE22:
+ 1242              	.Letext0:
+ 1243              		.file 2 "cpu/STM32F103/stm32f10x_type.h"
+ 1244              		.file 3 "cpu/STM32F103/stm32f10x_map.h"
+ 1245              		.file 4 "cpu/STM32F103/stm32f10x_spi.h"
+ 1246              		.file 5 "cpu/STM32F103/stm32f10x_rcc.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f10x_spi.c
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:24     .text:00000000 SPI_I2S_DeInit
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:121    .text:00000064 $d
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:125    .text:00000068 $t
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:132    .text:00000068 SPI_Init
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:217    .text:000000bc I2S_Init
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:402    .text:00000164 $d
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:406    .text:00000168 $t
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:413    .text:00000168 SPI_StructInit
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:464    .text:00000180 I2S_StructInit
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:506    .text:00000194 SPI_Cmd
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:546    .text:000001b0 I2S_Cmd
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:586    .text:000001cc SPI_I2S_ITConfig
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:647    .text:000001ec SPI_I2S_DMACmd
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:691    .text:00000200 SPI_I2S_SendData
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:715    .text:00000204 SPI_I2S_ReceiveData
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:741    .text:0000020c SPI_NSSInternalSoftwareConfig
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:784    .text:0000022c SPI_SSOutputCmd
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:824    .text:00000248 SPI_DataSizeConfig
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:859    .text:00000260 SPI_TransmitCRC
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:886    .text:0000026c SPI_CalculateCRC
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:926    .text:00000288 SPI_GetCRC
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:963    .text:00000294 SPI_GetCRCPolynomial
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:989    .text:0000029c SPI_BiDirectionalLineConfig
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:1031   .text:000002bc SPI_I2S_GetFlagStatus
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:1066   .text:000002c8 SPI_I2S_ClearFlag
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:1122   .text:000002f0 SPI_I2S_GetITStatus
+C:\Users\forre\AppData\Local\Temp\cci8fAMb.s:1185   .text:0000031c SPI_I2S_ClearITPendingBit
+
+UNDEFINED SYMBOLS
+RCC_APB1PeriphResetCmd
+RCC_APB2PeriphResetCmd
+RCC_GetClocksFreq

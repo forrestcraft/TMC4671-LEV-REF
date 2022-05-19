@@ -1,0 +1,1208 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"stm32f10x_dma.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	DMA_DeInit
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	DMA_DeInit:
+  25              	.LVL0:
+  26              	.LFB0:
+  27              		.file 1 "cpu/STM32F103/stm32f10x_dma.c"
+   1:cpu/STM32F103/stm32f10x_dma.c **** /******************** (C) COPYRIGHT 2008 STMicroelectronics ********************
+   2:cpu/STM32F103/stm32f10x_dma.c **** * File Name          : stm32f10x_dma.c
+   3:cpu/STM32F103/stm32f10x_dma.c **** * Author             : MCD Application Team
+   4:cpu/STM32F103/stm32f10x_dma.c **** * Version            : V2.0
+   5:cpu/STM32F103/stm32f10x_dma.c **** * Date               : 05/23/2008
+   6:cpu/STM32F103/stm32f10x_dma.c **** * Description        : This file provides all the DMA firmware functions.
+   7:cpu/STM32F103/stm32f10x_dma.c **** ********************************************************************************
+   8:cpu/STM32F103/stm32f10x_dma.c **** * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+   9:cpu/STM32F103/stm32f10x_dma.c **** * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+  10:cpu/STM32F103/stm32f10x_dma.c **** * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+  11:cpu/STM32F103/stm32f10x_dma.c **** * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+  12:cpu/STM32F103/stm32f10x_dma.c **** * CONTENT OF SUCH SOFTWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+  13:cpu/STM32F103/stm32f10x_dma.c **** * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  14:cpu/STM32F103/stm32f10x_dma.c **** * FOR MORE INFORMATION PLEASE CAREFULLY READ THE LICENSE AGREEMENT FILE LOCATED 
+  15:cpu/STM32F103/stm32f10x_dma.c **** * IN THE ROOT DIRECTORY OF THIS FIRMWARE PACKAGE.
+  16:cpu/STM32F103/stm32f10x_dma.c **** *******************************************************************************/
+  17:cpu/STM32F103/stm32f10x_dma.c **** 
+  18:cpu/STM32F103/stm32f10x_dma.c **** /* Includes ------------------------------------------------------------------*/
+  19:cpu/STM32F103/stm32f10x_dma.c **** #include "stm32f10x_dma.h"
+  20:cpu/STM32F103/stm32f10x_dma.c **** #include "stm32f10x_rcc.h"
+  21:cpu/STM32F103/stm32f10x_dma.c **** 
+  22:cpu/STM32F103/stm32f10x_dma.c **** /* Private typedef -----------------------------------------------------------*/
+  23:cpu/STM32F103/stm32f10x_dma.c **** /* Private define ------------------------------------------------------------*/
+  24:cpu/STM32F103/stm32f10x_dma.c **** /* DMA ENABLE mask */
+  25:cpu/STM32F103/stm32f10x_dma.c **** #define CCR_ENABLE_Set          ((u32)0x00000001)
+  26:cpu/STM32F103/stm32f10x_dma.c **** #define CCR_ENABLE_Reset        ((u32)0xFFFFFFFE)
+  27:cpu/STM32F103/stm32f10x_dma.c **** 
+  28:cpu/STM32F103/stm32f10x_dma.c **** /* DMA1 Channelx interrupt pending bit masks */
+  29:cpu/STM32F103/stm32f10x_dma.c **** #define DMA1_Channel1_IT_Mask    ((u32)0x0000000F)
+  30:cpu/STM32F103/stm32f10x_dma.c **** #define DMA1_Channel2_IT_Mask    ((u32)0x000000F0)
+  31:cpu/STM32F103/stm32f10x_dma.c **** #define DMA1_Channel3_IT_Mask    ((u32)0x00000F00)
+  32:cpu/STM32F103/stm32f10x_dma.c **** #define DMA1_Channel4_IT_Mask    ((u32)0x0000F000)
+  33:cpu/STM32F103/stm32f10x_dma.c **** #define DMA1_Channel5_IT_Mask    ((u32)0x000F0000)
+  34:cpu/STM32F103/stm32f10x_dma.c **** #define DMA1_Channel6_IT_Mask    ((u32)0x00F00000)
+  35:cpu/STM32F103/stm32f10x_dma.c **** #define DMA1_Channel7_IT_Mask    ((u32)0x0F000000)
+  36:cpu/STM32F103/stm32f10x_dma.c **** 
+  37:cpu/STM32F103/stm32f10x_dma.c **** /* DMA2 Channelx interrupt pending bit masks */
+  38:cpu/STM32F103/stm32f10x_dma.c **** #define DMA2_Channel1_IT_Mask    ((u32)0x0000000F)
+  39:cpu/STM32F103/stm32f10x_dma.c **** #define DMA2_Channel2_IT_Mask    ((u32)0x000000F0)
+  40:cpu/STM32F103/stm32f10x_dma.c **** #define DMA2_Channel3_IT_Mask    ((u32)0x00000F00)
+  41:cpu/STM32F103/stm32f10x_dma.c **** #define DMA2_Channel4_IT_Mask    ((u32)0x0000F000)
+  42:cpu/STM32F103/stm32f10x_dma.c **** #define DMA2_Channel5_IT_Mask    ((u32)0x000F0000)
+  43:cpu/STM32F103/stm32f10x_dma.c **** 
+  44:cpu/STM32F103/stm32f10x_dma.c **** /* DMA2 FLAG mask */
+  45:cpu/STM32F103/stm32f10x_dma.c **** #define FLAG_Mask                ((u32)0x10000000)
+  46:cpu/STM32F103/stm32f10x_dma.c **** 
+  47:cpu/STM32F103/stm32f10x_dma.c **** /* DMA registers Masks */
+  48:cpu/STM32F103/stm32f10x_dma.c **** #define CCR_CLEAR_Mask           ((u32)0xFFFF800F)
+  49:cpu/STM32F103/stm32f10x_dma.c **** 
+  50:cpu/STM32F103/stm32f10x_dma.c **** /* Private macro -------------------------------------------------------------*/
+  51:cpu/STM32F103/stm32f10x_dma.c **** /* Private variables ---------------------------------------------------------*/
+  52:cpu/STM32F103/stm32f10x_dma.c **** /* Private function prototypes -----------------------------------------------*/
+  53:cpu/STM32F103/stm32f10x_dma.c **** /* Private functions ---------------------------------------------------------*/
+  54:cpu/STM32F103/stm32f10x_dma.c **** 
+  55:cpu/STM32F103/stm32f10x_dma.c **** /*******************************************************************************
+  56:cpu/STM32F103/stm32f10x_dma.c **** * Function Name  : DMA_DeInit
+  57:cpu/STM32F103/stm32f10x_dma.c **** * Description    : Deinitializes the DMAy Channelx registers to their default reset
+  58:cpu/STM32F103/stm32f10x_dma.c **** *                  values.
+  59:cpu/STM32F103/stm32f10x_dma.c **** * Input          : - DMAy_Channelx: where y can be 1 or 2 to select the DMA and
+  60:cpu/STM32F103/stm32f10x_dma.c **** *                    x can be 1 to 7 for DMA1 and 1 to 5 for DMA2 to select the 
+  61:cpu/STM32F103/stm32f10x_dma.c **** *                    DMA Channel.
+  62:cpu/STM32F103/stm32f10x_dma.c **** * Output         : None
+  63:cpu/STM32F103/stm32f10x_dma.c **** * Return         : None
+  64:cpu/STM32F103/stm32f10x_dma.c **** *******************************************************************************/
+  65:cpu/STM32F103/stm32f10x_dma.c **** void DMA_DeInit(DMA_Channel_TypeDef* DMAy_Channelx)
+  66:cpu/STM32F103/stm32f10x_dma.c **** {
+  28              		.loc 1 66 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  67:cpu/STM32F103/stm32f10x_dma.c ****   /* Check the parameters */
+  68:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_ALL_PERIPH(DMAy_Channelx));
+  33              		.loc 1 68 3 view .LVU1
+  69:cpu/STM32F103/stm32f10x_dma.c **** 
+  70:cpu/STM32F103/stm32f10x_dma.c ****   /* Disable the selected DMAy Channelx */
+  71:cpu/STM32F103/stm32f10x_dma.c ****   DMAy_Channelx->CCR &= CCR_ENABLE_Reset;
+  34              		.loc 1 71 3 view .LVU2
+  72:cpu/STM32F103/stm32f10x_dma.c **** 
+  73:cpu/STM32F103/stm32f10x_dma.c ****   /* Reset DMAy Channelx control register */
+  74:cpu/STM32F103/stm32f10x_dma.c ****   DMAy_Channelx->CCR  = 0;
+  35              		.loc 1 74 23 is_stmt 0 view .LVU3
+  36 0000 0023     		movs	r3, #0
+  71:cpu/STM32F103/stm32f10x_dma.c **** 
+  37              		.loc 1 71 22 view .LVU4
+  38 0002 0268     		ldr	r2, [r0]
+  75:cpu/STM32F103/stm32f10x_dma.c ****   
+  76:cpu/STM32F103/stm32f10x_dma.c ****   /* Reset DMAy Channelx remaining bytes register */
+  77:cpu/STM32F103/stm32f10x_dma.c ****   DMAy_Channelx->CNDTR = 0;
+  78:cpu/STM32F103/stm32f10x_dma.c ****   
+  79:cpu/STM32F103/stm32f10x_dma.c ****   /* Reset DMAy Channelx peripheral address register */
+  80:cpu/STM32F103/stm32f10x_dma.c ****   DMAy_Channelx->CPAR  = 0;
+  81:cpu/STM32F103/stm32f10x_dma.c ****   
+  82:cpu/STM32F103/stm32f10x_dma.c ****   /* Reset DMAy Channelx memory address register */
+  83:cpu/STM32F103/stm32f10x_dma.c ****   DMAy_Channelx->CMAR = 0;
+  84:cpu/STM32F103/stm32f10x_dma.c **** 
+  85:cpu/STM32F103/stm32f10x_dma.c ****   switch (*(u32*)&DMAy_Channelx)
+  39              		.loc 1 85 3 view .LVU5
+  40 0004 3C49     		ldr	r1, .L25
+  71:cpu/STM32F103/stm32f10x_dma.c **** 
+  41              		.loc 1 71 22 view .LVU6
+  42 0006 22F00102 		bic	r2, r2, #1
+  43              		.loc 1 85 3 view .LVU7
+  44 000a 8842     		cmp	r0, r1
+  71:cpu/STM32F103/stm32f10x_dma.c **** 
+  45              		.loc 1 71 22 view .LVU8
+  46 000c 0260     		str	r2, [r0]
+  74:cpu/STM32F103/stm32f10x_dma.c ****   
+  47              		.loc 1 74 3 is_stmt 1 view .LVU9
+  74:cpu/STM32F103/stm32f10x_dma.c ****   
+  48              		.loc 1 74 23 is_stmt 0 view .LVU10
+  49 000e 0360     		str	r3, [r0]
+  77:cpu/STM32F103/stm32f10x_dma.c ****   
+  50              		.loc 1 77 3 is_stmt 1 view .LVU11
+  77:cpu/STM32F103/stm32f10x_dma.c ****   
+  51              		.loc 1 77 24 is_stmt 0 view .LVU12
+  52 0010 4360     		str	r3, [r0, #4]
+  80:cpu/STM32F103/stm32f10x_dma.c ****   
+  53              		.loc 1 80 3 is_stmt 1 view .LVU13
+  80:cpu/STM32F103/stm32f10x_dma.c ****   
+  54              		.loc 1 80 24 is_stmt 0 view .LVU14
+  55 0012 8360     		str	r3, [r0, #8]
+  83:cpu/STM32F103/stm32f10x_dma.c **** 
+  56              		.loc 1 83 3 is_stmt 1 view .LVU15
+  83:cpu/STM32F103/stm32f10x_dma.c **** 
+  57              		.loc 1 83 23 is_stmt 0 view .LVU16
+  58 0014 C360     		str	r3, [r0, #12]
+  59              		.loc 1 85 3 is_stmt 1 view .LVU17
+  60 0016 41D0     		beq	.L2
+  61 0018 0FD8     		bhi	.L3
+  62 001a 384B     		ldr	r3, .L25+4
+  63 001c 9842     		cmp	r0, r3
+  64 001e 43D0     		beq	.L4
+  65 0020 24D8     		bhi	.L5
+  66 0022 283B     		subs	r3, r3, #40
+  67 0024 9842     		cmp	r0, r3
+  68 0026 45D0     		beq	.L6
+  69 0028 1433     		adds	r3, r3, #20
+  70 002a 9842     		cmp	r0, r3
+  71 002c 15D1     		bne	.L19
+  86:cpu/STM32F103/stm32f10x_dma.c ****   {
+  87:cpu/STM32F103/stm32f10x_dma.c ****     case DMA1_Channel1_BASE:
+  88:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA1 Channel1 */
+  89:cpu/STM32F103/stm32f10x_dma.c ****       DMA1->IFCR |= DMA1_Channel1_IT_Mask;
+  90:cpu/STM32F103/stm32f10x_dma.c ****       break;
+  91:cpu/STM32F103/stm32f10x_dma.c **** 
+  92:cpu/STM32F103/stm32f10x_dma.c ****     case DMA1_Channel2_BASE:
+  93:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA1 Channel2 */
+  94:cpu/STM32F103/stm32f10x_dma.c ****       DMA1->IFCR |= DMA1_Channel2_IT_Mask;
+  95:cpu/STM32F103/stm32f10x_dma.c ****       break;
+  96:cpu/STM32F103/stm32f10x_dma.c **** 
+  97:cpu/STM32F103/stm32f10x_dma.c ****     case DMA1_Channel3_BASE:
+  98:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA1 Channel3 */
+  99:cpu/STM32F103/stm32f10x_dma.c ****       DMA1->IFCR |= DMA1_Channel3_IT_Mask;
+  72              		.loc 1 99 7 view .LVU18
+  73              		.loc 1 99 18 is_stmt 0 view .LVU19
+  74 002e 344A     		ldr	r2, .L25+8
+  75 0030 5368     		ldr	r3, [r2, #4]
+  76 0032 43F47063 		orr	r3, r3, #3840
+  77 0036 5360     		str	r3, [r2, #4]
+ 100:cpu/STM32F103/stm32f10x_dma.c ****       break;
+  78              		.loc 1 100 7 is_stmt 1 view .LVU20
+  79 0038 7047     		bx	lr
+  80              	.L3:
+  85:cpu/STM32F103/stm32f10x_dma.c ****   {
+  81              		.loc 1 85 3 is_stmt 0 view .LVU21
+  82 003a 324B     		ldr	r3, .L25+12
+  83 003c 9842     		cmp	r0, r3
+  84 003e 3FD0     		beq	.L12
+  85 0040 20D9     		bls	.L20
+  86 0042 314B     		ldr	r3, .L25+16
+  87 0044 9842     		cmp	r0, r3
+  88 0046 41D0     		beq	.L16
+  89 0048 1433     		adds	r3, r3, #20
+  90 004a 9842     		cmp	r0, r3
+  91 004c 50D1     		bne	.L21
+ 101:cpu/STM32F103/stm32f10x_dma.c **** 
+ 102:cpu/STM32F103/stm32f10x_dma.c ****     case DMA1_Channel4_BASE:
+ 103:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA1 Channel4 */
+ 104:cpu/STM32F103/stm32f10x_dma.c ****       DMA1->IFCR |= DMA1_Channel4_IT_Mask;
+ 105:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 106:cpu/STM32F103/stm32f10x_dma.c **** 
+ 107:cpu/STM32F103/stm32f10x_dma.c ****     case DMA1_Channel5_BASE:
+ 108:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA1 Channel5 */
+ 109:cpu/STM32F103/stm32f10x_dma.c ****       DMA1->IFCR |= DMA1_Channel5_IT_Mask;
+ 110:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 111:cpu/STM32F103/stm32f10x_dma.c **** 
+ 112:cpu/STM32F103/stm32f10x_dma.c ****     case DMA1_Channel6_BASE:
+ 113:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA1 Channel6 */
+ 114:cpu/STM32F103/stm32f10x_dma.c ****       DMA1->IFCR |= DMA1_Channel6_IT_Mask;
+ 115:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 116:cpu/STM32F103/stm32f10x_dma.c **** 
+ 117:cpu/STM32F103/stm32f10x_dma.c ****     case DMA1_Channel7_BASE:
+ 118:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA1 Channel7 */
+ 119:cpu/STM32F103/stm32f10x_dma.c ****       DMA1->IFCR |= DMA1_Channel7_IT_Mask;
+ 120:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 121:cpu/STM32F103/stm32f10x_dma.c **** 
+ 122:cpu/STM32F103/stm32f10x_dma.c ****     case DMA2_Channel1_BASE:
+ 123:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA2 Channel1 */
+ 124:cpu/STM32F103/stm32f10x_dma.c ****       DMA2->IFCR |= DMA2_Channel1_IT_Mask;
+ 125:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 126:cpu/STM32F103/stm32f10x_dma.c **** 
+ 127:cpu/STM32F103/stm32f10x_dma.c ****     case DMA2_Channel2_BASE:
+ 128:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA2 Channel2 */
+ 129:cpu/STM32F103/stm32f10x_dma.c ****       DMA2->IFCR |= DMA2_Channel2_IT_Mask;
+ 130:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 131:cpu/STM32F103/stm32f10x_dma.c **** 
+ 132:cpu/STM32F103/stm32f10x_dma.c ****     case DMA2_Channel3_BASE:
+ 133:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA2 Channel3 */
+ 134:cpu/STM32F103/stm32f10x_dma.c ****       DMA2->IFCR |= DMA2_Channel3_IT_Mask;
+ 135:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 136:cpu/STM32F103/stm32f10x_dma.c **** 
+ 137:cpu/STM32F103/stm32f10x_dma.c ****     case DMA2_Channel4_BASE:
+ 138:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA2 Channel4 */
+ 139:cpu/STM32F103/stm32f10x_dma.c ****       DMA2->IFCR |= DMA2_Channel4_IT_Mask;
+ 140:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 141:cpu/STM32F103/stm32f10x_dma.c **** 
+ 142:cpu/STM32F103/stm32f10x_dma.c ****     case DMA2_Channel5_BASE:
+ 143:cpu/STM32F103/stm32f10x_dma.c ****       /* Reset interrupt pending bits for DMA2 Channel5 */
+ 144:cpu/STM32F103/stm32f10x_dma.c ****       DMA2->IFCR |= DMA2_Channel5_IT_Mask;
+  92              		.loc 1 144 7 is_stmt 1 view .LVU22
+  93              		.loc 1 144 18 is_stmt 0 view .LVU23
+  94 004e 2F4A     		ldr	r2, .L25+20
+  95 0050 5368     		ldr	r3, [r2, #4]
+  96 0052 43F47023 		orr	r3, r3, #983040
+  97 0056 5360     		str	r3, [r2, #4]
+ 145:cpu/STM32F103/stm32f10x_dma.c ****       break;
+  98              		.loc 1 145 7 is_stmt 1 view .LVU24
+ 146:cpu/STM32F103/stm32f10x_dma.c ****       
+ 147:cpu/STM32F103/stm32f10x_dma.c ****     default:
+ 148:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 149:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 150:cpu/STM32F103/stm32f10x_dma.c **** }
+  99              		.loc 1 150 1 is_stmt 0 view .LVU25
+ 100 0058 7047     		bx	lr
+ 101              	.L19:
+  85:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 102              		.loc 1 85 3 view .LVU26
+ 103 005a 283B     		subs	r3, r3, #40
+ 104 005c 9842     		cmp	r0, r3
+ 105 005e 4AD1     		bne	.L22
+  89:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 106              		.loc 1 89 7 is_stmt 1 view .LVU27
+  89:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 107              		.loc 1 89 18 is_stmt 0 view .LVU28
+ 108 0060 274A     		ldr	r2, .L25+8
+ 109 0062 5368     		ldr	r3, [r2, #4]
+ 110 0064 43F00F03 		orr	r3, r3, #15
+ 111 0068 5360     		str	r3, [r2, #4]
+  90:cpu/STM32F103/stm32f10x_dma.c **** 
+ 112              		.loc 1 90 7 is_stmt 1 view .LVU29
+ 113 006a 7047     		bx	lr
+ 114              	.L5:
+  85:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 115              		.loc 1 85 3 is_stmt 0 view .LVU30
+ 116 006c 284B     		ldr	r3, .L25+24
+ 117 006e 9842     		cmp	r0, r3
+ 118 0070 32D0     		beq	.L10
+ 119 0072 1433     		adds	r3, r3, #20
+ 120 0074 9842     		cmp	r0, r3
+ 121 0076 3DD1     		bne	.L23
+ 114:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 122              		.loc 1 114 7 is_stmt 1 view .LVU31
+ 114:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 123              		.loc 1 114 18 is_stmt 0 view .LVU32
+ 124 0078 214A     		ldr	r2, .L25+8
+ 125 007a 5368     		ldr	r3, [r2, #4]
+ 126 007c 43F47003 		orr	r3, r3, #15728640
+ 127 0080 5360     		str	r3, [r2, #4]
+ 115:cpu/STM32F103/stm32f10x_dma.c **** 
+ 128              		.loc 1 115 7 is_stmt 1 view .LVU33
+ 129 0082 7047     		bx	lr
+ 130              	.L20:
+  85:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 131              		.loc 1 85 3 is_stmt 0 view .LVU34
+ 132 0084 283B     		subs	r3, r3, #40
+ 133 0086 9842     		cmp	r0, r3
+ 134 0088 2CD0     		beq	.L14
+ 135 008a 1433     		adds	r3, r3, #20
+ 136 008c 9842     		cmp	r0, r3
+ 137 008e 30D1     		bne	.L24
+ 129:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 138              		.loc 1 129 7 is_stmt 1 view .LVU35
+ 129:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 139              		.loc 1 129 18 is_stmt 0 view .LVU36
+ 140 0090 1E4A     		ldr	r2, .L25+20
+ 141 0092 5368     		ldr	r3, [r2, #4]
+ 142 0094 43F0F003 		orr	r3, r3, #240
+ 143 0098 5360     		str	r3, [r2, #4]
+ 130:cpu/STM32F103/stm32f10x_dma.c **** 
+ 144              		.loc 1 130 7 is_stmt 1 view .LVU37
+ 145 009a 7047     		bx	lr
+ 146              	.L2:
+ 119:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 147              		.loc 1 119 7 view .LVU38
+ 119:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 148              		.loc 1 119 18 is_stmt 0 view .LVU39
+ 149 009c 184A     		ldr	r2, .L25+8
+ 150 009e 5368     		ldr	r3, [r2, #4]
+ 151 00a0 43F07063 		orr	r3, r3, #251658240
+ 152 00a4 5360     		str	r3, [r2, #4]
+ 120:cpu/STM32F103/stm32f10x_dma.c **** 
+ 153              		.loc 1 120 7 is_stmt 1 view .LVU40
+ 154 00a6 7047     		bx	lr
+ 155              	.L4:
+ 104:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 156              		.loc 1 104 7 view .LVU41
+ 104:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 157              		.loc 1 104 18 is_stmt 0 view .LVU42
+ 158 00a8 154A     		ldr	r2, .L25+8
+ 159 00aa 5368     		ldr	r3, [r2, #4]
+ 160 00ac 43F47043 		orr	r3, r3, #61440
+ 161 00b0 5360     		str	r3, [r2, #4]
+ 105:cpu/STM32F103/stm32f10x_dma.c **** 
+ 162              		.loc 1 105 7 is_stmt 1 view .LVU43
+ 163 00b2 7047     		bx	lr
+ 164              	.L6:
+  94:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 165              		.loc 1 94 7 view .LVU44
+  94:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 166              		.loc 1 94 18 is_stmt 0 view .LVU45
+ 167 00b4 124A     		ldr	r2, .L25+8
+ 168 00b6 5368     		ldr	r3, [r2, #4]
+ 169 00b8 43F0F003 		orr	r3, r3, #240
+ 170 00bc 5360     		str	r3, [r2, #4]
+  95:cpu/STM32F103/stm32f10x_dma.c **** 
+ 171              		.loc 1 95 7 is_stmt 1 view .LVU46
+ 172 00be 7047     		bx	lr
+ 173              	.L12:
+ 134:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 174              		.loc 1 134 7 view .LVU47
+ 134:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 175              		.loc 1 134 18 is_stmt 0 view .LVU48
+ 176 00c0 124A     		ldr	r2, .L25+20
+ 177 00c2 5368     		ldr	r3, [r2, #4]
+ 178 00c4 43F47063 		orr	r3, r3, #3840
+ 179 00c8 5360     		str	r3, [r2, #4]
+ 135:cpu/STM32F103/stm32f10x_dma.c **** 
+ 180              		.loc 1 135 7 is_stmt 1 view .LVU49
+ 181 00ca 7047     		bx	lr
+ 182              	.L16:
+ 139:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 183              		.loc 1 139 7 view .LVU50
+ 139:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 184              		.loc 1 139 18 is_stmt 0 view .LVU51
+ 185 00cc 0F4A     		ldr	r2, .L25+20
+ 186 00ce 5368     		ldr	r3, [r2, #4]
+ 187 00d0 43F47043 		orr	r3, r3, #61440
+ 188 00d4 5360     		str	r3, [r2, #4]
+ 140:cpu/STM32F103/stm32f10x_dma.c **** 
+ 189              		.loc 1 140 7 is_stmt 1 view .LVU52
+ 190 00d6 7047     		bx	lr
+ 191              	.L10:
+ 109:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 192              		.loc 1 109 7 view .LVU53
+ 109:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 193              		.loc 1 109 18 is_stmt 0 view .LVU54
+ 194 00d8 094A     		ldr	r2, .L25+8
+ 195 00da 5368     		ldr	r3, [r2, #4]
+ 196 00dc 43F47023 		orr	r3, r3, #983040
+ 197 00e0 5360     		str	r3, [r2, #4]
+ 110:cpu/STM32F103/stm32f10x_dma.c **** 
+ 198              		.loc 1 110 7 is_stmt 1 view .LVU55
+ 199 00e2 7047     		bx	lr
+ 200              	.L14:
+ 124:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 201              		.loc 1 124 7 view .LVU56
+ 124:cpu/STM32F103/stm32f10x_dma.c ****       break;
+ 202              		.loc 1 124 18 is_stmt 0 view .LVU57
+ 203 00e4 094A     		ldr	r2, .L25+20
+ 204 00e6 5368     		ldr	r3, [r2, #4]
+ 205 00e8 43F00F03 		orr	r3, r3, #15
+ 206 00ec 5360     		str	r3, [r2, #4]
+ 125:cpu/STM32F103/stm32f10x_dma.c **** 
+ 207              		.loc 1 125 7 is_stmt 1 view .LVU58
+ 208 00ee 7047     		bx	lr
+ 209              	.L21:
+ 125:cpu/STM32F103/stm32f10x_dma.c **** 
+ 210              		.loc 1 125 7 is_stmt 0 view .LVU59
+ 211 00f0 7047     		bx	lr
+ 212              	.L24:
+ 125:cpu/STM32F103/stm32f10x_dma.c **** 
+ 213              		.loc 1 125 7 view .LVU60
+ 214 00f2 7047     		bx	lr
+ 215              	.L23:
+ 125:cpu/STM32F103/stm32f10x_dma.c **** 
+ 216              		.loc 1 125 7 view .LVU61
+ 217 00f4 7047     		bx	lr
+ 218              	.L22:
+ 125:cpu/STM32F103/stm32f10x_dma.c **** 
+ 219              		.loc 1 125 7 view .LVU62
+ 220 00f6 7047     		bx	lr
+ 221              	.L26:
+ 222              		.align	2
+ 223              	.L25:
+ 224 00f8 80000240 		.word	1073873024
+ 225 00fc 44000240 		.word	1073872964
+ 226 0100 00000240 		.word	1073872896
+ 227 0104 30040240 		.word	1073873968
+ 228 0108 44040240 		.word	1073873988
+ 229 010c 00040240 		.word	1073873920
+ 230 0110 58000240 		.word	1073872984
+ 231              		.cfi_endproc
+ 232              	.LFE0:
+ 234              		.align	1
+ 235              		.p2align 2,,3
+ 236              		.global	DMA_Init
+ 237              		.syntax unified
+ 238              		.thumb
+ 239              		.thumb_func
+ 241              	DMA_Init:
+ 242              	.LVL1:
+ 243              	.LFB1:
+ 151:cpu/STM32F103/stm32f10x_dma.c **** 
+ 152:cpu/STM32F103/stm32f10x_dma.c **** /*******************************************************************************
+ 153:cpu/STM32F103/stm32f10x_dma.c **** * Function Name  : DMA_Init
+ 154:cpu/STM32F103/stm32f10x_dma.c **** * Description    : Initializes the DMAy Channelx according to the specified
+ 155:cpu/STM32F103/stm32f10x_dma.c **** *                  parameters in the DMA_InitStruct.
+ 156:cpu/STM32F103/stm32f10x_dma.c **** * Input          : - DMAy_Channelx: where y can be 1 or 2 to select the DMA and 
+ 157:cpu/STM32F103/stm32f10x_dma.c **** *                    x can be 1 to 7 for DMA1 and 1 to 5 for DMA2 to select the 
+ 158:cpu/STM32F103/stm32f10x_dma.c **** *                    DMA Channel.
+ 159:cpu/STM32F103/stm32f10x_dma.c **** *                  - DMA_InitStruct: pointer to a DMA_InitTypeDef structure that
+ 160:cpu/STM32F103/stm32f10x_dma.c **** *                    contains the configuration information for the specified
+ 161:cpu/STM32F103/stm32f10x_dma.c **** *                    DMA Channel.
+ 162:cpu/STM32F103/stm32f10x_dma.c **** * Output         : None
+ 163:cpu/STM32F103/stm32f10x_dma.c **** * Return         : None
+ 164:cpu/STM32F103/stm32f10x_dma.c **** ******************************************************************************/
+ 165:cpu/STM32F103/stm32f10x_dma.c **** void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, DMA_InitTypeDef* DMA_InitStruct)
+ 166:cpu/STM32F103/stm32f10x_dma.c **** {
+ 244              		.loc 1 166 1 is_stmt 1 view -0
+ 245              		.cfi_startproc
+ 246              		@ args = 0, pretend = 0, frame = 0
+ 247              		@ frame_needed = 0, uses_anonymous_args = 0
+ 248              		@ link register save eliminated.
+ 167:cpu/STM32F103/stm32f10x_dma.c ****   u32 tmpreg = 0;
+ 249              		.loc 1 167 3 view .LVU64
+ 168:cpu/STM32F103/stm32f10x_dma.c **** 
+ 169:cpu/STM32F103/stm32f10x_dma.c ****   /* Check the parameters */
+ 170:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_ALL_PERIPH(DMAy_Channelx));
+ 250              		.loc 1 170 3 view .LVU65
+ 171:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_DIR(DMA_InitStruct->DMA_DIR));
+ 251              		.loc 1 171 3 view .LVU66
+ 172:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_BUFFER_SIZE(DMA_InitStruct->DMA_BufferSize));
+ 252              		.loc 1 172 3 view .LVU67
+ 173:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_PERIPHERAL_INC_STATE(DMA_InitStruct->DMA_PeripheralInc));
+ 253              		.loc 1 173 3 view .LVU68
+ 174:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_MEMORY_INC_STATE(DMA_InitStruct->DMA_MemoryInc));   
+ 254              		.loc 1 174 3 view .LVU69
+ 175:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_PERIPHERAL_DATA_SIZE(DMA_InitStruct->DMA_PeripheralDataSize));
+ 255              		.loc 1 175 3 view .LVU70
+ 176:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_MEMORY_DATA_SIZE(DMA_InitStruct->DMA_MemoryDataSize));
+ 256              		.loc 1 176 3 view .LVU71
+ 177:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_MODE(DMA_InitStruct->DMA_Mode));
+ 257              		.loc 1 177 3 view .LVU72
+ 178:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_PRIORITY(DMA_InitStruct->DMA_Priority));
+ 258              		.loc 1 178 3 view .LVU73
+ 179:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_M2M_STATE(DMA_InitStruct->DMA_M2M));
+ 259              		.loc 1 179 3 view .LVU74
+ 180:cpu/STM32F103/stm32f10x_dma.c **** 
+ 181:cpu/STM32F103/stm32f10x_dma.c **** /*--------------------------- DMAy Channelx CCR Configuration -----------------*/
+ 182:cpu/STM32F103/stm32f10x_dma.c ****   /* Get the DMAy_Channelx CCR value */
+ 183:cpu/STM32F103/stm32f10x_dma.c ****   tmpreg = DMAy_Channelx->CCR;
+ 260              		.loc 1 183 3 view .LVU75
+ 184:cpu/STM32F103/stm32f10x_dma.c ****   /* Clear MEM2MEM, PL, MSIZE, PSIZE, MINC, PINC, CIRC and DIR bits */
+ 185:cpu/STM32F103/stm32f10x_dma.c ****   tmpreg &= CCR_CLEAR_Mask;
+ 186:cpu/STM32F103/stm32f10x_dma.c ****   /* Configure DMAy Channelx: data transfer, data size, priority level and mode */
+ 187:cpu/STM32F103/stm32f10x_dma.c ****   /* Set DIR bit according to DMA_DIR value */
+ 188:cpu/STM32F103/stm32f10x_dma.c ****   /* Set CIRC bit according to DMA_Mode value */
+ 189:cpu/STM32F103/stm32f10x_dma.c ****   /* Set PINC bit according to DMA_PeripheralInc value */
+ 190:cpu/STM32F103/stm32f10x_dma.c ****   /* Set MINC bit according to DMA_MemoryInc value */
+ 191:cpu/STM32F103/stm32f10x_dma.c ****   /* Set PSIZE bits according to DMA_PeripheralDataSize value */
+ 192:cpu/STM32F103/stm32f10x_dma.c ****   /* Set MSIZE bits according to DMA_MemoryDataSize value */
+ 193:cpu/STM32F103/stm32f10x_dma.c ****   /* Set PL bits according to DMA_Priority value */
+ 194:cpu/STM32F103/stm32f10x_dma.c ****   /* Set the MEM2MEM bit according to DMA_M2M value */
+ 195:cpu/STM32F103/stm32f10x_dma.c ****   tmpreg |= DMA_InitStruct->DMA_DIR | DMA_InitStruct->DMA_Mode |
+ 261              		.loc 1 195 37 is_stmt 0 view .LVU76
+ 262 0114 8B68     		ldr	r3, [r1, #8]
+ 166:cpu/STM32F103/stm32f10x_dma.c ****   u32 tmpreg = 0;
+ 263              		.loc 1 166 1 view .LVU77
+ 264 0116 10B4     		push	{r4}
+ 265              	.LCFI0:
+ 266              		.cfi_def_cfa_offset 4
+ 267              		.cfi_offset 4, -4
+ 268              		.loc 1 195 37 view .LVU78
+ 269 0118 0C6A     		ldr	r4, [r1, #32]
+ 270              		.loc 1 195 64 view .LVU79
+ 271 011a 0A69     		ldr	r2, [r1, #16]
+ 272              		.loc 1 195 37 view .LVU80
+ 273 011c 2343     		orrs	r3, r3, r4
+ 274              		.loc 1 195 64 view .LVU81
+ 275 011e 1343     		orrs	r3, r3, r2
+ 196:cpu/STM32F103/stm32f10x_dma.c ****             DMA_InitStruct->DMA_PeripheralInc | DMA_InitStruct->DMA_MemoryInc |
+ 276              		.loc 1 196 79 view .LVU82
+ 277 0120 D1E90524 		ldrd	r2, r4, [r1, #20]
+ 278              		.loc 1 196 47 view .LVU83
+ 279 0124 1343     		orrs	r3, r3, r2
+ 280              		.loc 1 196 79 view .LVU84
+ 281 0126 2343     		orrs	r3, r3, r4
+ 197:cpu/STM32F103/stm32f10x_dma.c ****             DMA_InitStruct->DMA_PeripheralDataSize | DMA_InitStruct->DMA_MemoryDataSize |
+ 282              		.loc 1 197 52 view .LVU85
+ 283 0128 CC69     		ldr	r4, [r1, #28]
+ 183:cpu/STM32F103/stm32f10x_dma.c ****   /* Clear MEM2MEM, PL, MSIZE, PSIZE, MINC, PINC, CIRC and DIR bits */
+ 284              		.loc 1 183 10 view .LVU86
+ 285 012a 0268     		ldr	r2, [r0]
+ 286              	.LVL2:
+ 185:cpu/STM32F103/stm32f10x_dma.c ****   /* Configure DMAy Channelx: data transfer, data size, priority level and mode */
+ 287              		.loc 1 185 3 is_stmt 1 view .LVU87
+ 288              		.loc 1 197 52 is_stmt 0 view .LVU88
+ 289 012c 2343     		orrs	r3, r3, r4
+ 290              		.loc 1 197 89 view .LVU89
+ 291 012e 4C6A     		ldr	r4, [r1, #36]
+ 185:cpu/STM32F103/stm32f10x_dma.c ****   /* Configure DMAy Channelx: data transfer, data size, priority level and mode */
+ 292              		.loc 1 185 10 view .LVU90
+ 293 0130 22F4FF42 		bic	r2, r2, #32640
+ 294              	.LVL3:
+ 295              		.loc 1 197 89 view .LVU91
+ 296 0134 2343     		orrs	r3, r3, r4
+ 198:cpu/STM32F103/stm32f10x_dma.c ****             DMA_InitStruct->DMA_Priority | DMA_InitStruct->DMA_M2M;
+ 297              		.loc 1 198 42 view .LVU92
+ 298 0136 8C6A     		ldr	r4, [r1, #40]
+ 185:cpu/STM32F103/stm32f10x_dma.c ****   /* Configure DMAy Channelx: data transfer, data size, priority level and mode */
+ 299              		.loc 1 185 10 view .LVU93
+ 300 0138 22F07002 		bic	r2, r2, #112
+ 301              	.LVL4:
+ 195:cpu/STM32F103/stm32f10x_dma.c ****             DMA_InitStruct->DMA_PeripheralInc | DMA_InitStruct->DMA_MemoryInc |
+ 302              		.loc 1 195 3 is_stmt 1 view .LVU94
+ 303              		.loc 1 198 42 is_stmt 0 view .LVU95
+ 304 013c 2343     		orrs	r3, r3, r4
+ 199:cpu/STM32F103/stm32f10x_dma.c ****   /* Write to DMAy Channelx CCR */
+ 200:cpu/STM32F103/stm32f10x_dma.c ****   DMAy_Channelx->CCR = tmpreg;
+ 201:cpu/STM32F103/stm32f10x_dma.c **** 
+ 202:cpu/STM32F103/stm32f10x_dma.c **** /*--------------------------- DMAy Channelx CNDTR Configuration ---------------*/
+ 203:cpu/STM32F103/stm32f10x_dma.c ****   /* Write to DMAy Channelx CNDTR */
+ 204:cpu/STM32F103/stm32f10x_dma.c ****   DMAy_Channelx->CNDTR = DMA_InitStruct->DMA_BufferSize;
+ 305              		.loc 1 204 40 view .LVU96
+ 306 013e CC68     		ldr	r4, [r1, #12]
+ 195:cpu/STM32F103/stm32f10x_dma.c ****             DMA_InitStruct->DMA_PeripheralInc | DMA_InitStruct->DMA_MemoryInc |
+ 307              		.loc 1 195 10 view .LVU97
+ 308 0140 1343     		orrs	r3, r3, r2
+ 309              	.LVL5:
+ 200:cpu/STM32F103/stm32f10x_dma.c **** 
+ 310              		.loc 1 200 3 is_stmt 1 view .LVU98
+ 200:cpu/STM32F103/stm32f10x_dma.c **** 
+ 311              		.loc 1 200 22 is_stmt 0 view .LVU99
+ 312 0142 0360     		str	r3, [r0]
+ 313              		.loc 1 204 3 is_stmt 1 view .LVU100
+ 205:cpu/STM32F103/stm32f10x_dma.c **** 
+ 206:cpu/STM32F103/stm32f10x_dma.c **** /*--------------------------- DMAy Channelx CPAR Configuration ----------------*/
+ 207:cpu/STM32F103/stm32f10x_dma.c ****   /* Write to DMAy Channelx CPAR */
+ 208:cpu/STM32F103/stm32f10x_dma.c ****   DMAy_Channelx->CPAR = DMA_InitStruct->DMA_PeripheralBaseAddr;
+ 209:cpu/STM32F103/stm32f10x_dma.c **** 
+ 210:cpu/STM32F103/stm32f10x_dma.c **** /*--------------------------- DMAy Channelx CMAR Configuration ----------------*/
+ 211:cpu/STM32F103/stm32f10x_dma.c ****   /* Write to DMAy Channelx CMAR */
+ 212:cpu/STM32F103/stm32f10x_dma.c ****   DMAy_Channelx->CMAR = DMA_InitStruct->DMA_MemoryBaseAddr;
+ 314              		.loc 1 212 39 is_stmt 0 view .LVU101
+ 315 0144 D1E90023 		ldrd	r2, r3, [r1]
+ 316              	.LVL6:
+ 204:cpu/STM32F103/stm32f10x_dma.c **** 
+ 317              		.loc 1 204 24 view .LVU102
+ 318 0148 4460     		str	r4, [r0, #4]
+ 319              	.LVL7:
+ 208:cpu/STM32F103/stm32f10x_dma.c **** 
+ 320              		.loc 1 208 3 is_stmt 1 view .LVU103
+ 208:cpu/STM32F103/stm32f10x_dma.c **** 
+ 321              		.loc 1 208 23 is_stmt 0 view .LVU104
+ 322 014a 8260     		str	r2, [r0, #8]
+ 323              		.loc 1 212 3 is_stmt 1 view .LVU105
+ 213:cpu/STM32F103/stm32f10x_dma.c **** }
+ 324              		.loc 1 213 1 is_stmt 0 view .LVU106
+ 325 014c 10BC     		pop	{r4}
+ 326              	.LCFI1:
+ 327              		.cfi_restore 4
+ 328              		.cfi_def_cfa_offset 0
+ 212:cpu/STM32F103/stm32f10x_dma.c **** }
+ 329              		.loc 1 212 23 view .LVU107
+ 330 014e C360     		str	r3, [r0, #12]
+ 331              		.loc 1 213 1 view .LVU108
+ 332 0150 7047     		bx	lr
+ 333              		.cfi_endproc
+ 334              	.LFE1:
+ 336              		.align	1
+ 337 0152 00BF     		.p2align 2,,3
+ 338              		.global	DMA_StructInit
+ 339              		.syntax unified
+ 340              		.thumb
+ 341              		.thumb_func
+ 343              	DMA_StructInit:
+ 344              	.LVL8:
+ 345              	.LFB2:
+ 214:cpu/STM32F103/stm32f10x_dma.c **** 
+ 215:cpu/STM32F103/stm32f10x_dma.c **** /*******************************************************************************
+ 216:cpu/STM32F103/stm32f10x_dma.c **** * Function Name  : DMA_StructInit
+ 217:cpu/STM32F103/stm32f10x_dma.c **** * Description    : Fills each DMA_InitStruct member with its default value.
+ 218:cpu/STM32F103/stm32f10x_dma.c **** * Input          : - DMA_InitStruct : pointer to a DMA_InitTypeDef structure
+ 219:cpu/STM32F103/stm32f10x_dma.c **** *                    which will be initialized.
+ 220:cpu/STM32F103/stm32f10x_dma.c **** * Output         : None
+ 221:cpu/STM32F103/stm32f10x_dma.c **** * Return         : None
+ 222:cpu/STM32F103/stm32f10x_dma.c **** *******************************************************************************/
+ 223:cpu/STM32F103/stm32f10x_dma.c **** void DMA_StructInit(DMA_InitTypeDef* DMA_InitStruct)
+ 224:cpu/STM32F103/stm32f10x_dma.c **** {
+ 346              		.loc 1 224 1 is_stmt 1 view -0
+ 347              		.cfi_startproc
+ 348              		@ args = 0, pretend = 0, frame = 0
+ 349              		@ frame_needed = 0, uses_anonymous_args = 0
+ 350              		@ link register save eliminated.
+ 225:cpu/STM32F103/stm32f10x_dma.c **** /*-------------- Reset DMA init structure parameters values ------------------*/
+ 226:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_PeripheralBaseAddr member */
+ 227:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_PeripheralBaseAddr = 0;
+ 351              		.loc 1 227 3 view .LVU110
+ 352              		.loc 1 227 42 is_stmt 0 view .LVU111
+ 353 0154 0023     		movs	r3, #0
+ 228:cpu/STM32F103/stm32f10x_dma.c **** 
+ 229:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_MemoryBaseAddr member */
+ 230:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_MemoryBaseAddr = 0;
+ 354              		.loc 1 230 38 view .LVU112
+ 355 0156 C0E90033 		strd	r3, r3, [r0]
+ 231:cpu/STM32F103/stm32f10x_dma.c **** 
+ 232:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_DIR member */
+ 233:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_DIR = DMA_DIR_PeripheralSRC;
+ 356              		.loc 1 233 3 is_stmt 1 view .LVU113
+ 234:cpu/STM32F103/stm32f10x_dma.c **** 
+ 235:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_BufferSize member */
+ 236:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_BufferSize = 0;
+ 357              		.loc 1 236 34 is_stmt 0 view .LVU114
+ 358 015a C0E90233 		strd	r3, r3, [r0, #8]
+ 237:cpu/STM32F103/stm32f10x_dma.c **** 
+ 238:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_PeripheralInc member */
+ 239:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+ 359              		.loc 1 239 3 is_stmt 1 view .LVU115
+ 240:cpu/STM32F103/stm32f10x_dma.c **** 
+ 241:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_MemoryInc member */
+ 242:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_MemoryInc = DMA_MemoryInc_Disable;
+ 360              		.loc 1 242 33 is_stmt 0 view .LVU116
+ 361 015e C0E90433 		strd	r3, r3, [r0, #16]
+ 243:cpu/STM32F103/stm32f10x_dma.c **** 
+ 244:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_PeripheralDataSize member */
+ 245:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+ 362              		.loc 1 245 3 is_stmt 1 view .LVU117
+ 246:cpu/STM32F103/stm32f10x_dma.c **** 
+ 247:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_MemoryDataSize member */
+ 248:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+ 363              		.loc 1 248 38 is_stmt 0 view .LVU118
+ 364 0162 C0E90633 		strd	r3, r3, [r0, #24]
+ 249:cpu/STM32F103/stm32f10x_dma.c **** 
+ 250:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_Mode member */
+ 251:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_Mode = DMA_Mode_Normal;
+ 365              		.loc 1 251 3 is_stmt 1 view .LVU119
+ 252:cpu/STM32F103/stm32f10x_dma.c **** 
+ 253:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_Priority member */
+ 254:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_Priority = DMA_Priority_Low;
+ 366              		.loc 1 254 32 is_stmt 0 view .LVU120
+ 367 0166 C0E90833 		strd	r3, r3, [r0, #32]
+ 255:cpu/STM32F103/stm32f10x_dma.c **** 
+ 256:cpu/STM32F103/stm32f10x_dma.c ****   /* Initialize the DMA_M2M member */
+ 257:cpu/STM32F103/stm32f10x_dma.c ****   DMA_InitStruct->DMA_M2M = DMA_M2M_Disable;
+ 368              		.loc 1 257 3 is_stmt 1 view .LVU121
+ 369              		.loc 1 257 27 is_stmt 0 view .LVU122
+ 370 016a 8362     		str	r3, [r0, #40]
+ 258:cpu/STM32F103/stm32f10x_dma.c **** }
+ 371              		.loc 1 258 1 view .LVU123
+ 372 016c 7047     		bx	lr
+ 373              		.cfi_endproc
+ 374              	.LFE2:
+ 376              		.align	1
+ 377 016e 00BF     		.p2align 2,,3
+ 378              		.global	DMA_Cmd
+ 379              		.syntax unified
+ 380              		.thumb
+ 381              		.thumb_func
+ 383              	DMA_Cmd:
+ 384              	.LVL9:
+ 385              	.LFB3:
+ 259:cpu/STM32F103/stm32f10x_dma.c **** 
+ 260:cpu/STM32F103/stm32f10x_dma.c **** /*******************************************************************************
+ 261:cpu/STM32F103/stm32f10x_dma.c **** * Function Name  : DMA_Cmd
+ 262:cpu/STM32F103/stm32f10x_dma.c **** * Description    : Enables or disables the specified DMAy Channelx.
+ 263:cpu/STM32F103/stm32f10x_dma.c **** * Input          : - DMAy_Channelx: where y can be 1 or 2 to select the DMA and 
+ 264:cpu/STM32F103/stm32f10x_dma.c **** *                    x can be 1 to 7 for DMA1 and 1 to 5 for DMA2 to select the 
+ 265:cpu/STM32F103/stm32f10x_dma.c **** *                    DMA Channel.
+ 266:cpu/STM32F103/stm32f10x_dma.c **** *                  - NewState: new state of the DMAy Channelx. 
+ 267:cpu/STM32F103/stm32f10x_dma.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 268:cpu/STM32F103/stm32f10x_dma.c **** * Output         : None
+ 269:cpu/STM32F103/stm32f10x_dma.c **** * Return         : None
+ 270:cpu/STM32F103/stm32f10x_dma.c **** *******************************************************************************/
+ 271:cpu/STM32F103/stm32f10x_dma.c **** void DMA_Cmd(DMA_Channel_TypeDef* DMAy_Channelx, FunctionalState NewState)
+ 272:cpu/STM32F103/stm32f10x_dma.c **** {
+ 386              		.loc 1 272 1 is_stmt 1 view -0
+ 387              		.cfi_startproc
+ 388              		@ args = 0, pretend = 0, frame = 0
+ 389              		@ frame_needed = 0, uses_anonymous_args = 0
+ 390              		@ link register save eliminated.
+ 273:cpu/STM32F103/stm32f10x_dma.c ****   /* Check the parameters */
+ 274:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_ALL_PERIPH(DMAy_Channelx));
+ 391              		.loc 1 274 3 view .LVU125
+ 275:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 392              		.loc 1 275 3 view .LVU126
+ 276:cpu/STM32F103/stm32f10x_dma.c **** 
+ 277:cpu/STM32F103/stm32f10x_dma.c ****   if (NewState != DISABLE)
+ 393              		.loc 1 277 3 view .LVU127
+ 278:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 279:cpu/STM32F103/stm32f10x_dma.c ****     /* Enable the selected DMAy Channelx */
+ 280:cpu/STM32F103/stm32f10x_dma.c ****     DMAy_Channelx->CCR |= CCR_ENABLE_Set;
+ 394              		.loc 1 280 24 is_stmt 0 view .LVU128
+ 395 0170 0368     		ldr	r3, [r0]
+ 277:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 396              		.loc 1 277 6 view .LVU129
+ 397 0172 19B1     		cbz	r1, .L31
+ 398              		.loc 1 280 5 is_stmt 1 view .LVU130
+ 399              		.loc 1 280 24 is_stmt 0 view .LVU131
+ 400 0174 43F00103 		orr	r3, r3, #1
+ 401 0178 0360     		str	r3, [r0]
+ 402 017a 7047     		bx	lr
+ 403              	.L31:
+ 281:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 282:cpu/STM32F103/stm32f10x_dma.c ****   else
+ 283:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 284:cpu/STM32F103/stm32f10x_dma.c ****     /* Disable the selected DMAy Channelx */
+ 285:cpu/STM32F103/stm32f10x_dma.c ****     DMAy_Channelx->CCR &= CCR_ENABLE_Reset;
+ 404              		.loc 1 285 5 is_stmt 1 view .LVU132
+ 405              		.loc 1 285 24 is_stmt 0 view .LVU133
+ 406 017c 23F00103 		bic	r3, r3, #1
+ 407 0180 0360     		str	r3, [r0]
+ 286:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 287:cpu/STM32F103/stm32f10x_dma.c **** }
+ 408              		.loc 1 287 1 view .LVU134
+ 409 0182 7047     		bx	lr
+ 410              		.cfi_endproc
+ 411              	.LFE3:
+ 413              		.align	1
+ 414              		.p2align 2,,3
+ 415              		.global	DMA_ITConfig
+ 416              		.syntax unified
+ 417              		.thumb
+ 418              		.thumb_func
+ 420              	DMA_ITConfig:
+ 421              	.LVL10:
+ 422              	.LFB4:
+ 288:cpu/STM32F103/stm32f10x_dma.c **** 
+ 289:cpu/STM32F103/stm32f10x_dma.c **** /*******************************************************************************
+ 290:cpu/STM32F103/stm32f10x_dma.c **** * Function Name  : DMA_ITConfig
+ 291:cpu/STM32F103/stm32f10x_dma.c **** * Description    : Enables or disables the specified DMAy Channelx interrupts.
+ 292:cpu/STM32F103/stm32f10x_dma.c **** * Input          : - DMAy_Channelx: where y can be 1 or 2 to select the DMA and 
+ 293:cpu/STM32F103/stm32f10x_dma.c **** *                    x can be 1 to 7 for DMA1 and 1 to 5 for DMA2 to select the 
+ 294:cpu/STM32F103/stm32f10x_dma.c **** *                    DMA Channel.
+ 295:cpu/STM32F103/stm32f10x_dma.c **** *                  - DMA_IT: specifies the DMA interrupts sources to be enabled
+ 296:cpu/STM32F103/stm32f10x_dma.c **** *                    or disabled. 
+ 297:cpu/STM32F103/stm32f10x_dma.c **** *                    This parameter can be any combination of the following values:
+ 298:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA_IT_TC:  Transfer complete interrupt mask
+ 299:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA_IT_HT:  Half transfer interrupt mask
+ 300:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA_IT_TE:  Transfer error interrupt mask
+ 301:cpu/STM32F103/stm32f10x_dma.c **** *                  - NewState: new state of the specified DMA interrupts.
+ 302:cpu/STM32F103/stm32f10x_dma.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 303:cpu/STM32F103/stm32f10x_dma.c **** * Output         : None
+ 304:cpu/STM32F103/stm32f10x_dma.c **** * Return         : None
+ 305:cpu/STM32F103/stm32f10x_dma.c **** *******************************************************************************/
+ 306:cpu/STM32F103/stm32f10x_dma.c **** void DMA_ITConfig(DMA_Channel_TypeDef* DMAy_Channelx, u32 DMA_IT, FunctionalState NewState)
+ 307:cpu/STM32F103/stm32f10x_dma.c **** {
+ 423              		.loc 1 307 1 is_stmt 1 view -0
+ 424              		.cfi_startproc
+ 425              		@ args = 0, pretend = 0, frame = 0
+ 426              		@ frame_needed = 0, uses_anonymous_args = 0
+ 427              		@ link register save eliminated.
+ 308:cpu/STM32F103/stm32f10x_dma.c ****   /* Check the parameters */
+ 309:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_ALL_PERIPH(DMAy_Channelx));
+ 428              		.loc 1 309 3 view .LVU136
+ 310:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_CONFIG_IT(DMA_IT));
+ 429              		.loc 1 310 3 view .LVU137
+ 311:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 430              		.loc 1 311 3 view .LVU138
+ 312:cpu/STM32F103/stm32f10x_dma.c **** 
+ 313:cpu/STM32F103/stm32f10x_dma.c ****   if (NewState != DISABLE)
+ 431              		.loc 1 313 3 view .LVU139
+ 314:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 315:cpu/STM32F103/stm32f10x_dma.c ****     /* Enable the selected DMA interrupts */
+ 316:cpu/STM32F103/stm32f10x_dma.c ****     DMAy_Channelx->CCR |= DMA_IT;
+ 432              		.loc 1 316 24 is_stmt 0 view .LVU140
+ 433 0184 0368     		ldr	r3, [r0]
+ 313:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 434              		.loc 1 313 6 view .LVU141
+ 435 0186 12B1     		cbz	r2, .L34
+ 436              		.loc 1 316 5 is_stmt 1 view .LVU142
+ 437              		.loc 1 316 24 is_stmt 0 view .LVU143
+ 438 0188 1943     		orrs	r1, r1, r3
+ 439              	.LVL11:
+ 440              		.loc 1 316 24 view .LVU144
+ 441 018a 0160     		str	r1, [r0]
+ 442 018c 7047     		bx	lr
+ 443              	.LVL12:
+ 444              	.L34:
+ 317:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 318:cpu/STM32F103/stm32f10x_dma.c ****   else
+ 319:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 320:cpu/STM32F103/stm32f10x_dma.c ****     /* Disable the selected DMA interrupts */
+ 321:cpu/STM32F103/stm32f10x_dma.c ****     DMAy_Channelx->CCR &= ~DMA_IT;
+ 445              		.loc 1 321 5 is_stmt 1 view .LVU145
+ 446              		.loc 1 321 24 is_stmt 0 view .LVU146
+ 447 018e 23EA0101 		bic	r1, r3, r1
+ 448              	.LVL13:
+ 449              		.loc 1 321 24 view .LVU147
+ 450 0192 0160     		str	r1, [r0]
+ 322:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 323:cpu/STM32F103/stm32f10x_dma.c **** }
+ 451              		.loc 1 323 1 view .LVU148
+ 452 0194 7047     		bx	lr
+ 453              		.cfi_endproc
+ 454              	.LFE4:
+ 456              		.align	1
+ 457 0196 00BF     		.p2align 2,,3
+ 458              		.global	DMA_GetCurrDataCounter
+ 459              		.syntax unified
+ 460              		.thumb
+ 461              		.thumb_func
+ 463              	DMA_GetCurrDataCounter:
+ 464              	.LVL14:
+ 465              	.LFB5:
+ 324:cpu/STM32F103/stm32f10x_dma.c **** 
+ 325:cpu/STM32F103/stm32f10x_dma.c **** /*******************************************************************************
+ 326:cpu/STM32F103/stm32f10x_dma.c **** * Function Name  : DMA_GetCurrDataCounter
+ 327:cpu/STM32F103/stm32f10x_dma.c **** * Description    : Returns the number of remaining data units in the current
+ 328:cpu/STM32F103/stm32f10x_dma.c **** *                  DMAy Channelx transfer.
+ 329:cpu/STM32F103/stm32f10x_dma.c **** * Input          : - DMAy_Channelx: where y can be 1 or 2 to select the DMA and 
+ 330:cpu/STM32F103/stm32f10x_dma.c **** *                    x can be 1 to 7 for DMA1 and 1 to 5 for DMA2 to select the 
+ 331:cpu/STM32F103/stm32f10x_dma.c **** *                    DMA Channel.
+ 332:cpu/STM32F103/stm32f10x_dma.c **** * Output         : None
+ 333:cpu/STM32F103/stm32f10x_dma.c **** * Return         : The number of remaining data units in the current DMAy Channelx
+ 334:cpu/STM32F103/stm32f10x_dma.c **** *                  transfer.
+ 335:cpu/STM32F103/stm32f10x_dma.c **** *******************************************************************************/
+ 336:cpu/STM32F103/stm32f10x_dma.c **** u16 DMA_GetCurrDataCounter(DMA_Channel_TypeDef* DMAy_Channelx)
+ 337:cpu/STM32F103/stm32f10x_dma.c **** {
+ 466              		.loc 1 337 1 is_stmt 1 view -0
+ 467              		.cfi_startproc
+ 468              		@ args = 0, pretend = 0, frame = 0
+ 469              		@ frame_needed = 0, uses_anonymous_args = 0
+ 470              		@ link register save eliminated.
+ 338:cpu/STM32F103/stm32f10x_dma.c ****   /* Check the parameters */
+ 339:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_ALL_PERIPH(DMAy_Channelx));
+ 471              		.loc 1 339 3 view .LVU150
+ 340:cpu/STM32F103/stm32f10x_dma.c **** 
+ 341:cpu/STM32F103/stm32f10x_dma.c ****   /* Return the number of remaining data units for DMAy Channelx */
+ 342:cpu/STM32F103/stm32f10x_dma.c ****   return ((u16)(DMAy_Channelx->CNDTR));
+ 472              		.loc 1 342 3 view .LVU151
+ 473              		.loc 1 342 30 is_stmt 0 view .LVU152
+ 474 0198 4068     		ldr	r0, [r0, #4]
+ 475              	.LVL15:
+ 343:cpu/STM32F103/stm32f10x_dma.c **** }
+ 476              		.loc 1 343 1 view .LVU153
+ 477 019a 80B2     		uxth	r0, r0
+ 478 019c 7047     		bx	lr
+ 479              		.cfi_endproc
+ 480              	.LFE5:
+ 482              		.align	1
+ 483 019e 00BF     		.p2align 2,,3
+ 484              		.global	DMA_GetFlagStatus
+ 485              		.syntax unified
+ 486              		.thumb
+ 487              		.thumb_func
+ 489              	DMA_GetFlagStatus:
+ 490              	.LVL16:
+ 491              	.LFB6:
+ 344:cpu/STM32F103/stm32f10x_dma.c **** 
+ 345:cpu/STM32F103/stm32f10x_dma.c **** /*******************************************************************************
+ 346:cpu/STM32F103/stm32f10x_dma.c **** * Function Name  : DMA_GetFlagStatus
+ 347:cpu/STM32F103/stm32f10x_dma.c **** * Description    : Checks whether the specified DMAy Channelx flag is set or not.
+ 348:cpu/STM32F103/stm32f10x_dma.c **** * Input          : - DMA_FLAG: specifies the flag to check.
+ 349:cpu/STM32F103/stm32f10x_dma.c **** *                    This parameter can be one of the following values:
+ 350:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL1: DMA1 Channel1 global flag.
+ 351:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC1: DMA1 Channel1 transfer complete flag.
+ 352:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT1: DMA1 Channel1 half transfer flag.
+ 353:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE1: DMA1 Channel1 transfer error flag.
+ 354:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL2: DMA1 Channel2 global flag.
+ 355:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC2: DMA1 Channel2 transfer complete flag.
+ 356:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT2: DMA1 Channel2 half transfer flag.
+ 357:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE2: DMA1 Channel2 transfer error flag.
+ 358:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL3: DMA1 Channel3 global flag.
+ 359:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC3: DMA1 Channel3 transfer complete flag.
+ 360:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT3: DMA1 Channel3 half transfer flag.
+ 361:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE3: DMA1 Channel3 transfer error flag.
+ 362:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL4: DMA1 Channel4 global flag.
+ 363:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC4: DMA1 Channel4 transfer complete flag.
+ 364:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT4: DMA1 Channel4 half transfer flag.
+ 365:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE4: DMA1 Channel4 transfer error flag.
+ 366:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL5: DMA1 Channel5 global flag.
+ 367:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC5: DMA1 Channel5 transfer complete flag.
+ 368:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT5: DMA1 Channel5 half transfer flag.
+ 369:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE5: DMA1 Channel5 transfer error flag.
+ 370:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL6: DMA1 Channel6 global flag.
+ 371:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC6: DMA1 Channel6 transfer complete flag.
+ 372:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT6: DMA1 Channel6 half transfer flag.
+ 373:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE6: DMA1 Channel6 transfer error flag.
+ 374:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL7: DMA1 Channel7 global flag.
+ 375:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC7: DMA1 Channel7 transfer complete flag.
+ 376:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT7: DMA1 Channel7 half transfer flag.
+ 377:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE7: DMA1 Channel7 transfer error flag.
+ 378:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL1: DMA2 Channel1 global flag.
+ 379:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC1: DMA2 Channel1 transfer complete flag.
+ 380:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT1: DMA2 Channel1 half transfer flag.
+ 381:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE1: DMA2 Channel1 transfer error flag.
+ 382:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL2: DMA2 Channel2 global flag.
+ 383:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC2: DMA2 Channel2 transfer complete flag.
+ 384:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT2: DMA2 Channel2 half transfer flag.
+ 385:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE2: DMA2 Channel2 transfer error flag.
+ 386:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL3: DMA2 Channel3 global flag.
+ 387:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC3: DMA2 Channel3 transfer complete flag.
+ 388:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT3: DMA2 Channel3 half transfer flag.
+ 389:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE3: DMA2 Channel3 transfer error flag.
+ 390:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL4: DMA2 Channel4 global flag.
+ 391:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC4: DMA2 Channel4 transfer complete flag.
+ 392:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT4: DMA2 Channel4 half transfer flag.
+ 393:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE4: DMA2 Channel4 transfer error flag.
+ 394:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL5: DMA2 Channel5 global flag.
+ 395:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC5: DMA2 Channel5 transfer complete flag.
+ 396:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT5: DMA2 Channel5 half transfer flag.
+ 397:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE5: DMA2 Channel5 transfer error flag.
+ 398:cpu/STM32F103/stm32f10x_dma.c **** * Output         : None
+ 399:cpu/STM32F103/stm32f10x_dma.c **** * Return         : The new state of DMA_FLAG (SET or RESET).
+ 400:cpu/STM32F103/stm32f10x_dma.c **** *******************************************************************************/
+ 401:cpu/STM32F103/stm32f10x_dma.c **** FlagStatus DMA_GetFlagStatus(u32 DMA_FLAG)
+ 402:cpu/STM32F103/stm32f10x_dma.c **** {
+ 492              		.loc 1 402 1 is_stmt 1 view -0
+ 493              		.cfi_startproc
+ 494              		@ args = 0, pretend = 0, frame = 0
+ 495              		@ frame_needed = 0, uses_anonymous_args = 0
+ 496              		@ link register save eliminated.
+ 403:cpu/STM32F103/stm32f10x_dma.c ****   FlagStatus bitstatus = RESET;
+ 497              		.loc 1 403 3 view .LVU155
+ 404:cpu/STM32F103/stm32f10x_dma.c ****   u32 tmpreg = 0;
+ 498              		.loc 1 404 3 view .LVU156
+ 405:cpu/STM32F103/stm32f10x_dma.c **** 
+ 406:cpu/STM32F103/stm32f10x_dma.c ****   /* Check the parameters */
+ 407:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_GET_FLAG(DMA_FLAG));
+ 499              		.loc 1 407 3 view .LVU157
+ 408:cpu/STM32F103/stm32f10x_dma.c **** 
+ 409:cpu/STM32F103/stm32f10x_dma.c ****   /* Calculate the used DMA */
+ 410:cpu/STM32F103/stm32f10x_dma.c ****   if ((DMA_FLAG & FLAG_Mask) != (u32)RESET)
+ 500              		.loc 1 410 3 view .LVU158
+ 501              		.loc 1 410 6 is_stmt 0 view .LVU159
+ 502 01a0 C300     		lsls	r3, r0, #3
+ 411:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 412:cpu/STM32F103/stm32f10x_dma.c ****     /* Get DMA2 ISR register value */
+ 413:cpu/STM32F103/stm32f10x_dma.c ****     tmpreg = DMA2->ISR ;
+ 503              		.loc 1 413 5 is_stmt 1 view .LVU160
+ 504              		.loc 1 413 12 is_stmt 0 view .LVU161
+ 505 01a2 4CBF     		ite	mi
+ 506 01a4 034B     		ldrmi	r3, .L40
+ 414:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 415:cpu/STM32F103/stm32f10x_dma.c ****   else
+ 416:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 417:cpu/STM32F103/stm32f10x_dma.c ****     /* Get DMA1 ISR register value */
+ 418:cpu/STM32F103/stm32f10x_dma.c ****     tmpreg = DMA1->ISR ;
+ 507              		.loc 1 418 5 is_stmt 1 view .LVU162
+ 508              		.loc 1 418 12 is_stmt 0 view .LVU163
+ 509 01a6 044B     		ldrpl	r3, .L40+4
+ 510 01a8 1B68     		ldr	r3, [r3]
+ 511              	.LVL17:
+ 419:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 420:cpu/STM32F103/stm32f10x_dma.c **** 
+ 421:cpu/STM32F103/stm32f10x_dma.c ****   /* Check the status of the specified DMA flag */
+ 422:cpu/STM32F103/stm32f10x_dma.c ****   if ((tmpreg & DMA_FLAG) != (u32)RESET)
+ 512              		.loc 1 422 3 is_stmt 1 view .LVU164
+ 423:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 424:cpu/STM32F103/stm32f10x_dma.c ****     /* DMA_FLAG is set */
+ 425:cpu/STM32F103/stm32f10x_dma.c ****     bitstatus = SET;
+ 426:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 427:cpu/STM32F103/stm32f10x_dma.c ****   else
+ 428:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 429:cpu/STM32F103/stm32f10x_dma.c ****     /* DMA_FLAG is reset */
+ 430:cpu/STM32F103/stm32f10x_dma.c ****     bitstatus = RESET;
+ 431:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 432:cpu/STM32F103/stm32f10x_dma.c ****   
+ 433:cpu/STM32F103/stm32f10x_dma.c ****   /* Return the DMA_FLAG status */
+ 434:cpu/STM32F103/stm32f10x_dma.c ****   return  bitstatus;
+ 513              		.loc 1 434 3 view .LVU165
+ 422:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 514              		.loc 1 422 6 is_stmt 0 view .LVU166
+ 515 01aa 0342     		tst	r3, r0
+ 435:cpu/STM32F103/stm32f10x_dma.c **** }
+ 516              		.loc 1 435 1 view .LVU167
+ 517 01ac 14BF     		ite	ne
+ 518 01ae 0120     		movne	r0, #1
+ 519              	.LVL18:
+ 520              		.loc 1 435 1 view .LVU168
+ 521 01b0 0020     		moveq	r0, #0
+ 522 01b2 7047     		bx	lr
+ 523              	.L41:
+ 524              		.align	2
+ 525              	.L40:
+ 526 01b4 00040240 		.word	1073873920
+ 527 01b8 00000240 		.word	1073872896
+ 528              		.cfi_endproc
+ 529              	.LFE6:
+ 531              		.align	1
+ 532              		.p2align 2,,3
+ 533              		.global	DMA_ClearFlag
+ 534              		.syntax unified
+ 535              		.thumb
+ 536              		.thumb_func
+ 538              	DMA_ClearFlag:
+ 539              	.LVL19:
+ 540              	.LFB7:
+ 436:cpu/STM32F103/stm32f10x_dma.c **** 
+ 437:cpu/STM32F103/stm32f10x_dma.c **** /*******************************************************************************
+ 438:cpu/STM32F103/stm32f10x_dma.c **** * Function Name  : DMA_ClearFlag
+ 439:cpu/STM32F103/stm32f10x_dma.c **** * Description    : Clears the DMAy Channelx's pending flags.
+ 440:cpu/STM32F103/stm32f10x_dma.c **** * Input          : - DMA_FLAG: specifies the flag to clear.
+ 441:cpu/STM32F103/stm32f10x_dma.c **** *                    This parameter can be any combination (for the same DMA) of 
+ 442:cpu/STM32F103/stm32f10x_dma.c **** *                    the following values:
+ 443:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL1: DMA1 Channel1 global flag.
+ 444:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC1: DMA1 Channel1 transfer complete flag.
+ 445:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT1: DMA1 Channel1 half transfer flag.
+ 446:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE1: DMA1 Channel1 transfer error flag.
+ 447:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL2: DMA1 Channel2 global flag.
+ 448:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC2: DMA1 Channel2 transfer complete flag.
+ 449:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT2: DMA1 Channel2 half transfer flag.
+ 450:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE2: DMA1 Channel2 transfer error flag.
+ 451:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL3: DMA1 Channel3 global flag.
+ 452:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC3: DMA1 Channel3 transfer complete flag.
+ 453:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT3: DMA1 Channel3 half transfer flag.
+ 454:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE3: DMA1 Channel3 transfer error flag.
+ 455:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL4: DMA1 Channel4 global flag.
+ 456:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC4: DMA1 Channel4 transfer complete flag.
+ 457:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT4: DMA1 Channel4 half transfer flag.
+ 458:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE4: DMA1 Channel4 transfer error flag.
+ 459:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL5: DMA1 Channel5 global flag.
+ 460:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC5: DMA1 Channel5 transfer complete flag.
+ 461:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT5: DMA1 Channel5 half transfer flag.
+ 462:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE5: DMA1 Channel5 transfer error flag.
+ 463:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL6: DMA1 Channel6 global flag.
+ 464:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC6: DMA1 Channel6 transfer complete flag.
+ 465:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT6: DMA1 Channel6 half transfer flag.
+ 466:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE6: DMA1 Channel6 transfer error flag.
+ 467:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_GL7: DMA1 Channel7 global flag.
+ 468:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TC7: DMA1 Channel7 transfer complete flag.
+ 469:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_HT7: DMA1 Channel7 half transfer flag.
+ 470:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA1_FLAG_TE7: DMA1 Channel7 transfer error flag.
+ 471:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL1: DMA2 Channel1 global flag.
+ 472:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC1: DMA2 Channel1 transfer complete flag.
+ 473:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT1: DMA2 Channel1 half transfer flag.
+ 474:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE1: DMA2 Channel1 transfer error flag.
+ 475:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL2: DMA2 Channel2 global flag.
+ 476:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC2: DMA2 Channel2 transfer complete flag.
+ 477:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT2: DMA2 Channel2 half transfer flag.
+ 478:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE2: DMA2 Channel2 transfer error flag.
+ 479:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL3: DMA2 Channel3 global flag.
+ 480:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC3: DMA2 Channel3 transfer complete flag.
+ 481:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT3: DMA2 Channel3 half transfer flag.
+ 482:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE3: DMA2 Channel3 transfer error flag.
+ 483:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL4: DMA2 Channel4 global flag.
+ 484:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC4: DMA2 Channel4 transfer complete flag.
+ 485:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT4: DMA2 Channel4 half transfer flag.
+ 486:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE4: DMA2 Channel4 transfer error flag.
+ 487:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_GL5: DMA2 Channel5 global flag.
+ 488:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TC5: DMA2 Channel5 transfer complete flag.
+ 489:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_HT5: DMA2 Channel5 half transfer flag.
+ 490:cpu/STM32F103/stm32f10x_dma.c **** *                       - DMA2_FLAG_TE5: DMA2 Channel5 transfer error flag.
+ 491:cpu/STM32F103/stm32f10x_dma.c **** * Output         : None
+ 492:cpu/STM32F103/stm32f10x_dma.c **** * Return         : None
+ 493:cpu/STM32F103/stm32f10x_dma.c **** *******************************************************************************/
+ 494:cpu/STM32F103/stm32f10x_dma.c **** void DMA_ClearFlag(u32 DMA_FLAG)
+ 495:cpu/STM32F103/stm32f10x_dma.c **** {
+ 541              		.loc 1 495 1 is_stmt 1 view -0
+ 542              		.cfi_startproc
+ 543              		@ args = 0, pretend = 0, frame = 0
+ 544              		@ frame_needed = 0, uses_anonymous_args = 0
+ 545              		@ link register save eliminated.
+ 496:cpu/STM32F103/stm32f10x_dma.c ****   /* Check the parameters */
+ 497:cpu/STM32F103/stm32f10x_dma.c ****   assert_param(IS_DMA_CLEAR_FLAG(DMA_FLAG));
+ 546              		.loc 1 497 3 view .LVU170
+ 498:cpu/STM32F103/stm32f10x_dma.c **** 
+ 499:cpu/STM32F103/stm32f10x_dma.c ****   /* Calculate the used DMA */
+ 500:cpu/STM32F103/stm32f10x_dma.c ****   if ((DMA_FLAG & FLAG_Mask) != (u32)RESET)
+ 547              		.loc 1 500 3 view .LVU171
+ 548              		.loc 1 500 6 is_stmt 0 view .LVU172
+ 549 01bc C300     		lsls	r3, r0, #3
+ 501:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 502:cpu/STM32F103/stm32f10x_dma.c ****     /* Clear the selected DMA flags */
+ 503:cpu/STM32F103/stm32f10x_dma.c ****     DMA2->IFCR = DMA_FLAG;
+ 550              		.loc 1 503 5 is_stmt 1 view .LVU173
+ 551              		.loc 1 503 16 is_stmt 0 view .LVU174
+ 552 01be 4CBF     		ite	mi
+ 553 01c0 014B     		ldrmi	r3, .L45
+ 504:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 505:cpu/STM32F103/stm32f10x_dma.c ****   else
+ 506:cpu/STM32F103/stm32f10x_dma.c ****   {
+ 507:cpu/STM32F103/stm32f10x_dma.c ****     /* Clear the selected DMA flags */
+ 508:cpu/STM32F103/stm32f10x_dma.c ****     DMA1->IFCR = DMA_FLAG;
+ 554              		.loc 1 508 5 is_stmt 1 view .LVU175
+ 555              		.loc 1 508 16 is_stmt 0 view .LVU176
+ 556 01c2 024B     		ldrpl	r3, .L45+4
+ 557 01c4 5860     		str	r0, [r3, #4]
+ 509:cpu/STM32F103/stm32f10x_dma.c ****   }
+ 510:cpu/STM32F103/stm32f10x_dma.c **** }
+ 558              		.loc 1 510 1 view .LVU177
+ 559 01c6 7047     		bx	lr
+ 560              	.L46:
+ 561              		.align	2
+ 562              	.L45:
+ 563 01c8 00040240 		.word	1073873920
+ 564 01cc 00000240 		.word	1073872896
+ 565              		.cfi_endproc
+ 566              	.LFE7:
+ 568              		.align	1
+ 569              		.p2align 2,,3
+ 570              		.global	DMA_GetITStatus
+ 571              		.syntax unified
+ 572              		.thumb
+ 573              		.thumb_func
+ 575              	DMA_GetITStatus:
+ 576              	.LFB11:
+ 577              		.cfi_startproc
+ 578              		@ args = 0, pretend = 0, frame = 0
+ 579              		@ frame_needed = 0, uses_anonymous_args = 0
+ 580              		@ link register save eliminated.
+ 581 01d0 C300     		lsls	r3, r0, #3
+ 582 01d2 4CBF     		ite	mi
+ 583 01d4 034B     		ldrmi	r3, .L50
+ 584 01d6 044B     		ldrpl	r3, .L50+4
+ 585 01d8 1B68     		ldr	r3, [r3]
+ 586 01da 1842     		tst	r0, r3
+ 587 01dc 14BF     		ite	ne
+ 588 01de 0120     		movne	r0, #1
+ 589 01e0 0020     		moveq	r0, #0
+ 590 01e2 7047     		bx	lr
+ 591              	.L51:
+ 592              		.align	2
+ 593              	.L50:
+ 594 01e4 00040240 		.word	1073873920
+ 595 01e8 00000240 		.word	1073872896
+ 596              		.cfi_endproc
+ 597              	.LFE11:
+ 599              		.align	1
+ 600              		.p2align 2,,3
+ 601              		.global	DMA_ClearITPendingBit
+ 602              		.syntax unified
+ 603              		.thumb
+ 604              		.thumb_func
+ 606              	DMA_ClearITPendingBit:
+ 607              	.LFB13:
+ 608              		.cfi_startproc
+ 609              		@ args = 0, pretend = 0, frame = 0
+ 610              		@ frame_needed = 0, uses_anonymous_args = 0
+ 611              		@ link register save eliminated.
+ 612 01ec C300     		lsls	r3, r0, #3
+ 613 01ee 4CBF     		ite	mi
+ 614 01f0 014B     		ldrmi	r3, .L55
+ 615 01f2 024B     		ldrpl	r3, .L55+4
+ 616 01f4 5860     		str	r0, [r3, #4]
+ 617 01f6 7047     		bx	lr
+ 618              	.L56:
+ 619              		.align	2
+ 620              	.L55:
+ 621 01f8 00040240 		.word	1073873920
+ 622 01fc 00000240 		.word	1073872896
+ 623              		.cfi_endproc
+ 624              	.LFE13:
+ 626              	.Letext0:
+ 627              		.file 2 "cpu/STM32F103/stm32f10x_type.h"
+ 628              		.file 3 "cpu/STM32F103/stm32f10x_map.h"
+ 629              		.file 4 "cpu/STM32F103/stm32f10x_dma.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f10x_dma.c
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:24     .text:00000000 DMA_DeInit
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:224    .text:000000f8 $d
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:234    .text:00000114 $t
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:241    .text:00000114 DMA_Init
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:343    .text:00000154 DMA_StructInit
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:383    .text:00000170 DMA_Cmd
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:420    .text:00000184 DMA_ITConfig
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:463    .text:00000198 DMA_GetCurrDataCounter
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:489    .text:000001a0 DMA_GetFlagStatus
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:526    .text:000001b4 $d
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:531    .text:000001bc $t
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:538    .text:000001bc DMA_ClearFlag
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:563    .text:000001c8 $d
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:568    .text:000001d0 $t
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:575    .text:000001d0 DMA_GetITStatus
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:594    .text:000001e4 $d
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:599    .text:000001ec $t
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:606    .text:000001ec DMA_ClearITPendingBit
+C:\Users\forre\AppData\Local\Temp\cchekIOj.s:621    .text:000001f8 $d
+
+NO UNDEFINED SYMBOLS

@@ -1,0 +1,423 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	setCanUsbInterruptVectors
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	setCanUsbInterruptVectors:
+  25              	.LFB0:
+  26              		.file 1 "main.c"
+   1:main.c        **** /*
+   2:main.c        ****  * main.c
+   3:main.c        ****  *
+   4:main.c        ****  *  Created on: 14.02.2019
+   5:main.c        ****  *      Author: ED
+   6:main.c        ****  */
+   7:main.c        **** 
+   8:main.c        **** #include "hal/system/Cpu.h"
+   9:main.c        **** #include "hal/system/IO.h"
+  10:main.c        **** #include "hal/system/SysTick.h"
+  11:main.c        **** #include "hal/system/SystemInfo.h"
+  12:main.c        **** #include "hal/comm/SPI.h"
+  13:main.c        **** #include "hal/comm/Eeprom.h"
+  14:main.c        **** #include "hal/ic/LIS2DH12.h"
+  15:main.c        **** #include "BLDC.h"
+  16:main.c        **** #include "TMCL.h"
+  17:main.c        **** #include "Led.h"
+  18:main.c        **** #include "LedRear.h"
+  19:main.c        **** #include "Sensor.h"
+  20:main.c        **** 
+  21:main.c        **** #if defined(USE_CAN_INTERFACE)
+  22:main.c        **** 	#include "hal/comm/CAN.h"
+  23:main.c        **** #endif
+  24:main.c        **** 
+  25:main.c        **** #if defined(USE_UART_INTERFACE)
+  26:main.c        **** 	#include "hal/comm/UART.h"
+  27:main.c        **** #endif
+  28:main.c        **** 
+  29:main.c        **** PIrqFunction CanTxUsbHpIrqVector;      // interrupt vector for CAN-TX or USB
+  30:main.c        **** PIrqFunction CanRx0UsbLpIrqVector;     // interrupt vector for CAN-RX0 or USB
+  31:main.c        **** PIrqFunction CanRx1IrqVector;          // interrupt vector for CAN-RX1
+  32:main.c        **** PIrqFunction CanSceIrqVector;          // interrupt vector for CAN-Error
+  33:main.c        **** 
+  34:main.c        **** void setCanUsbInterruptVectors()
+  35:main.c        **** {
+  27              		.loc 1 35 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  36:main.c        **** 	CanTxUsbHpIrqVector  = can_TxIrq;
+  32              		.loc 1 36 2 view .LVU1
+  33              		.loc 1 36 23 is_stmt 0 view .LVU2
+  34 0000 034B     		ldr	r3, .L3
+  35 0002 0448     		ldr	r0, .L3+4
+  37:main.c        **** 	CanRx0UsbLpIrqVector = can_Rx0Irq;
+  36              		.loc 1 37 23 view .LVU3
+  37 0004 0449     		ldr	r1, .L3+8
+  38:main.c        **** 	CanRx1IrqVector      = can_Rx1Irq;
+  38              		.loc 1 38 23 view .LVU4
+  39 0006 054A     		ldr	r2, .L3+12
+  37:main.c        **** 	CanRx0UsbLpIrqVector = can_Rx0Irq;
+  40              		.loc 1 37 23 view .LVU5
+  41 0008 C3E90001 		strd	r0, r1, [r3]
+  42              		.loc 1 38 2 is_stmt 1 view .LVU6
+  43              		.loc 1 38 23 is_stmt 0 view .LVU7
+  44 000c 9A60     		str	r2, [r3, #8]
+  39:main.c        **** }
+  45              		.loc 1 39 1 view .LVU8
+  46 000e 7047     		bx	lr
+  47              	.L4:
+  48              		.align	2
+  49              	.L3:
+  50 0010 00000000 		.word	.LANCHOR0
+  51 0014 00000000 		.word	can_TxIrq
+  52 0018 00000000 		.word	can_Rx0Irq
+  53 001c 00000000 		.word	can_Rx1Irq
+  54              		.cfi_endproc
+  55              	.LFE0:
+  57              		.section	.text.startup,"ax",%progbits
+  58              		.align	1
+  59              		.p2align 2,,3
+  60              		.global	main
+  61              		.syntax unified
+  62              		.thumb
+  63              		.thumb_func
+  65              	main:
+  66              	.LFB1:
+  40:main.c        **** 
+  41:main.c        **** int main()
+  42:main.c        **** {
+  67              		.loc 1 42 1 is_stmt 1 view -0
+  68              		.cfi_startproc
+  69              		@ Volatile: function does not return.
+  70              		@ args = 0, pretend = 0, frame = 0
+  71              		@ frame_needed = 0, uses_anonymous_args = 0
+  43:main.c        **** 	cpu_init();
+  72              		.loc 1 43 2 view .LVU10
+  42:main.c        **** 	cpu_init();
+  73              		.loc 1 42 1 is_stmt 0 view .LVU11
+  74 0000 08B5     		push	{r3, lr}
+  75              	.LCFI0:
+  76              		.cfi_def_cfa_offset 8
+  77              		.cfi_offset 3, -8
+  78              		.cfi_offset 14, -4
+  79              		.loc 1 43 2 view .LVU12
+  80 0002 FFF7FEFF 		bl	cpu_init
+  81              	.LVL0:
+  44:main.c        **** 
+  45:main.c        **** 	// load default values of the module
+  46:main.c        **** 	tmcm_initModuleConfig();
+  82              		.loc 1 46 2 is_stmt 1 view .LVU13
+  47:main.c        **** 	tmcm_initMotorConfig();
+  48:main.c        **** 
+  49:main.c        **** 	// initialize periphery
+  50:main.c        **** 	tmcm_initModuleSpecificIO();
+  51:main.c        **** 	tmcm_initModuleSpecificADC();
+  52:main.c        **** 
+  53:main.c        **** 	// init CAN/USB vectors
+  54:main.c        **** 	setCanUsbInterruptVectors();
+  55:main.c        **** 
+  56:main.c        **** 	// initialize hal functionality
+  57:main.c        **** 	systick_init();
+  58:main.c        **** 	spi_init();
+  59:main.c        **** 	LIS2DH12_spi_init();
+  60:main.c        **** 	eeprom_initConfig(&moduleConfig, &motorConfig);
+  83              		.loc 1 60 2 is_stmt 0 view .LVU14
+  84 0006 234D     		ldr	r5, .L9
+  46:main.c        **** 	tmcm_initMotorConfig();
+  85              		.loc 1 46 2 view .LVU15
+  86 0008 FFF7FEFF 		bl	tmcm_initModuleConfig
+  87              	.LVL1:
+  47:main.c        **** 	tmcm_initMotorConfig();
+  88              		.loc 1 47 2 is_stmt 1 view .LVU16
+  89              	.LBB5:
+  90              	.LBB6:
+  36:main.c        **** 	CanRx0UsbLpIrqVector = can_Rx0Irq;
+  91              		.loc 1 36 23 is_stmt 0 view .LVU17
+  92 000c 224C     		ldr	r4, .L9+4
+  93              	.LBE6:
+  94              	.LBE5:
+  47:main.c        **** 	tmcm_initMotorConfig();
+  95              		.loc 1 47 2 view .LVU18
+  96 000e FFF7FEFF 		bl	tmcm_initMotorConfig
+  97              	.LVL2:
+  50:main.c        **** 	tmcm_initModuleSpecificADC();
+  98              		.loc 1 50 2 is_stmt 1 view .LVU19
+  99 0012 FFF7FEFF 		bl	tmcm_initModuleSpecificIO
+ 100              	.LVL3:
+  51:main.c        **** 
+ 101              		.loc 1 51 2 view .LVU20
+ 102 0016 FFF7FEFF 		bl	tmcm_initModuleSpecificADC
+ 103              	.LVL4:
+  54:main.c        **** 
+ 104              		.loc 1 54 2 view .LVU21
+ 105              	.LBB8:
+ 106              	.LBI5:
+  34:main.c        **** {
+ 107              		.loc 1 34 6 view .LVU22
+ 108              	.LBB7:
+  36:main.c        **** 	CanRx0UsbLpIrqVector = can_Rx0Irq;
+ 109              		.loc 1 36 2 view .LVU23
+  38:main.c        **** }
+ 110              		.loc 1 38 23 is_stmt 0 view .LVU24
+ 111 001a 204B     		ldr	r3, .L9+8
+  37:main.c        **** 	CanRx1IrqVector      = can_Rx1Irq;
+ 112              		.loc 1 37 23 view .LVU25
+ 113 001c 204A     		ldr	r2, .L9+12
+  36:main.c        **** 	CanRx0UsbLpIrqVector = can_Rx0Irq;
+ 114              		.loc 1 36 23 view .LVU26
+ 115 001e 2149     		ldr	r1, .L9+16
+  38:main.c        **** }
+ 116              		.loc 1 38 23 view .LVU27
+ 117 0020 A360     		str	r3, [r4, #8]
+  37:main.c        **** 	CanRx1IrqVector      = can_Rx1Irq;
+ 118              		.loc 1 37 23 view .LVU28
+ 119 0022 C4E90012 		strd	r1, r2, [r4]
+  38:main.c        **** }
+ 120              		.loc 1 38 2 is_stmt 1 view .LVU29
+ 121              	.LBE7:
+ 122              	.LBE8:
+  57:main.c        **** 	spi_init();
+ 123              		.loc 1 57 2 view .LVU30
+ 124 0026 FFF7FEFF 		bl	systick_init
+ 125              	.LVL5:
+  58:main.c        **** 	LIS2DH12_spi_init();
+ 126              		.loc 1 58 2 view .LVU31
+ 127 002a FFF7FEFF 		bl	spi_init
+ 128              	.LVL6:
+  59:main.c        **** 	eeprom_initConfig(&moduleConfig, &motorConfig);
+ 129              		.loc 1 59 2 view .LVU32
+ 130 002e FFF7FEFF 		bl	LIS2DH12_spi_init
+ 131              	.LVL7:
+ 132              		.loc 1 60 2 view .LVU33
+ 133 0032 2846     		mov	r0, r5
+ 134 0034 1C49     		ldr	r1, .L9+20
+ 135 0036 FFF7FEFF 		bl	eeprom_initConfig
+ 136              	.LVL8:
+  61:main.c        **** 
+  62:main.c        **** 	// initialize communication interfaces
+  63:main.c        **** #if defined(USE_CAN_INTERFACE)
+  64:main.c        **** 	can_init(moduleConfig.CANBitrate, moduleConfig.CANReceiveID, moduleConfig.CANSecondaryID);
+ 137              		.loc 1 64 2 view .LVU34
+ 138 003a EA68     		ldr	r2, [r5, #12]
+ 139 003c 6968     		ldr	r1, [r5, #4]
+ 140 003e E878     		ldrb	r0, [r5, #3]	@ zero_extendqisi2
+ 141 0040 FFF7FEFF 		bl	can_init
+ 142              	.LVL9:
+  65:main.c        **** #endif
+  66:main.c        **** #ifdef USE_UART_INTERFACE
+  67:main.c        **** 	uart_init(moduleConfig.baudrate);
+ 143              		.loc 1 67 2 view .LVU35
+ 144 0044 2878     		ldrb	r0, [r5]	@ zero_extendqisi2
+ 145 0046 FFF7FEFF 		bl	uart_init
+ 146              	.LVL10:
+  68:main.c        **** #endif
+  69:main.c        **** 
+  70:main.c        ****     // use saved configuration values from EEPROM
+  71:main.c        ****     tmcm_updateConfig();
+ 147              		.loc 1 71 5 view .LVU36
+ 148 004a FFF7FEFF 		bl	tmcm_updateConfig
+ 149              	.LVL11:
+  72:main.c        **** 
+  73:main.c        ****     // init main software functions
+  74:main.c        **** 	tmcl_init();
+ 150              		.loc 1 74 2 view .LVU37
+ 151 004e FFF7FEFF 		bl	tmcl_init
+ 152              	.LVL12:
+  75:main.c        ****     bldc_init();
+ 153              		.loc 1 75 5 view .LVU38
+ 154 0052 FFF7FEFF 		bl	bldc_init
+ 155              	.LVL13:
+  76:main.c        ****     LI2DH12_init();
+ 156              		.loc 1 76 5 view .LVU39
+ 157 0056 FFF7FEFF 		bl	LI2DH12_init
+ 158              	.LVL14:
+  77:main.c        ****     sensor_init();
+ 159              		.loc 1 77 5 view .LVU40
+ 160 005a FFF7FEFF 		bl	sensor_init
+ 161              	.LVL15:
+  78:main.c        ****     led_init();
+ 162              		.loc 1 78 5 view .LVU41
+ 163 005e FFF7FEFF 		bl	led_init
+ 164              	.LVL16:
+  79:main.c        ****     rear_led_init();
+ 165              		.loc 1 79 5 view .LVU42
+ 166 0062 FFF7FEFF 		bl	rear_led_init
+ 167              	.LVL17:
+ 168              	.L7:
+  80:main.c        **** 
+  81:main.c        **** 	for(;;)
+ 169              		.loc 1 81 2 view .LVU43
+ 170              	.LBB9:
+  82:main.c        **** 	{
+  83:main.c        **** 		systemInfo_incMainLoopCounter();
+ 171              		.loc 1 83 3 view .LVU44
+ 172 0066 FFF7FEFF 		bl	systemInfo_incMainLoopCounter
+ 173              	.LVL18:
+  84:main.c        **** 
+  85:main.c        **** 		// process incoming tmcl commands
+  86:main.c        **** 		tmcl_processCommand();
+ 174              		.loc 1 86 3 view .LVU45
+ 175 006a FFF7FEFF 		bl	tmcl_processCommand
+ 176              	.LVL19:
+  87:main.c        **** 		bldc_processBLDC();
+ 177              		.loc 1 87 3 view .LVU46
+ 178 006e FFF7FEFF 		bl	bldc_processBLDC
+ 179              	.LVL20:
+  88:main.c        **** 
+  89:main.c        **** #ifdef USE_ALIVE_LED
+  90:main.c        **** 		// I am alive LED
+  91:main.c        **** 		static uint32_t ledCounterCheckTime = 0;
+ 180              		.loc 1 91 3 view .LVU47
+  92:main.c        **** 		if ((systick_getTimer()-ledCounterCheckTime) > 1000)
+ 181              		.loc 1 92 3 view .LVU48
+ 182              		.loc 1 92 8 is_stmt 0 view .LVU49
+ 183 0072 FFF7FEFF 		bl	systick_getTimer
+ 184              	.LVL21:
+  93:main.c        **** 		{
+  94:main.c        **** 			tmcm_ledGreenToggle();
+ 185              		.loc 1 94 4 is_stmt 1 view .LVU50
+  92:main.c        **** 		if ((systick_getTimer()-ledCounterCheckTime) > 1000)
+ 186              		.loc 1 92 26 is_stmt 0 view .LVU51
+ 187 0076 E368     		ldr	r3, [r4, #12]
+ 188 0078 C01A     		subs	r0, r0, r3
+  92:main.c        **** 		if ((systick_getTimer()-ledCounterCheckTime) > 1000)
+ 189              		.loc 1 92 6 view .LVU52
+ 190 007a B0F57A7F 		cmp	r0, #1000
+ 191 007e 04D9     		bls	.L6
+ 192              		.loc 1 94 4 view .LVU53
+ 193 0080 FFF7FEFF 		bl	tmcm_ledGreenToggle
+ 194              	.LVL22:
+  95:main.c        **** 			ledCounterCheckTime = systick_getTimer();
+ 195              		.loc 1 95 4 is_stmt 1 view .LVU54
+ 196              		.loc 1 95 26 is_stmt 0 view .LVU55
+ 197 0084 FFF7FEFF 		bl	systick_getTimer
+ 198              	.LVL23:
+ 199              		.loc 1 95 24 view .LVU56
+ 200 0088 E060     		str	r0, [r4, #12]
+ 201              	.L6:
+  96:main.c        **** 		}
+  97:main.c        **** #endif
+  98:main.c        **** 
+  99:main.c        **** 		systemInfo_update(systick_getTimer());
+ 202              		.loc 1 99 3 is_stmt 1 view .LVU57
+ 203 008a FFF7FEFF 		bl	systick_getTimer
+ 204              	.LVL24:
+ 205 008e FFF7FEFF 		bl	systemInfo_update
+ 206              	.LVL25:
+ 207              	.LBE9:
+  81:main.c        **** 	{
+ 208              		.loc 1 81 7 view .LVU58
+  82:main.c        **** 		systemInfo_incMainLoopCounter();
+ 209              		.loc 1 82 2 is_stmt 0 view .LVU59
+ 210 0092 E8E7     		b	.L7
+ 211              	.L10:
+ 212              		.align	2
+ 213              	.L9:
+ 214 0094 00000000 		.word	moduleConfig
+ 215 0098 00000000 		.word	.LANCHOR0
+ 216 009c 00000000 		.word	can_Rx1Irq
+ 217 00a0 00000000 		.word	can_Rx0Irq
+ 218 00a4 00000000 		.word	can_TxIrq
+ 219 00a8 00000000 		.word	motorConfig
+ 220              		.cfi_endproc
+ 221              	.LFE1:
+ 223              		.global	CanSceIrqVector
+ 224              		.global	CanRx1IrqVector
+ 225              		.global	CanRx0UsbLpIrqVector
+ 226              		.global	CanTxUsbHpIrqVector
+ 227              		.bss
+ 228              		.align	2
+ 229              		.set	.LANCHOR0,. + 0
+ 232              	CanTxUsbHpIrqVector:
+ 233 0000 00000000 		.space	4
+ 236              	CanRx0UsbLpIrqVector:
+ 237 0004 00000000 		.space	4
+ 240              	CanRx1IrqVector:
+ 241 0008 00000000 		.space	4
+ 244              	ledCounterCheckTime.0:
+ 245 000c 00000000 		.space	4
+ 248              	CanSceIrqVector:
+ 249 0010 00000000 		.space	4
+ 250              		.text
+ 251              	.Letext0:
+ 252              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 253              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 254              		.file 4 "hal/system/../../TMC-API/tmc/helpers/Types.h"
+ 255              		.file 5 "hal/system/../../Definitions.h"
+ 256              		.file 6 "./cpu/STM32F103/stm32f10x_type.h"
+ 257              		.file 7 "hal/system/SystemInfo.h"
+ 258              		.file 8 "TMCL.h"
+ 259              		.file 9 "BLDC.h"
+ 260              		.file 10 "hal/system/SysTick.h"
+ 261              		.file 11 "hal/system/Cpu.h"
+ 262              		.file 12 "hal/comm/SPI.h"
+ 263              		.file 13 "hal/ic/LIS2DH12.h"
+ 264              		.file 14 "hal/comm/Eeprom.h"
+ 265              		.file 15 "hal/comm/CAN.h"
+ 266              		.file 16 "hal/comm/UART.h"
+ 267              		.file 17 "Sensor.h"
+ 268              		.file 18 "Led.h"
+ 269              		.file 19 "LedRear.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:24     .text:00000000 setCanUsbInterruptVectors
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:50     .text:00000010 $d
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:58     .text.startup:00000000 $t
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:65     .text.startup:00000000 main
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:214    .text.startup:00000094 $d
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:248    .bss:00000010 CanSceIrqVector
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:240    .bss:00000008 CanRx1IrqVector
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:236    .bss:00000004 CanRx0UsbLpIrqVector
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:232    .bss:00000000 CanTxUsbHpIrqVector
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:228    .bss:00000000 $d
+C:\Users\forre\AppData\Local\Temp\cce0lMoq.s:244    .bss:0000000c ledCounterCheckTime.0
+
+UNDEFINED SYMBOLS
+can_TxIrq
+can_Rx0Irq
+can_Rx1Irq
+cpu_init
+tmcm_initModuleConfig
+tmcm_initMotorConfig
+tmcm_initModuleSpecificIO
+tmcm_initModuleSpecificADC
+systick_init
+spi_init
+LIS2DH12_spi_init
+eeprom_initConfig
+can_init
+uart_init
+tmcm_updateConfig
+tmcl_init
+bldc_init
+LI2DH12_init
+sensor_init
+led_init
+rear_led_init
+systemInfo_incMainLoopCounter
+tmcl_processCommand
+bldc_processBLDC
+systick_getTimer
+tmcm_ledGreenToggle
+systemInfo_update
+moduleConfig
+motorConfig

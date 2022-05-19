@@ -1,0 +1,864 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"Led.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	led_init
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	led_init:
+  25              	.LFB0:
+  26              		.file 1 "Led.c"
+   1:Led.c         **** /*
+   2:Led.c         ****  * Led.c
+   3:Led.c         ****  *
+   4:Led.c         ****  *  Created on: 22.03.2019
+   5:Led.c         ****  *      Author: ED
+   6:Led.c         ****  */
+   7:Led.c         **** 
+   8:Led.c         **** #include "Led.h"
+   9:Led.c         **** #include "hal/system/SysTick.h"
+  10:Led.c         **** 
+  11:Led.c         **** u16 pwmCounter = 0;
+  12:Led.c         **** u8 ledMode = 0;
+  13:Led.c         **** u8 ledColor = 0;
+  14:Led.c         **** u16 msCounter = 0;
+  15:Led.c         **** u16 swipeColor = 0;
+  16:Led.c         **** bool swipeDirection = 0;
+  17:Led.c         **** u16 blinkTime = 1000;
+  18:Led.c         **** 
+  19:Led.c         **** void led_init()
+  20:Led.c         **** {
+  27              		.loc 1 20 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  21:Led.c         **** 	tmcm_ledGreenOff();
+  31              		.loc 1 21 2 view .LVU1
+  20:Led.c         **** 	tmcm_ledGreenOff();
+  32              		.loc 1 20 1 is_stmt 0 view .LVU2
+  33 0000 08B5     		push	{r3, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 3, -8
+  37              		.cfi_offset 14, -4
+  38              		.loc 1 21 2 view .LVU3
+  39 0002 FFF7FEFF 		bl	tmcm_ledGreenOff
+  40              	.LVL0:
+  22:Led.c         **** 	tmcm_ledRedOff();
+  41              		.loc 1 22 2 is_stmt 1 view .LVU4
+  23:Led.c         **** }
+  42              		.loc 1 23 1 is_stmt 0 view .LVU5
+  43 0006 BDE80840 		pop	{r3, lr}
+  44              	.LCFI1:
+  45              		.cfi_restore 14
+  46              		.cfi_restore 3
+  47              		.cfi_def_cfa_offset 0
+  22:Led.c         **** 	tmcm_ledRedOff();
+  48              		.loc 1 22 2 view .LVU6
+  49 000a FFF7FEBF 		b	tmcm_ledRedOff
+  50              	.LVL1:
+  51              		.cfi_endproc
+  52              	.LFE0:
+  54              		.align	1
+  55 000e 00BF     		.p2align 2,,3
+  56              		.global	led_resetCounter
+  57              		.syntax unified
+  58              		.thumb
+  59              		.thumb_func
+  61              	led_resetCounter:
+  62              	.LFB1:
+  24:Led.c         **** 
+  25:Led.c         **** void led_resetCounter()
+  26:Led.c         **** {
+  63              		.loc 1 26 1 is_stmt 1 view -0
+  64              		.cfi_startproc
+  65              		@ args = 0, pretend = 0, frame = 0
+  66              		@ frame_needed = 0, uses_anonymous_args = 0
+  67              		@ link register save eliminated.
+  27:Led.c         **** 	pwmCounter = 0;
+  68              		.loc 1 27 2 view .LVU8
+  69              		.loc 1 27 13 is_stmt 0 view .LVU9
+  70 0010 0022     		movs	r2, #0
+  71 0012 024B     		ldr	r3, .L5
+  72 0014 1A80     		strh	r2, [r3]	@ movhi
+  28:Led.c         **** 	msCounter = 0;
+  73              		.loc 1 28 2 is_stmt 1 view .LVU10
+  74              		.loc 1 28 12 is_stmt 0 view .LVU11
+  75 0016 5A80     		strh	r2, [r3, #2]	@ movhi
+  29:Led.c         **** 	swipeColor = LED_COLOR_GREEN;
+  76              		.loc 1 29 2 is_stmt 1 view .LVU12
+  77              		.loc 1 29 13 is_stmt 0 view .LVU13
+  78 0018 9A80     		strh	r2, [r3, #4]	@ movhi
+  30:Led.c         **** }
+  79              		.loc 1 30 1 view .LVU14
+  80 001a 7047     		bx	lr
+  81              	.L6:
+  82              		.align	2
+  83              	.L5:
+  84 001c 00000000 		.word	.LANCHOR0
+  85              		.cfi_endproc
+  86              	.LFE1:
+  88              		.align	1
+  89              		.p2align 2,,3
+  90              		.global	led_setMode
+  91              		.syntax unified
+  92              		.thumb
+  93              		.thumb_func
+  95              	led_setMode:
+  96              	.LVL2:
+  97              	.LFB2:
+  31:Led.c         **** 
+  32:Led.c         **** void led_setMode(u8 mode)
+  33:Led.c         **** {
+  98              		.loc 1 33 1 is_stmt 1 view -0
+  99              		.cfi_startproc
+ 100              		@ args = 0, pretend = 0, frame = 0
+ 101              		@ frame_needed = 0, uses_anonymous_args = 0
+ 102              		@ link register save eliminated.
+  34:Led.c         **** 	u8 actualMode = ledMode;
+ 103              		.loc 1 34 2 view .LVU16
+  35:Led.c         **** 
+  36:Led.c         **** 	switch(mode)
+ 104              		.loc 1 36 2 is_stmt 0 view .LVU17
+ 105 0020 0428     		cmp	r0, #4
+ 106 0022 94BF     		ite	ls
+ 107 0024 0146     		movls	r1, r0
+ 108 0026 0021     		movhi	r1, #0
+  34:Led.c         **** 	u8 actualMode = ledMode;
+ 109              		.loc 1 34 5 view .LVU18
+ 110 0028 044B     		ldr	r3, .L11
+ 111 002a 9A79     		ldrb	r2, [r3, #6]	@ zero_extendqisi2
+ 112              	.LVL3:
+ 113              		.loc 1 36 2 is_stmt 1 view .LVU19
+ 114 002c 9971     		strb	r1, [r3, #6]
+  37:Led.c         **** 	{
+  38:Led.c         **** 		case LED_MODE_OFF:
+  39:Led.c         **** 		case LED_MODE_ON:
+  40:Led.c         **** 		case LED_MODE_BLINK:
+  41:Led.c         **** 		case LED_MODE_FADE:
+  42:Led.c         **** 		case LED_MODE_SWIPE:
+  43:Led.c         **** 			ledMode = mode;
+  44:Led.c         **** 			break;
+  45:Led.c         **** 		default:
+  46:Led.c         **** 			ledMode = LED_MODE_OFF;
+  47:Led.c         **** 	}
+  48:Led.c         **** 
+  49:Led.c         **** 	// reset timer on mode switch, to get clean switch over
+  50:Led.c         **** 	if (actualMode != mode)
+ 115              		.loc 1 50 2 view .LVU20
+ 116              		.loc 1 50 5 is_stmt 0 view .LVU21
+ 117 002e 8242     		cmp	r2, r0
+ 118 0030 03D0     		beq	.L7
+  51:Led.c         **** 		led_resetCounter();
+ 119              		.loc 1 51 3 is_stmt 1 view .LVU22
+ 120              	.LBB8:
+ 121              	.LBI8:
+  25:Led.c         **** {
+ 122              		.loc 1 25 6 view .LVU23
+ 123              	.LBB9:
+  27:Led.c         **** 	msCounter = 0;
+ 124              		.loc 1 27 2 view .LVU24
+  27:Led.c         **** 	msCounter = 0;
+ 125              		.loc 1 27 13 is_stmt 0 view .LVU25
+ 126 0032 0022     		movs	r2, #0
+ 127              	.LVL4:
+  27:Led.c         **** 	msCounter = 0;
+ 128              		.loc 1 27 13 view .LVU26
+ 129 0034 1A80     		strh	r2, [r3]	@ movhi
+  28:Led.c         **** 	swipeColor = LED_COLOR_GREEN;
+ 130              		.loc 1 28 2 is_stmt 1 view .LVU27
+  28:Led.c         **** 	swipeColor = LED_COLOR_GREEN;
+ 131              		.loc 1 28 12 is_stmt 0 view .LVU28
+ 132 0036 5A80     		strh	r2, [r3, #2]	@ movhi
+  29:Led.c         **** }
+ 133              		.loc 1 29 2 is_stmt 1 view .LVU29
+  29:Led.c         **** }
+ 134              		.loc 1 29 13 is_stmt 0 view .LVU30
+ 135 0038 9A80     		strh	r2, [r3, #4]	@ movhi
+ 136              	.L7:
+ 137              	.LBE9:
+ 138              	.LBE8:
+  52:Led.c         **** }
+ 139              		.loc 1 52 1 view .LVU31
+ 140 003a 7047     		bx	lr
+ 141              	.L12:
+ 142              		.align	2
+ 143              	.L11:
+ 144 003c 00000000 		.word	.LANCHOR0
+ 145              		.cfi_endproc
+ 146              	.LFE2:
+ 148              		.align	1
+ 149              		.p2align 2,,3
+ 150              		.global	led_setColor
+ 151              		.syntax unified
+ 152              		.thumb
+ 153              		.thumb_func
+ 155              	led_setColor:
+ 156              	.LVL5:
+ 157              	.LFB3:
+  53:Led.c         **** 
+  54:Led.c         **** void led_setColor(u8 color)
+  55:Led.c         **** {
+ 158              		.loc 1 55 1 is_stmt 1 view -0
+ 159              		.cfi_startproc
+ 160              		@ args = 0, pretend = 0, frame = 0
+ 161              		@ frame_needed = 0, uses_anonymous_args = 0
+ 162              		@ link register save eliminated.
+  56:Led.c         **** 	if (color <= MAX_COLOR)
+ 163              		.loc 1 56 2 view .LVU33
+  57:Led.c         **** 		ledColor = color;
+  58:Led.c         **** 	else
+  59:Led.c         **** 		ledColor = LED_COLOR_GREEN;
+ 164              		.loc 1 59 12 is_stmt 0 view .LVU34
+ 165 0040 0A28     		cmp	r0, #10
+ 166 0042 28BF     		it	cs
+ 167 0044 0020     		movcs	r0, #0
+ 168              	.LVL6:
+ 169              		.loc 1 59 12 view .LVU35
+ 170 0046 014B     		ldr	r3, .L16
+ 171 0048 D871     		strb	r0, [r3, #7]
+  60:Led.c         **** }
+ 172              		.loc 1 60 1 view .LVU36
+ 173 004a 7047     		bx	lr
+ 174              	.L17:
+ 175              		.align	2
+ 176              	.L16:
+ 177 004c 00000000 		.word	.LANCHOR0
+ 178              		.cfi_endproc
+ 179              	.LFE3:
+ 181              		.align	1
+ 182              		.p2align 2,,3
+ 183              		.global	led_updateColor
+ 184              		.syntax unified
+ 185              		.thumb
+ 186              		.thumb_func
+ 188              	led_updateColor:
+ 189              	.LVL7:
+ 190              	.LFB4:
+  61:Led.c         **** 
+  62:Led.c         **** void led_updateColor(u8 duty, u8 color)
+  63:Led.c         **** {
+ 191              		.loc 1 63 1 is_stmt 1 view -0
+ 192              		.cfi_startproc
+ 193              		@ args = 0, pretend = 0, frame = 0
+ 194              		@ frame_needed = 0, uses_anonymous_args = 0
+  64:Led.c         **** 	if (duty < color)
+ 195              		.loc 1 64 2 view .LVU38
+ 196              		.loc 1 64 5 is_stmt 0 view .LVU39
+ 197 0050 8842     		cmp	r0, r1
+  63:Led.c         **** 	if (duty < color)
+ 198              		.loc 1 63 1 view .LVU40
+ 199 0052 08B5     		push	{r3, lr}
+ 200              	.LCFI2:
+ 201              		.cfi_def_cfa_offset 8
+ 202              		.cfi_offset 3, -8
+ 203              		.cfi_offset 14, -4
+ 204              		.loc 1 64 5 view .LVU41
+ 205 0054 05D2     		bcs	.L19
+  65:Led.c         **** 	{
+  66:Led.c         **** 		tmcm_ledGreenOn();
+ 206              		.loc 1 66 3 is_stmt 1 view .LVU42
+ 207 0056 FFF7FEFF 		bl	tmcm_ledGreenOn
+ 208              	.LVL8:
+  67:Led.c         **** 		tmcm_ledRedOff();
+ 209              		.loc 1 67 3 view .LVU43
+  68:Led.c         **** 	}
+  69:Led.c         **** 	else
+  70:Led.c         **** 	{
+  71:Led.c         **** 		tmcm_ledGreenOff();
+  72:Led.c         **** 		tmcm_ledRedOn();
+  73:Led.c         **** 	}
+  74:Led.c         **** }
+ 210              		.loc 1 74 1 is_stmt 0 view .LVU44
+ 211 005a BDE80840 		pop	{r3, lr}
+ 212              	.LCFI3:
+ 213              		.cfi_remember_state
+ 214              		.cfi_restore 14
+ 215              		.cfi_restore 3
+ 216              		.cfi_def_cfa_offset 0
+  67:Led.c         **** 		tmcm_ledRedOff();
+ 217              		.loc 1 67 3 view .LVU45
+ 218 005e FFF7FEBF 		b	tmcm_ledRedOff
+ 219              	.LVL9:
+ 220              	.L19:
+ 221              	.LCFI4:
+ 222              		.cfi_restore_state
+  71:Led.c         **** 		tmcm_ledRedOn();
+ 223              		.loc 1 71 3 is_stmt 1 view .LVU46
+ 224 0062 FFF7FEFF 		bl	tmcm_ledGreenOff
+ 225              	.LVL10:
+  72:Led.c         **** 	}
+ 226              		.loc 1 72 3 view .LVU47
+ 227              		.loc 1 74 1 is_stmt 0 view .LVU48
+ 228 0066 BDE80840 		pop	{r3, lr}
+ 229              	.LCFI5:
+ 230              		.cfi_restore 14
+ 231              		.cfi_restore 3
+ 232              		.cfi_def_cfa_offset 0
+  72:Led.c         **** 	}
+ 233              		.loc 1 72 3 view .LVU49
+ 234 006a FFF7FEBF 		b	tmcm_ledRedOn
+ 235              	.LVL11:
+ 236              		.cfi_endproc
+ 237              	.LFE4:
+ 239              		.align	1
+ 240 006e 00BF     		.p2align 2,,3
+ 241              		.global	led_setBlinkTime
+ 242              		.syntax unified
+ 243              		.thumb
+ 244              		.thumb_func
+ 246              	led_setBlinkTime:
+ 247              	.LVL12:
+ 248              	.LFB5:
+  75:Led.c         **** 
+  76:Led.c         **** void led_setBlinkTime(u16 time)
+  77:Led.c         **** {
+ 249              		.loc 1 77 1 is_stmt 1 view -0
+ 250              		.cfi_startproc
+ 251              		@ args = 0, pretend = 0, frame = 0
+ 252              		@ frame_needed = 0, uses_anonymous_args = 0
+ 253              		@ link register save eliminated.
+  78:Led.c         **** 	blinkTime = time;
+ 254              		.loc 1 78 2 view .LVU51
+ 255              		.loc 1 78 12 is_stmt 0 view .LVU52
+ 256 0070 014B     		ldr	r3, .L22
+ 257 0072 1880     		strh	r0, [r3]	@ movhi
+  79:Led.c         **** }
+ 258              		.loc 1 79 1 view .LVU53
+ 259 0074 7047     		bx	lr
+ 260              	.L23:
+ 261 0076 00BF     		.align	2
+ 262              	.L22:
+ 263 0078 00000000 		.word	.LANCHOR1
+ 264              		.cfi_endproc
+ 265              	.LFE5:
+ 267              		.align	1
+ 268              		.p2align 2,,3
+ 269              		.global	led_off
+ 270              		.syntax unified
+ 271              		.thumb
+ 272              		.thumb_func
+ 274              	led_off:
+ 275              	.LFB9:
+ 276              		.cfi_startproc
+ 277              		@ args = 0, pretend = 0, frame = 0
+ 278              		@ frame_needed = 0, uses_anonymous_args = 0
+ 279 007c 08B5     		push	{r3, lr}
+ 280              	.LCFI6:
+ 281              		.cfi_def_cfa_offset 8
+ 282              		.cfi_offset 3, -8
+ 283              		.cfi_offset 14, -4
+ 284 007e FFF7FEFF 		bl	tmcm_ledGreenOff
+ 285 0082 BDE80840 		pop	{r3, lr}
+ 286              	.LCFI7:
+ 287              		.cfi_restore 14
+ 288              		.cfi_restore 3
+ 289              		.cfi_def_cfa_offset 0
+ 290 0086 FFF7FEBF 		b	tmcm_ledRedOff
+ 291              		.cfi_endproc
+ 292              	.LFE9:
+ 294              		.align	1
+ 295 008a 00BF     		.p2align 2,,3
+ 296              		.global	led_periodicJob
+ 297              		.syntax unified
+ 298              		.thumb
+ 299              		.thumb_func
+ 301              	led_periodicJob:
+ 302              	.LFB7:
+  80:Led.c         **** 
+  81:Led.c         **** void led_off()
+  82:Led.c         **** {
+  83:Led.c         **** 	tmcm_ledGreenOff();
+  84:Led.c         **** 	tmcm_ledRedOff();
+  85:Led.c         **** }
+  86:Led.c         **** 
+  87:Led.c         **** void led_periodicJob()
+  88:Led.c         **** {
+ 303              		.loc 1 88 1 is_stmt 1 view -0
+ 304              		.cfi_startproc
+ 305              		@ args = 0, pretend = 0, frame = 0
+ 306              		@ frame_needed = 0, uses_anonymous_args = 0
+  89:Led.c         **** 	switch(ledMode)
+ 307              		.loc 1 89 2 view .LVU55
+  88:Led.c         **** 	switch(ledMode)
+ 308              		.loc 1 88 1 is_stmt 0 view .LVU56
+ 309 008c 38B5     		push	{r3, r4, r5, lr}
+ 310              	.LCFI8:
+ 311              		.cfi_def_cfa_offset 16
+ 312              		.cfi_offset 3, -16
+ 313              		.cfi_offset 4, -12
+ 314              		.cfi_offset 5, -8
+ 315              		.cfi_offset 14, -4
+ 316              		.loc 1 89 2 view .LVU57
+ 317 008e 384C     		ldr	r4, .L64
+ 318 0090 A379     		ldrb	r3, [r4, #6]	@ zero_extendqisi2
+ 319 0092 042B     		cmp	r3, #4
+ 320 0094 6AD8     		bhi	.L49
+ 321 0096 DFE803F0 		tbb	[pc, r3]
+ 322              	.L29:
+ 323 009a 14       		.byte	(.L33-.L29)/2
+ 324 009b 43       		.byte	(.L32-.L29)/2
+ 325 009c 2A       		.byte	(.L31-.L29)/2
+ 326 009d 39       		.byte	(.L30-.L29)/2
+ 327 009e 03       		.byte	(.L28-.L29)/2
+ 328 009f 00       		.p2align 1
+ 329              	.L28:
+  90:Led.c         **** 	{
+  91:Led.c         **** 		case LED_MODE_OFF:
+  92:Led.c         **** 			led_off();
+  93:Led.c         **** 			break;
+  94:Led.c         **** 		case LED_MODE_ON:
+  95:Led.c         **** 			led_updateColor(pwmCounter, ledColor);
+  96:Led.c         **** 			break;
+  97:Led.c         **** 		case LED_MODE_BLINK:
+  98:Led.c         **** 			(msCounter < (blinkTime>>1)) ? led_updateColor(pwmCounter, ledColor) : led_off();
+  99:Led.c         **** 			break;
+ 100:Led.c         **** 		case LED_MODE_FADE:
+ 101:Led.c         **** 			// change color every blinking time
+ 102:Led.c         **** 			if (msCounter == 0)
+ 103:Led.c         **** 			{
+ 104:Led.c         **** 				swipeColor++;
+ 105:Led.c         **** 				if (swipeColor >= MAX_PWM_COUNT)
+ 106:Led.c         **** 					swipeColor = 0;
+ 107:Led.c         **** 			}
+ 108:Led.c         **** 			led_updateColor(pwmCounter, swipeColor);
+ 109:Led.c         **** 			break;
+ 110:Led.c         **** 		case LED_MODE_SWIPE:
+ 111:Led.c         **** 			// change color every blinking time
+ 112:Led.c         **** 			if (msCounter == 0)
+ 330              		.loc 1 112 4 is_stmt 1 view .LVU58
+ 331              		.loc 1 112 7 is_stmt 0 view .LVU59
+ 332 00a0 6288     		ldrh	r2, [r4, #2]
+ 113:Led.c         **** 			{
+ 114:Led.c         **** 				swipeColor++;
+ 333              		.loc 1 114 15 view .LVU60
+ 334 00a2 A388     		ldrh	r3, [r4, #4]
+ 112:Led.c         **** 			{
+ 335              		.loc 1 112 7 view .LVU61
+ 336 00a4 002A     		cmp	r2, #0
+ 337 00a6 4DD1     		bne	.L42
+ 338              		.loc 1 114 5 is_stmt 1 view .LVU62
+ 339              		.loc 1 114 15 is_stmt 0 view .LVU63
+ 340 00a8 0133     		adds	r3, r3, #1
+ 341 00aa 9BB2     		uxth	r3, r3
+ 115:Led.c         **** 				if (swipeColor >= MAX_PWM_COUNT)
+ 342              		.loc 1 115 5 is_stmt 1 view .LVU64
+ 343              		.loc 1 115 8 is_stmt 0 view .LVU65
+ 344 00ac 092B     		cmp	r3, #9
+ 345 00ae 48D9     		bls	.L62
+ 116:Led.c         **** 				{
+ 117:Led.c         **** 					swipeColor = 0;
+ 346              		.loc 1 117 6 is_stmt 1 view .LVU66
+ 118:Led.c         **** 					swipeDirection = !swipeDirection;
+ 347              		.loc 1 118 6 is_stmt 0 view .LVU67
+ 348 00b0 237A     		ldrb	r3, [r4, #8]	@ zero_extendqisi2
+ 117:Led.c         **** 					swipeDirection = !swipeDirection;
+ 349              		.loc 1 117 17 view .LVU68
+ 350 00b2 A280     		strh	r2, [r4, #4]	@ movhi
+ 351              		.loc 1 118 6 is_stmt 1 view .LVU69
+ 352 00b4 83F00103 		eor	r3, r3, #1
+ 353              		.loc 1 118 21 is_stmt 0 view .LVU70
+ 354 00b8 2372     		strb	r3, [r4, #8]
+ 119:Led.c         **** 				}
+ 120:Led.c         **** 			}
+ 121:Led.c         **** 			// set actual color
+ 122:Led.c         **** 			(swipeDirection) ? led_updateColor(pwmCounter, swipeColor) : led_updateColor(pwmCounter, MAX_COL
+ 355              		.loc 1 122 4 is_stmt 1 view .LVU71
+ 356              		.loc 1 122 63 is_stmt 0 view .LVU72
+ 357 00ba 002B     		cmp	r3, #0
+ 358 00bc 4BD1     		bne	.L59
+ 359 00be 0923     		movs	r3, #9
+ 360 00c0 46E0     		b	.L44
+ 361              	.L33:
+  92:Led.c         **** 			break;
+ 362              		.loc 1 92 4 is_stmt 1 view .LVU73
+ 363              	.LBB24:
+ 364              	.LBI24:
+  81:Led.c         **** {
+ 365              		.loc 1 81 6 view .LVU74
+ 366              	.LBB25:
+  83:Led.c         **** 	tmcm_ledRedOff();
+ 367              		.loc 1 83 2 view .LVU75
+ 368 00c2 FFF7FEFF 		bl	tmcm_ledGreenOff
+ 369              	.LVL13:
+  84:Led.c         **** }
+ 370              		.loc 1 84 2 view .LVU76
+ 371 00c6 2B4D     		ldr	r5, .L64+4
+ 372 00c8 FFF7FEFF 		bl	tmcm_ledRedOff
+ 373              	.LVL14:
+ 374              	.L27:
+ 375              	.LBE25:
+ 376              	.LBE24:
+ 123:Led.c         **** 			break;
+ 124:Led.c         **** 	}
+ 125:Led.c         **** 
+ 126:Led.c         **** 	// counter for pwm duty cycle (frequncy = 1kHz / MAX_PWM_COUNT)
+ 127:Led.c         **** 	pwmCounter++;
+ 377              		.loc 1 127 2 view .LVU77
+ 378              		.loc 1 127 12 is_stmt 0 view .LVU78
+ 379 00cc 2388     		ldrh	r3, [r4]
+ 128:Led.c         **** 	if (pwmCounter >= MAX_PWM_COUNT)
+ 129:Led.c         **** 		pwmCounter = 0;
+ 130:Led.c         **** 
+ 131:Led.c         **** 	// millisecond counter for blinking
+ 132:Led.c         **** 	msCounter++;
+ 133:Led.c         **** 	if (msCounter >= blinkTime)
+ 380              		.loc 1 133 5 view .LVU79
+ 381 00ce 2A88     		ldrh	r2, [r5]
+ 127:Led.c         **** 	if (pwmCounter >= MAX_PWM_COUNT)
+ 382              		.loc 1 127 12 view .LVU80
+ 383 00d0 0133     		adds	r3, r3, #1
+ 384 00d2 9BB2     		uxth	r3, r3
+ 128:Led.c         **** 	if (pwmCounter >= MAX_PWM_COUNT)
+ 385              		.loc 1 128 2 is_stmt 1 view .LVU81
+ 128:Led.c         **** 	if (pwmCounter >= MAX_PWM_COUNT)
+ 386              		.loc 1 128 5 is_stmt 0 view .LVU82
+ 387 00d4 092B     		cmp	r3, #9
+ 129:Led.c         **** 
+ 388              		.loc 1 129 3 is_stmt 1 view .LVU83
+ 129:Led.c         **** 
+ 389              		.loc 1 129 14 is_stmt 0 view .LVU84
+ 390 00d6 88BF     		it	hi
+ 391 00d8 0023     		movhi	r3, #0
+ 392 00da 2380     		strh	r3, [r4]	@ movhi
+ 132:Led.c         **** 	if (msCounter >= blinkTime)
+ 393              		.loc 1 132 2 is_stmt 1 view .LVU85
+ 132:Led.c         **** 	if (msCounter >= blinkTime)
+ 394              		.loc 1 132 11 is_stmt 0 view .LVU86
+ 395 00dc 6388     		ldrh	r3, [r4, #2]
+ 396 00de 0133     		adds	r3, r3, #1
+ 397 00e0 9BB2     		uxth	r3, r3
+ 398              		.loc 1 133 5 view .LVU87
+ 399 00e2 9A42     		cmp	r2, r3
+ 132:Led.c         **** 	if (msCounter >= blinkTime)
+ 400              		.loc 1 132 11 view .LVU88
+ 401 00e4 6380     		strh	r3, [r4, #2]	@ movhi
+ 402              		.loc 1 133 2 is_stmt 1 view .LVU89
+ 134:Led.c         **** 		msCounter=0;
+ 403              		.loc 1 134 3 view .LVU90
+ 404              		.loc 1 134 12 is_stmt 0 view .LVU91
+ 405 00e6 9CBF     		itt	ls
+ 406 00e8 0023     		movls	r3, #0
+ 407 00ea 6380     		strhls	r3, [r4, #2]	@ movhi
+ 135:Led.c         **** }
+ 408              		.loc 1 135 1 view .LVU92
+ 409 00ec 38BD     		pop	{r3, r4, r5, pc}
+ 410              	.L31:
+  98:Led.c         **** 			break;
+ 411              		.loc 1 98 4 is_stmt 1 view .LVU93
+  98:Led.c         **** 			break;
+ 412              		.loc 1 98 15 is_stmt 0 view .LVU94
+ 413 00ee 214D     		ldr	r5, .L64+4
+  98:Led.c         **** 			break;
+ 414              		.loc 1 98 73 view .LVU95
+ 415 00f0 6388     		ldrh	r3, [r4, #2]
+  98:Led.c         **** 			break;
+ 416              		.loc 1 98 15 view .LVU96
+ 417 00f2 2A88     		ldrh	r2, [r5]
+  98:Led.c         **** 			break;
+ 418              		.loc 1 98 73 view .LVU97
+ 419 00f4 B3EB520F 		cmp	r3, r2, lsr #1
+ 420 00f8 33D2     		bcs	.L35
+ 421              	.LVL15:
+ 422              	.LBB26:
+ 423              	.LBI26:
+  62:Led.c         **** {
+ 424              		.loc 1 62 6 is_stmt 1 discriminator 1 view .LVU98
+ 425              	.LBB27:
+  64:Led.c         **** 	{
+ 426              		.loc 1 64 2 discriminator 1 view .LVU99
+  64:Led.c         **** 	{
+ 427              		.loc 1 64 5 is_stmt 0 discriminator 1 view .LVU100
+ 428 00fa E279     		ldrb	r2, [r4, #7]	@ zero_extendqisi2
+ 429 00fc 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 430 00fe 9A42     		cmp	r2, r3
+ 431 0100 13D8     		bhi	.L36
+ 432              	.LVL16:
+ 433              	.L34:
+  64:Led.c         **** 	{
+ 434              		.loc 1 64 5 discriminator 1 view .LVU101
+ 435              	.LBE27:
+ 436              	.LBE26:
+ 437              	.LBB28:
+ 438              	.LBB29:
+  71:Led.c         **** 		tmcm_ledRedOn();
+ 439              		.loc 1 71 3 is_stmt 1 view .LVU102
+ 440 0102 FFF7FEFF 		bl	tmcm_ledGreenOff
+ 441              	.LVL17:
+  72:Led.c         **** 	}
+ 442              		.loc 1 72 3 view .LVU103
+ 443 0106 FFF7FEFF 		bl	tmcm_ledRedOn
+ 444              	.LVL18:
+ 445 010a DFE7     		b	.L27
+ 446              	.L30:
+ 447              	.LBE29:
+ 448              	.LBE28:
+ 102:Led.c         **** 			{
+ 449              		.loc 1 102 4 view .LVU104
+ 102:Led.c         **** 			{
+ 450              		.loc 1 102 7 is_stmt 0 view .LVU105
+ 451 010c 6288     		ldrh	r2, [r4, #2]
+ 104:Led.c         **** 				if (swipeColor >= MAX_PWM_COUNT)
+ 452              		.loc 1 104 15 view .LVU106
+ 453 010e A388     		ldrh	r3, [r4, #4]
+ 102:Led.c         **** 			{
+ 454              		.loc 1 102 7 view .LVU107
+ 455 0110 8AB9     		cbnz	r2, .L45
+ 104:Led.c         **** 				if (swipeColor >= MAX_PWM_COUNT)
+ 456              		.loc 1 104 5 is_stmt 1 view .LVU108
+ 104:Led.c         **** 				if (swipeColor >= MAX_PWM_COUNT)
+ 457              		.loc 1 104 15 is_stmt 0 view .LVU109
+ 458 0112 0133     		adds	r3, r3, #1
+ 459 0114 9BB2     		uxth	r3, r3
+ 105:Led.c         **** 					swipeColor = 0;
+ 460              		.loc 1 105 5 is_stmt 1 view .LVU110
+ 105:Led.c         **** 					swipeColor = 0;
+ 461              		.loc 1 105 8 is_stmt 0 view .LVU111
+ 462 0116 092B     		cmp	r3, #9
+ 463 0118 0CD9     		bls	.L63
+ 106:Led.c         **** 			}
+ 464              		.loc 1 106 6 is_stmt 1 view .LVU112
+ 465 011a 164D     		ldr	r5, .L64+4
+ 106:Led.c         **** 			}
+ 466              		.loc 1 106 17 is_stmt 0 view .LVU113
+ 467 011c A280     		strh	r2, [r4, #4]	@ movhi
+ 108:Led.c         **** 			break;
+ 468              		.loc 1 108 4 is_stmt 1 view .LVU114
+ 469              	.LVL19:
+ 470              	.LBB32:
+ 471              	.LBI32:
+  62:Led.c         **** {
+ 472              		.loc 1 62 6 view .LVU115
+ 473              	.LBB33:
+  64:Led.c         **** 	{
+ 474              		.loc 1 64 2 view .LVU116
+ 475 011e F0E7     		b	.L34
+ 476              	.LVL20:
+ 477              	.L32:
+  64:Led.c         **** 	{
+ 478              		.loc 1 64 2 is_stmt 0 view .LVU117
+ 479              	.LBE33:
+ 480              	.LBE32:
+  95:Led.c         **** 			break;
+ 481              		.loc 1 95 4 is_stmt 1 view .LVU118
+ 482              	.LBB34:
+ 483              	.LBI28:
+  62:Led.c         **** {
+ 484              		.loc 1 62 6 view .LVU119
+ 485              	.LBB30:
+  64:Led.c         **** 	{
+ 486              		.loc 1 64 2 view .LVU120
+  64:Led.c         **** 	{
+ 487              		.loc 1 64 5 is_stmt 0 view .LVU121
+ 488 0120 E279     		ldrb	r2, [r4, #7]	@ zero_extendqisi2
+ 489 0122 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 490 0124 134D     		ldr	r5, .L64+4
+ 491 0126 9A42     		cmp	r2, r3
+ 492 0128 EBD9     		bls	.L34
+ 493              	.LVL21:
+ 494              	.L36:
+  66:Led.c         **** 		tmcm_ledRedOff();
+ 495              		.loc 1 66 3 is_stmt 1 view .LVU122
+ 496 012a FFF7FEFF 		bl	tmcm_ledGreenOn
+ 497              	.LVL22:
+  67:Led.c         **** 	}
+ 498              		.loc 1 67 3 view .LVU123
+ 499 012e FFF7FEFF 		bl	tmcm_ledRedOff
+ 500              	.LVL23:
+ 501 0132 CBE7     		b	.L27
+ 502              	.L63:
+ 503              	.LBE30:
+ 504              	.LBE34:
+ 104:Led.c         **** 				if (swipeColor >= MAX_PWM_COUNT)
+ 505              		.loc 1 104 15 is_stmt 0 view .LVU124
+ 506 0134 A380     		strh	r3, [r4, #4]	@ movhi
+ 507              	.L45:
+ 508              	.LVL24:
+ 509              	.LBB35:
+ 510              	.LBI35:
+  62:Led.c         **** {
+ 511              		.loc 1 62 6 is_stmt 1 discriminator 1 view .LVU125
+ 512              	.LBB36:
+  64:Led.c         **** 	{
+ 513              		.loc 1 64 2 discriminator 1 view .LVU126
+  64:Led.c         **** 	{
+ 514              		.loc 1 64 5 is_stmt 0 discriminator 1 view .LVU127
+ 515 0136 2278     		ldrb	r2, [r4]	@ zero_extendqisi2
+ 516 0138 DBB2     		uxtb	r3, r3
+  64:Led.c         **** 	{
+ 517              		.loc 1 64 5 discriminator 1 view .LVU128
+ 518 013a 9A42     		cmp	r2, r3
+ 519 013c 0BD2     		bcs	.L59
+ 520              	.LVL25:
+ 521              	.L54:
+  64:Led.c         **** 	{
+ 522              		.loc 1 64 5 discriminator 1 view .LVU129
+ 523 013e 0D4D     		ldr	r5, .L64+4
+ 524 0140 F3E7     		b	.L36
+ 525              	.L62:
+ 526              	.LBE36:
+ 527              	.LBE35:
+ 114:Led.c         **** 				if (swipeColor >= MAX_PWM_COUNT)
+ 528              		.loc 1 114 15 view .LVU130
+ 529 0142 A380     		strh	r3, [r4, #4]	@ movhi
+ 530              	.L42:
+ 122:Led.c         **** 			break;
+ 531              		.loc 1 122 4 is_stmt 1 view .LVU131
+ 122:Led.c         **** 			break;
+ 532              		.loc 1 122 63 is_stmt 0 view .LVU132
+ 533 0144 227A     		ldrb	r2, [r4, #8]	@ zero_extendqisi2
+ 534 0146 002A     		cmp	r2, #0
+ 535 0148 F5D1     		bne	.L45
+ 122:Led.c         **** 			break;
+ 536              		.loc 1 122 65 view .LVU133
+ 537 014a C3F10903 		rsb	r3, r3, #9
+ 538 014e DBB2     		uxtb	r3, r3
+ 539              	.L44:
+ 540              	.LVL26:
+ 541              	.LBB37:
+ 542              	.LBI37:
+  62:Led.c         **** {
+ 543              		.loc 1 62 6 is_stmt 1 discriminator 2 view .LVU134
+ 544              	.LBB38:
+  64:Led.c         **** 	{
+ 545              		.loc 1 64 2 discriminator 2 view .LVU135
+  64:Led.c         **** 	{
+ 546              		.loc 1 64 5 is_stmt 0 discriminator 2 view .LVU136
+ 547 0150 2278     		ldrb	r2, [r4]	@ zero_extendqisi2
+ 548 0152 9A42     		cmp	r2, r3
+ 549 0154 F3D3     		bcc	.L54
+ 550              	.LVL27:
+ 551              	.L59:
+  64:Led.c         **** 	{
+ 552              		.loc 1 64 5 discriminator 2 view .LVU137
+ 553 0156 074D     		ldr	r5, .L64+4
+ 554              	.LBE38:
+ 555              	.LBE37:
+ 556              	.LBB39:
+ 557              	.LBB31:
+  71:Led.c         **** 		tmcm_ledRedOn();
+ 558              		.loc 1 71 3 is_stmt 1 view .LVU138
+ 559 0158 FFF7FEFF 		bl	tmcm_ledGreenOff
+ 560              	.LVL28:
+  72:Led.c         **** 	}
+ 561              		.loc 1 72 3 view .LVU139
+ 562 015c FFF7FEFF 		bl	tmcm_ledRedOn
+ 563              	.LVL29:
+ 564 0160 B4E7     		b	.L27
+ 565              	.L35:
+ 566              	.LBE31:
+ 567              	.LBE39:
+ 568              	.LBB40:
+ 569              	.LBI40:
+  81:Led.c         **** {
+ 570              		.loc 1 81 6 view .LVU140
+ 571              	.LBB41:
+  83:Led.c         **** 	tmcm_ledRedOff();
+ 572              		.loc 1 83 2 view .LVU141
+ 573 0162 FFF7FEFF 		bl	tmcm_ledGreenOff
+ 574              	.LVL30:
+  84:Led.c         **** }
+ 575              		.loc 1 84 2 view .LVU142
+ 576 0166 FFF7FEFF 		bl	tmcm_ledRedOff
+ 577              	.LVL31:
+  85:Led.c         **** 
+ 578              		.loc 1 85 1 is_stmt 0 view .LVU143
+ 579 016a AFE7     		b	.L27
+ 580              	.L49:
+ 581 016c 014D     		ldr	r5, .L64+4
+ 582 016e ADE7     		b	.L27
+ 583              	.L65:
+ 584              		.align	2
+ 585              	.L64:
+ 586 0170 00000000 		.word	.LANCHOR0
+ 587 0174 00000000 		.word	.LANCHOR1
+ 588              	.LBE41:
+ 589              	.LBE40:
+ 590              		.cfi_endproc
+ 591              	.LFE7:
+ 593              		.global	blinkTime
+ 594              		.global	swipeDirection
+ 595              		.global	swipeColor
+ 596              		.global	msCounter
+ 597              		.global	ledColor
+ 598              		.global	ledMode
+ 599              		.global	pwmCounter
+ 600              		.data
+ 601              		.align	1
+ 602              		.set	.LANCHOR1,. + 0
+ 605              	blinkTime:
+ 606 0000 E803     		.short	1000
+ 607              		.bss
+ 608              		.align	1
+ 609              		.set	.LANCHOR0,. + 0
+ 612              	pwmCounter:
+ 613 0000 0000     		.space	2
+ 616              	msCounter:
+ 617 0002 0000     		.space	2
+ 620              	swipeColor:
+ 621 0004 0000     		.space	2
+ 624              	ledMode:
+ 625 0006 00       		.space	1
+ 628              	ledColor:
+ 629 0007 00       		.space	1
+ 632              	swipeDirection:
+ 633 0008 00       		.space	1
+ 634              		.text
+ 635              	.Letext0:
+ 636              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 637              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 638              		.file 4 "TMC-API/tmc/helpers/Types.h"
+ 639              		.file 5 "Definitions.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 Led.c
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:24     .text:00000000 led_init
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:61     .text:00000010 led_resetCounter
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:84     .text:0000001c $d
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:88     .text:00000020 $t
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:95     .text:00000020 led_setMode
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:144    .text:0000003c $d
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:148    .text:00000040 $t
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:155    .text:00000040 led_setColor
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:177    .text:0000004c $d
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:181    .text:00000050 $t
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:188    .text:00000050 led_updateColor
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:246    .text:00000070 led_setBlinkTime
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:263    .text:00000078 $d
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:267    .text:0000007c $t
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:274    .text:0000007c led_off
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:301    .text:0000008c led_periodicJob
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:323    .text:0000009a $d
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:586    .text:00000170 $d
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:605    .data:00000000 blinkTime
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:632    .bss:00000008 swipeDirection
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:620    .bss:00000004 swipeColor
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:616    .bss:00000002 msCounter
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:628    .bss:00000007 ledColor
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:624    .bss:00000006 ledMode
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:612    .bss:00000000 pwmCounter
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:601    .data:00000000 $d
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:608    .bss:00000000 $d
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:328    .text:0000009f $d
+C:\Users\forre\AppData\Local\Temp\cchCClqs.s:328    .text:000000a0 $t
+
+UNDEFINED SYMBOLS
+tmcm_ledGreenOff
+tmcm_ledRedOff
+tmcm_ledGreenOn
+tmcm_ledRedOn

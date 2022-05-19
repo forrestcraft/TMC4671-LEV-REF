@@ -1,0 +1,472 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"SystemInfo.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	systemInfo_update
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	systemInfo_update:
+  25              	.LVL0:
+  26              	.LFB0:
+  27              		.file 1 "hal/system/SystemInfo.c"
+   1:hal/system/SystemInfo.c **** /*
+   2:hal/system/SystemInfo.c ****  * SystemInfo.c
+   3:hal/system/SystemInfo.c ****  *
+   4:hal/system/SystemInfo.c ****  *  Created on: 04.04.2019
+   5:hal/system/SystemInfo.c ****  *      Author: ED
+   6:hal/system/SystemInfo.c ****  */
+   7:hal/system/SystemInfo.c **** #include "SystemInfo.h"
+   8:hal/system/SystemInfo.c **** 
+   9:hal/system/SystemInfo.c **** uint32_t loopCounterCheckTime 	= 0;
+  10:hal/system/SystemInfo.c **** 
+  11:hal/system/SystemInfo.c **** uint32_t mainLoopCounter 		= 0;
+  12:hal/system/SystemInfo.c **** uint32_t mainLoopsPerSecond	 	= 0;
+  13:hal/system/SystemInfo.c **** 
+  14:hal/system/SystemInfo.c **** uint32_t commLoopCounter 		= 0;
+  15:hal/system/SystemInfo.c **** uint32_t commLoopsPerSecond		= 0;
+  16:hal/system/SystemInfo.c **** 
+  17:hal/system/SystemInfo.c **** uint32_t currentLoopCounter 		= 0;
+  18:hal/system/SystemInfo.c **** uint32_t currentLoopsPerSecond	= 0;
+  19:hal/system/SystemInfo.c **** 
+  20:hal/system/SystemInfo.c **** uint32_t velocityLoopCounter 	= 0;
+  21:hal/system/SystemInfo.c **** uint32_t velocityLoopsPerSecond	= 0;
+  22:hal/system/SystemInfo.c **** 
+  23:hal/system/SystemInfo.c **** void systemInfo_update(uint32_t actualSystick)
+  24:hal/system/SystemInfo.c **** {
+  28              		.loc 1 24 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  25:hal/system/SystemInfo.c **** 	if (abs(actualSystick-loopCounterCheckTime) >= 1000)
+  33              		.loc 1 25 2 view .LVU1
+  34              		.loc 1 25 23 is_stmt 0 view .LVU2
+  35 0000 0D4B     		ldr	r3, .L4
+  36 0002 1A68     		ldr	r2, [r3]
+  37 0004 821A     		subs	r2, r0, r2
+  38              		.loc 1 25 6 view .LVU3
+  39 0006 002A     		cmp	r2, #0
+  40 0008 B8BF     		it	lt
+  41 000a 5242     		rsblt	r2, r2, #0
+  42              		.loc 1 25 5 view .LVU4
+  43 000c B2F57A7F 		cmp	r2, #1000
+  44 0010 11DB     		blt	.L1
+  26:hal/system/SystemInfo.c **** 	{
+  27:hal/system/SystemInfo.c **** 		// reset main loop counter
+  28:hal/system/SystemInfo.c **** 		mainLoopsPerSecond = mainLoopCounter;
+  45              		.loc 1 28 3 is_stmt 1 view .LVU5
+  29:hal/system/SystemInfo.c **** 		mainLoopCounter = 0;
+  46              		.loc 1 29 19 is_stmt 0 view .LVU6
+  47 0012 0022     		movs	r2, #0
+  30:hal/system/SystemInfo.c **** 
+  31:hal/system/SystemInfo.c **** 		// reset communication loop counter
+  32:hal/system/SystemInfo.c **** 		commLoopsPerSecond = commLoopCounter;
+  48              		.loc 1 32 22 view .LVU7
+  49 0014 1969     		ldr	r1, [r3, #16]
+  28:hal/system/SystemInfo.c **** 		mainLoopCounter = 0;
+  50              		.loc 1 28 22 view .LVU8
+  51 0016 D3F808C0 		ldr	ip, [r3, #8]
+  52              		.loc 1 32 22 view .LVU9
+  53 001a D960     		str	r1, [r3, #12]
+  28:hal/system/SystemInfo.c **** 		mainLoopCounter = 0;
+  54              		.loc 1 28 22 view .LVU10
+  55 001c C3F804C0 		str	ip, [r3, #4]
+  29:hal/system/SystemInfo.c **** 		mainLoopCounter = 0;
+  56              		.loc 1 29 3 is_stmt 1 view .LVU11
+  33:hal/system/SystemInfo.c **** 		commLoopCounter = 0;
+  34:hal/system/SystemInfo.c **** 
+  35:hal/system/SystemInfo.c **** 		// reset current loop counter
+  36:hal/system/SystemInfo.c **** 		currentLoopsPerSecond = currentLoopCounter;
+  37:hal/system/SystemInfo.c **** 		currentLoopCounter = 0;
+  38:hal/system/SystemInfo.c **** 
+  39:hal/system/SystemInfo.c **** 		// reset velocity loop counter
+  40:hal/system/SystemInfo.c **** 		velocityLoopsPerSecond = velocityLoopCounter;
+  57              		.loc 1 40 26 is_stmt 0 view .LVU12
+  58 0020 196A     		ldr	r1, [r3, #32]
+  36:hal/system/SystemInfo.c **** 		currentLoopCounter = 0;
+  59              		.loc 1 36 25 view .LVU13
+  60 0022 D3F818C0 		ldr	ip, [r3, #24]
+  61              		.loc 1 40 26 view .LVU14
+  62 0026 D961     		str	r1, [r3, #28]
+  36:hal/system/SystemInfo.c **** 		currentLoopCounter = 0;
+  63              		.loc 1 36 25 view .LVU15
+  64 0028 C3F814C0 		str	ip, [r3, #20]
+  41:hal/system/SystemInfo.c **** 		velocityLoopCounter = 0;
+  42:hal/system/SystemInfo.c **** 
+  43:hal/system/SystemInfo.c **** 		loopCounterCheckTime = actualSystick;
+  65              		.loc 1 43 24 view .LVU16
+  66 002c 1860     		str	r0, [r3]
+  29:hal/system/SystemInfo.c **** 
+  67              		.loc 1 29 19 view .LVU17
+  68 002e 9A60     		str	r2, [r3, #8]
+  32:hal/system/SystemInfo.c **** 		commLoopCounter = 0;
+  69              		.loc 1 32 3 is_stmt 1 view .LVU18
+  33:hal/system/SystemInfo.c **** 
+  70              		.loc 1 33 3 view .LVU19
+  33:hal/system/SystemInfo.c **** 
+  71              		.loc 1 33 19 is_stmt 0 view .LVU20
+  72 0030 1A61     		str	r2, [r3, #16]
+  36:hal/system/SystemInfo.c **** 		currentLoopCounter = 0;
+  73              		.loc 1 36 3 is_stmt 1 view .LVU21
+  37:hal/system/SystemInfo.c **** 
+  74              		.loc 1 37 3 view .LVU22
+  37:hal/system/SystemInfo.c **** 
+  75              		.loc 1 37 22 is_stmt 0 view .LVU23
+  76 0032 9A61     		str	r2, [r3, #24]
+  40:hal/system/SystemInfo.c **** 		velocityLoopCounter = 0;
+  77              		.loc 1 40 3 is_stmt 1 view .LVU24
+  41:hal/system/SystemInfo.c **** 
+  78              		.loc 1 41 3 view .LVU25
+  41:hal/system/SystemInfo.c **** 
+  79              		.loc 1 41 23 is_stmt 0 view .LVU26
+  80 0034 1A62     		str	r2, [r3, #32]
+  81              		.loc 1 43 3 is_stmt 1 view .LVU27
+  82              	.L1:
+  44:hal/system/SystemInfo.c **** 	}
+  45:hal/system/SystemInfo.c **** }
+  83              		.loc 1 45 1 is_stmt 0 view .LVU28
+  84 0036 7047     		bx	lr
+  85              	.L5:
+  86              		.align	2
+  87              	.L4:
+  88 0038 00000000 		.word	.LANCHOR0
+  89              		.cfi_endproc
+  90              	.LFE0:
+  92              		.align	1
+  93              		.p2align 2,,3
+  94              		.global	systemInfo_incMainLoopCounter
+  95              		.syntax unified
+  96              		.thumb
+  97              		.thumb_func
+  99              	systemInfo_incMainLoopCounter:
+ 100              	.LFB1:
+  46:hal/system/SystemInfo.c **** 
+  47:hal/system/SystemInfo.c **** void systemInfo_incMainLoopCounter()
+  48:hal/system/SystemInfo.c **** {
+ 101              		.loc 1 48 1 is_stmt 1 view -0
+ 102              		.cfi_startproc
+ 103              		@ args = 0, pretend = 0, frame = 0
+ 104              		@ frame_needed = 0, uses_anonymous_args = 0
+ 105              		@ link register save eliminated.
+  49:hal/system/SystemInfo.c **** 	mainLoopCounter++;
+ 106              		.loc 1 49 2 view .LVU30
+ 107              		.loc 1 49 17 is_stmt 0 view .LVU31
+ 108 003c 024A     		ldr	r2, .L7
+ 109 003e 9368     		ldr	r3, [r2, #8]
+ 110 0040 0133     		adds	r3, r3, #1
+ 111 0042 9360     		str	r3, [r2, #8]
+  50:hal/system/SystemInfo.c **** }
+ 112              		.loc 1 50 1 view .LVU32
+ 113 0044 7047     		bx	lr
+ 114              	.L8:
+ 115 0046 00BF     		.align	2
+ 116              	.L7:
+ 117 0048 00000000 		.word	.LANCHOR0
+ 118              		.cfi_endproc
+ 119              	.LFE1:
+ 121              		.align	1
+ 122              		.p2align 2,,3
+ 123              		.global	systemInfo_getMainLoopsPerSecond
+ 124              		.syntax unified
+ 125              		.thumb
+ 126              		.thumb_func
+ 128              	systemInfo_getMainLoopsPerSecond:
+ 129              	.LFB2:
+  51:hal/system/SystemInfo.c **** 
+  52:hal/system/SystemInfo.c **** uint32_t systemInfo_getMainLoopsPerSecond()
+  53:hal/system/SystemInfo.c **** {
+ 130              		.loc 1 53 1 is_stmt 1 view -0
+ 131              		.cfi_startproc
+ 132              		@ args = 0, pretend = 0, frame = 0
+ 133              		@ frame_needed = 0, uses_anonymous_args = 0
+ 134              		@ link register save eliminated.
+  54:hal/system/SystemInfo.c **** 	return mainLoopsPerSecond;
+ 135              		.loc 1 54 2 view .LVU34
+ 136              		.loc 1 54 9 is_stmt 0 view .LVU35
+ 137 004c 014B     		ldr	r3, .L10
+  55:hal/system/SystemInfo.c **** }
+ 138              		.loc 1 55 1 view .LVU36
+ 139 004e 5868     		ldr	r0, [r3, #4]
+ 140 0050 7047     		bx	lr
+ 141              	.L11:
+ 142 0052 00BF     		.align	2
+ 143              	.L10:
+ 144 0054 00000000 		.word	.LANCHOR0
+ 145              		.cfi_endproc
+ 146              	.LFE2:
+ 148              		.align	1
+ 149              		.p2align 2,,3
+ 150              		.global	systemInfo_incCommunicationLoopCounter
+ 151              		.syntax unified
+ 152              		.thumb
+ 153              		.thumb_func
+ 155              	systemInfo_incCommunicationLoopCounter:
+ 156              	.LFB3:
+  56:hal/system/SystemInfo.c **** 
+  57:hal/system/SystemInfo.c **** void systemInfo_incCommunicationLoopCounter()
+  58:hal/system/SystemInfo.c **** {
+ 157              		.loc 1 58 1 is_stmt 1 view -0
+ 158              		.cfi_startproc
+ 159              		@ args = 0, pretend = 0, frame = 0
+ 160              		@ frame_needed = 0, uses_anonymous_args = 0
+ 161              		@ link register save eliminated.
+  59:hal/system/SystemInfo.c **** 	commLoopCounter++;
+ 162              		.loc 1 59 2 view .LVU38
+ 163              		.loc 1 59 17 is_stmt 0 view .LVU39
+ 164 0058 024A     		ldr	r2, .L13
+ 165 005a 1369     		ldr	r3, [r2, #16]
+ 166 005c 0133     		adds	r3, r3, #1
+ 167 005e 1361     		str	r3, [r2, #16]
+  60:hal/system/SystemInfo.c **** }
+ 168              		.loc 1 60 1 view .LVU40
+ 169 0060 7047     		bx	lr
+ 170              	.L14:
+ 171 0062 00BF     		.align	2
+ 172              	.L13:
+ 173 0064 00000000 		.word	.LANCHOR0
+ 174              		.cfi_endproc
+ 175              	.LFE3:
+ 177              		.align	1
+ 178              		.p2align 2,,3
+ 179              		.global	systemInfo_getCommunicationsPerSecond
+ 180              		.syntax unified
+ 181              		.thumb
+ 182              		.thumb_func
+ 184              	systemInfo_getCommunicationsPerSecond:
+ 185              	.LFB4:
+  61:hal/system/SystemInfo.c **** 
+  62:hal/system/SystemInfo.c **** uint32_t systemInfo_getCommunicationsPerSecond()
+  63:hal/system/SystemInfo.c **** {
+ 186              		.loc 1 63 1 is_stmt 1 view -0
+ 187              		.cfi_startproc
+ 188              		@ args = 0, pretend = 0, frame = 0
+ 189              		@ frame_needed = 0, uses_anonymous_args = 0
+ 190              		@ link register save eliminated.
+  64:hal/system/SystemInfo.c **** 	return commLoopsPerSecond;
+ 191              		.loc 1 64 2 view .LVU42
+ 192              		.loc 1 64 9 is_stmt 0 view .LVU43
+ 193 0068 014B     		ldr	r3, .L16
+  65:hal/system/SystemInfo.c **** }
+ 194              		.loc 1 65 1 view .LVU44
+ 195 006a D868     		ldr	r0, [r3, #12]
+ 196 006c 7047     		bx	lr
+ 197              	.L17:
+ 198 006e 00BF     		.align	2
+ 199              	.L16:
+ 200 0070 00000000 		.word	.LANCHOR0
+ 201              		.cfi_endproc
+ 202              	.LFE4:
+ 204              		.align	1
+ 205              		.p2align 2,,3
+ 206              		.global	systemInfo_incCurrentLoopCounter
+ 207              		.syntax unified
+ 208              		.thumb
+ 209              		.thumb_func
+ 211              	systemInfo_incCurrentLoopCounter:
+ 212              	.LFB5:
+  66:hal/system/SystemInfo.c **** 
+  67:hal/system/SystemInfo.c **** void systemInfo_incCurrentLoopCounter()
+  68:hal/system/SystemInfo.c **** {
+ 213              		.loc 1 68 1 is_stmt 1 view -0
+ 214              		.cfi_startproc
+ 215              		@ args = 0, pretend = 0, frame = 0
+ 216              		@ frame_needed = 0, uses_anonymous_args = 0
+ 217              		@ link register save eliminated.
+  69:hal/system/SystemInfo.c **** 	currentLoopCounter++;
+ 218              		.loc 1 69 2 view .LVU46
+ 219              		.loc 1 69 20 is_stmt 0 view .LVU47
+ 220 0074 024A     		ldr	r2, .L19
+ 221 0076 9369     		ldr	r3, [r2, #24]
+ 222 0078 0133     		adds	r3, r3, #1
+ 223 007a 9361     		str	r3, [r2, #24]
+  70:hal/system/SystemInfo.c **** }
+ 224              		.loc 1 70 1 view .LVU48
+ 225 007c 7047     		bx	lr
+ 226              	.L20:
+ 227 007e 00BF     		.align	2
+ 228              	.L19:
+ 229 0080 00000000 		.word	.LANCHOR0
+ 230              		.cfi_endproc
+ 231              	.LFE5:
+ 233              		.align	1
+ 234              		.p2align 2,,3
+ 235              		.global	systemInfo_getCurrentLoopsPerSecond
+ 236              		.syntax unified
+ 237              		.thumb
+ 238              		.thumb_func
+ 240              	systemInfo_getCurrentLoopsPerSecond:
+ 241              	.LFB6:
+  71:hal/system/SystemInfo.c **** 
+  72:hal/system/SystemInfo.c **** uint32_t systemInfo_getCurrentLoopsPerSecond()
+  73:hal/system/SystemInfo.c **** {
+ 242              		.loc 1 73 1 is_stmt 1 view -0
+ 243              		.cfi_startproc
+ 244              		@ args = 0, pretend = 0, frame = 0
+ 245              		@ frame_needed = 0, uses_anonymous_args = 0
+ 246              		@ link register save eliminated.
+  74:hal/system/SystemInfo.c **** 	return currentLoopsPerSecond;
+ 247              		.loc 1 74 2 view .LVU50
+ 248              		.loc 1 74 9 is_stmt 0 view .LVU51
+ 249 0084 014B     		ldr	r3, .L22
+  75:hal/system/SystemInfo.c **** }
+ 250              		.loc 1 75 1 view .LVU52
+ 251 0086 5869     		ldr	r0, [r3, #20]
+ 252 0088 7047     		bx	lr
+ 253              	.L23:
+ 254 008a 00BF     		.align	2
+ 255              	.L22:
+ 256 008c 00000000 		.word	.LANCHOR0
+ 257              		.cfi_endproc
+ 258              	.LFE6:
+ 260              		.align	1
+ 261              		.p2align 2,,3
+ 262              		.global	systemInfo_incVelocityLoopCounter
+ 263              		.syntax unified
+ 264              		.thumb
+ 265              		.thumb_func
+ 267              	systemInfo_incVelocityLoopCounter:
+ 268              	.LFB7:
+  76:hal/system/SystemInfo.c **** 
+  77:hal/system/SystemInfo.c **** void systemInfo_incVelocityLoopCounter()
+  78:hal/system/SystemInfo.c **** {
+ 269              		.loc 1 78 1 is_stmt 1 view -0
+ 270              		.cfi_startproc
+ 271              		@ args = 0, pretend = 0, frame = 0
+ 272              		@ frame_needed = 0, uses_anonymous_args = 0
+ 273              		@ link register save eliminated.
+  79:hal/system/SystemInfo.c **** 	velocityLoopCounter++;
+ 274              		.loc 1 79 2 view .LVU54
+ 275              		.loc 1 79 21 is_stmt 0 view .LVU55
+ 276 0090 024A     		ldr	r2, .L25
+ 277 0092 136A     		ldr	r3, [r2, #32]
+ 278 0094 0133     		adds	r3, r3, #1
+ 279 0096 1362     		str	r3, [r2, #32]
+  80:hal/system/SystemInfo.c **** }
+ 280              		.loc 1 80 1 view .LVU56
+ 281 0098 7047     		bx	lr
+ 282              	.L26:
+ 283 009a 00BF     		.align	2
+ 284              	.L25:
+ 285 009c 00000000 		.word	.LANCHOR0
+ 286              		.cfi_endproc
+ 287              	.LFE7:
+ 289              		.align	1
+ 290              		.p2align 2,,3
+ 291              		.global	systemInfo_getVelocityLoopsPerSecond
+ 292              		.syntax unified
+ 293              		.thumb
+ 294              		.thumb_func
+ 296              	systemInfo_getVelocityLoopsPerSecond:
+ 297              	.LFB8:
+  81:hal/system/SystemInfo.c **** 
+  82:hal/system/SystemInfo.c **** uint32_t systemInfo_getVelocityLoopsPerSecond()
+  83:hal/system/SystemInfo.c **** {
+ 298              		.loc 1 83 1 is_stmt 1 view -0
+ 299              		.cfi_startproc
+ 300              		@ args = 0, pretend = 0, frame = 0
+ 301              		@ frame_needed = 0, uses_anonymous_args = 0
+ 302              		@ link register save eliminated.
+  84:hal/system/SystemInfo.c **** 	return velocityLoopsPerSecond;
+ 303              		.loc 1 84 2 view .LVU58
+ 304              		.loc 1 84 9 is_stmt 0 view .LVU59
+ 305 00a0 014B     		ldr	r3, .L28
+  85:hal/system/SystemInfo.c **** }
+ 306              		.loc 1 85 1 view .LVU60
+ 307 00a2 D869     		ldr	r0, [r3, #28]
+ 308 00a4 7047     		bx	lr
+ 309              	.L29:
+ 310 00a6 00BF     		.align	2
+ 311              	.L28:
+ 312 00a8 00000000 		.word	.LANCHOR0
+ 313              		.cfi_endproc
+ 314              	.LFE8:
+ 316              		.global	velocityLoopsPerSecond
+ 317              		.global	velocityLoopCounter
+ 318              		.global	currentLoopsPerSecond
+ 319              		.global	currentLoopCounter
+ 320              		.global	commLoopsPerSecond
+ 321              		.global	commLoopCounter
+ 322              		.global	mainLoopsPerSecond
+ 323              		.global	mainLoopCounter
+ 324              		.global	loopCounterCheckTime
+ 325              		.bss
+ 326              		.align	2
+ 327              		.set	.LANCHOR0,. + 0
+ 330              	loopCounterCheckTime:
+ 331 0000 00000000 		.space	4
+ 334              	mainLoopsPerSecond:
+ 335 0004 00000000 		.space	4
+ 338              	mainLoopCounter:
+ 339 0008 00000000 		.space	4
+ 342              	commLoopsPerSecond:
+ 343 000c 00000000 		.space	4
+ 346              	commLoopCounter:
+ 347 0010 00000000 		.space	4
+ 350              	currentLoopsPerSecond:
+ 351 0014 00000000 		.space	4
+ 354              	currentLoopCounter:
+ 355 0018 00000000 		.space	4
+ 358              	velocityLoopsPerSecond:
+ 359 001c 00000000 		.space	4
+ 362              	velocityLoopCounter:
+ 363 0020 00000000 		.space	4
+ 364              		.text
+ 365              	.Letext0:
+ 366              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 367              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+DEFINED SYMBOLS
+                            *ABS*:00000000 SystemInfo.c
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:24     .text:00000000 systemInfo_update
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:88     .text:00000038 $d
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:92     .text:0000003c $t
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:99     .text:0000003c systemInfo_incMainLoopCounter
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:117    .text:00000048 $d
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:121    .text:0000004c $t
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:128    .text:0000004c systemInfo_getMainLoopsPerSecond
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:144    .text:00000054 $d
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:148    .text:00000058 $t
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:155    .text:00000058 systemInfo_incCommunicationLoopCounter
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:173    .text:00000064 $d
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:177    .text:00000068 $t
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:184    .text:00000068 systemInfo_getCommunicationsPerSecond
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:200    .text:00000070 $d
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:204    .text:00000074 $t
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:211    .text:00000074 systemInfo_incCurrentLoopCounter
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:229    .text:00000080 $d
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:233    .text:00000084 $t
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:240    .text:00000084 systemInfo_getCurrentLoopsPerSecond
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:256    .text:0000008c $d
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:260    .text:00000090 $t
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:267    .text:00000090 systemInfo_incVelocityLoopCounter
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:285    .text:0000009c $d
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:289    .text:000000a0 $t
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:296    .text:000000a0 systemInfo_getVelocityLoopsPerSecond
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:312    .text:000000a8 $d
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:358    .bss:0000001c velocityLoopsPerSecond
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:362    .bss:00000020 velocityLoopCounter
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:350    .bss:00000014 currentLoopsPerSecond
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:354    .bss:00000018 currentLoopCounter
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:342    .bss:0000000c commLoopsPerSecond
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:346    .bss:00000010 commLoopCounter
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:334    .bss:00000004 mainLoopsPerSecond
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:338    .bss:00000008 mainLoopCounter
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:330    .bss:00000000 loopCounterCheckTime
+C:\Users\forre\AppData\Local\Temp\cco40vwb.s:326    .bss:00000000 $d
+
+NO UNDEFINED SYMBOLS

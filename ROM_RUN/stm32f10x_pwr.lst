@@ -1,0 +1,756 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"stm32f10x_pwr.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	PWR_DeInit
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	PWR_DeInit:
+  25              	.LFB0:
+  26              		.file 1 "cpu/STM32F103/stm32f10x_pwr.c"
+   1:cpu/STM32F103/stm32f10x_pwr.c **** /******************** (C) COPYRIGHT 2008 STMicroelectronics ********************
+   2:cpu/STM32F103/stm32f10x_pwr.c **** * File Name          : stm32f10x_pwr.c
+   3:cpu/STM32F103/stm32f10x_pwr.c **** * Author             : MCD Application Team
+   4:cpu/STM32F103/stm32f10x_pwr.c **** * Version            : V2.0
+   5:cpu/STM32F103/stm32f10x_pwr.c **** * Date               : 05/23/2008
+   6:cpu/STM32F103/stm32f10x_pwr.c **** * Description        : This file provides all the PWR firmware functions.
+   7:cpu/STM32F103/stm32f10x_pwr.c **** ********************************************************************************
+   8:cpu/STM32F103/stm32f10x_pwr.c **** * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+   9:cpu/STM32F103/stm32f10x_pwr.c **** * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+  10:cpu/STM32F103/stm32f10x_pwr.c **** * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+  11:cpu/STM32F103/stm32f10x_pwr.c **** * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+  12:cpu/STM32F103/stm32f10x_pwr.c **** * CONTENT OF SUCH SOFTWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+  13:cpu/STM32F103/stm32f10x_pwr.c **** * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  14:cpu/STM32F103/stm32f10x_pwr.c **** * FOR MORE INFORMATION PLEASE CAREFULLY READ THE LICENSE AGREEMENT FILE LOCATED 
+  15:cpu/STM32F103/stm32f10x_pwr.c **** * IN THE ROOT DIRECTORY OF THIS FIRMWARE PACKAGE.
+  16:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+  17:cpu/STM32F103/stm32f10x_pwr.c **** 
+  18:cpu/STM32F103/stm32f10x_pwr.c **** /* Includes ------------------------------------------------------------------*/
+  19:cpu/STM32F103/stm32f10x_pwr.c **** #include "stm32f10x_pwr.h"
+  20:cpu/STM32F103/stm32f10x_pwr.c **** #include "stm32f10x_rcc.h"
+  21:cpu/STM32F103/stm32f10x_pwr.c **** 
+  22:cpu/STM32F103/stm32f10x_pwr.c **** /* Private typedef -----------------------------------------------------------*/
+  23:cpu/STM32F103/stm32f10x_pwr.c **** /* Private define ------------------------------------------------------------*/
+  24:cpu/STM32F103/stm32f10x_pwr.c **** /* --------- PWR registers bit address in the alias region ---------- */
+  25:cpu/STM32F103/stm32f10x_pwr.c **** #define PWR_OFFSET               (PWR_BASE - PERIPH_BASE)
+  26:cpu/STM32F103/stm32f10x_pwr.c **** 
+  27:cpu/STM32F103/stm32f10x_pwr.c **** /* --- CR Register ---*/
+  28:cpu/STM32F103/stm32f10x_pwr.c **** /* Alias word address of DBP bit */
+  29:cpu/STM32F103/stm32f10x_pwr.c **** #define CR_OFFSET                (PWR_OFFSET + 0x00)
+  30:cpu/STM32F103/stm32f10x_pwr.c **** #define DBP_BitNumber            0x08
+  31:cpu/STM32F103/stm32f10x_pwr.c **** #define CR_DBP_BB                (PERIPH_BB_BASE + (CR_OFFSET * 32) + (DBP_BitNumber * 4))
+  32:cpu/STM32F103/stm32f10x_pwr.c **** 
+  33:cpu/STM32F103/stm32f10x_pwr.c **** /* Alias word address of PVDE bit */
+  34:cpu/STM32F103/stm32f10x_pwr.c **** #define PVDE_BitNumber           0x04
+  35:cpu/STM32F103/stm32f10x_pwr.c **** #define CR_PVDE_BB               (PERIPH_BB_BASE + (CR_OFFSET * 32) + (PVDE_BitNumber * 4))
+  36:cpu/STM32F103/stm32f10x_pwr.c **** 
+  37:cpu/STM32F103/stm32f10x_pwr.c **** /* --- CSR Register ---*/
+  38:cpu/STM32F103/stm32f10x_pwr.c **** /* Alias word address of EWUP bit */
+  39:cpu/STM32F103/stm32f10x_pwr.c **** #define CSR_OFFSET               (PWR_OFFSET + 0x04)
+  40:cpu/STM32F103/stm32f10x_pwr.c **** #define EWUP_BitNumber           0x08
+  41:cpu/STM32F103/stm32f10x_pwr.c **** #define CSR_EWUP_BB              (PERIPH_BB_BASE + (CSR_OFFSET * 32) + (EWUP_BitNumber * 4))
+  42:cpu/STM32F103/stm32f10x_pwr.c **** 
+  43:cpu/STM32F103/stm32f10x_pwr.c **** /* ------------------ PWR registers bit mask ------------------------ */
+  44:cpu/STM32F103/stm32f10x_pwr.c **** /* CR register bit mask */
+  45:cpu/STM32F103/stm32f10x_pwr.c **** #define CR_PDDS_Set              ((u32)0x00000002)
+  46:cpu/STM32F103/stm32f10x_pwr.c **** #define CR_DS_Mask               ((u32)0xFFFFFFFC)
+  47:cpu/STM32F103/stm32f10x_pwr.c **** #define CR_CWUF_Set              ((u32)0x00000004)
+  48:cpu/STM32F103/stm32f10x_pwr.c **** #define CR_PLS_Mask              ((u32)0xFFFFFF1F)
+  49:cpu/STM32F103/stm32f10x_pwr.c **** 
+  50:cpu/STM32F103/stm32f10x_pwr.c **** /* --------- Cortex System Control register bit mask ---------------- */
+  51:cpu/STM32F103/stm32f10x_pwr.c **** /* Cortex System Control register address */
+  52:cpu/STM32F103/stm32f10x_pwr.c **** #define SCB_SysCtrl              ((u32)0xE000ED10)
+  53:cpu/STM32F103/stm32f10x_pwr.c **** /* SLEEPDEEP bit mask */
+  54:cpu/STM32F103/stm32f10x_pwr.c **** #define SysCtrl_SLEEPDEEP_Set    ((u32)0x00000004)
+  55:cpu/STM32F103/stm32f10x_pwr.c **** 
+  56:cpu/STM32F103/stm32f10x_pwr.c **** /* Private macro -------------------------------------------------------------*/
+  57:cpu/STM32F103/stm32f10x_pwr.c **** /* Private variables ---------------------------------------------------------*/
+  58:cpu/STM32F103/stm32f10x_pwr.c **** /* Private function prototypes -----------------------------------------------*/
+  59:cpu/STM32F103/stm32f10x_pwr.c **** /* Private functions ---------------------------------------------------------*/
+  60:cpu/STM32F103/stm32f10x_pwr.c **** 
+  61:cpu/STM32F103/stm32f10x_pwr.c **** /*******************************************************************************
+  62:cpu/STM32F103/stm32f10x_pwr.c **** * Function Name  : PWR_DeInit
+  63:cpu/STM32F103/stm32f10x_pwr.c **** * Description    : Deinitializes the PWR peripheral registers to their default
+  64:cpu/STM32F103/stm32f10x_pwr.c **** *                  reset values.
+  65:cpu/STM32F103/stm32f10x_pwr.c **** * Input          : None
+  66:cpu/STM32F103/stm32f10x_pwr.c **** * Output         : None
+  67:cpu/STM32F103/stm32f10x_pwr.c **** * Return         : None
+  68:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+  69:cpu/STM32F103/stm32f10x_pwr.c **** void PWR_DeInit(void)
+  70:cpu/STM32F103/stm32f10x_pwr.c **** {
+  27              		.loc 1 70 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  71:cpu/STM32F103/stm32f10x_pwr.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_PWR, ENABLE);
+  31              		.loc 1 71 3 view .LVU1
+  70:cpu/STM32F103/stm32f10x_pwr.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_PWR, ENABLE);
+  32              		.loc 1 70 1 is_stmt 0 view .LVU2
+  33 0000 08B5     		push	{r3, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 3, -8
+  37              		.cfi_offset 14, -4
+  38              		.loc 1 71 3 view .LVU3
+  39 0002 0121     		movs	r1, #1
+  40 0004 4FF08050 		mov	r0, #268435456
+  41 0008 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  42              	.LVL0:
+  72:cpu/STM32F103/stm32f10x_pwr.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_PWR, DISABLE);
+  43              		.loc 1 72 3 is_stmt 1 view .LVU4
+  73:cpu/STM32F103/stm32f10x_pwr.c **** }
+  44              		.loc 1 73 1 is_stmt 0 view .LVU5
+  45 000c BDE80840 		pop	{r3, lr}
+  46              	.LCFI1:
+  47              		.cfi_restore 14
+  48              		.cfi_restore 3
+  49              		.cfi_def_cfa_offset 0
+  72:cpu/STM32F103/stm32f10x_pwr.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_PWR, DISABLE);
+  50              		.loc 1 72 3 view .LVU6
+  51 0010 0021     		movs	r1, #0
+  52 0012 4FF08050 		mov	r0, #268435456
+  53 0016 FFF7FEBF 		b	RCC_APB1PeriphResetCmd
+  54              	.LVL1:
+  55              		.cfi_endproc
+  56              	.LFE0:
+  58              		.align	1
+  59 001a 00BF     		.p2align 2,,3
+  60              		.global	PWR_BackupAccessCmd
+  61              		.syntax unified
+  62              		.thumb
+  63              		.thumb_func
+  65              	PWR_BackupAccessCmd:
+  66              	.LVL2:
+  67              	.LFB1:
+  74:cpu/STM32F103/stm32f10x_pwr.c **** 
+  75:cpu/STM32F103/stm32f10x_pwr.c **** /*******************************************************************************
+  76:cpu/STM32F103/stm32f10x_pwr.c **** * Function Name  : PWR_BackupAccessCmd
+  77:cpu/STM32F103/stm32f10x_pwr.c **** * Description    : Enables or disables access to the RTC and backup registers.
+  78:cpu/STM32F103/stm32f10x_pwr.c **** * Input          : - NewState: new state of the access to the RTC and backup
+  79:cpu/STM32F103/stm32f10x_pwr.c **** *                    registers. This parameter can be: ENABLE or DISABLE.
+  80:cpu/STM32F103/stm32f10x_pwr.c **** * Output         : None
+  81:cpu/STM32F103/stm32f10x_pwr.c **** * Return         : None
+  82:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+  83:cpu/STM32F103/stm32f10x_pwr.c **** void PWR_BackupAccessCmd(FunctionalState NewState)
+  84:cpu/STM32F103/stm32f10x_pwr.c **** {
+  68              		.loc 1 84 1 is_stmt 1 view -0
+  69              		.cfi_startproc
+  70              		@ args = 0, pretend = 0, frame = 0
+  71              		@ frame_needed = 0, uses_anonymous_args = 0
+  72              		@ link register save eliminated.
+  85:cpu/STM32F103/stm32f10x_pwr.c ****   /* Check the parameters */
+  86:cpu/STM32F103/stm32f10x_pwr.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+  73              		.loc 1 86 3 view .LVU8
+  87:cpu/STM32F103/stm32f10x_pwr.c **** 
+  88:cpu/STM32F103/stm32f10x_pwr.c ****   *(vu32 *) CR_DBP_BB = (u32)NewState;
+  74              		.loc 1 88 3 view .LVU9
+  75              		.loc 1 88 23 is_stmt 0 view .LVU10
+  76 001c 014B     		ldr	r3, .L5
+  77 001e 1862     		str	r0, [r3, #32]
+  89:cpu/STM32F103/stm32f10x_pwr.c **** }
+  78              		.loc 1 89 1 view .LVU11
+  79 0020 7047     		bx	lr
+  80              	.L6:
+  81 0022 00BF     		.align	2
+  82              	.L5:
+  83 0024 00000E42 		.word	1108213760
+  84              		.cfi_endproc
+  85              	.LFE1:
+  87              		.align	1
+  88              		.p2align 2,,3
+  89              		.global	PWR_PVDCmd
+  90              		.syntax unified
+  91              		.thumb
+  92              		.thumb_func
+  94              	PWR_PVDCmd:
+  95              	.LVL3:
+  96              	.LFB2:
+  90:cpu/STM32F103/stm32f10x_pwr.c **** 
+  91:cpu/STM32F103/stm32f10x_pwr.c **** /*******************************************************************************
+  92:cpu/STM32F103/stm32f10x_pwr.c **** * Function Name  : PWR_PVDCmd
+  93:cpu/STM32F103/stm32f10x_pwr.c **** * Description    : Enables or disables the Power Voltage Detector(PVD).
+  94:cpu/STM32F103/stm32f10x_pwr.c **** * Input          : - NewState: new state of the PVD.
+  95:cpu/STM32F103/stm32f10x_pwr.c **** *                    This parameter can be: ENABLE or DISABLE.
+  96:cpu/STM32F103/stm32f10x_pwr.c **** * Output         : None
+  97:cpu/STM32F103/stm32f10x_pwr.c **** * Return         : None
+  98:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+  99:cpu/STM32F103/stm32f10x_pwr.c **** void PWR_PVDCmd(FunctionalState NewState)
+ 100:cpu/STM32F103/stm32f10x_pwr.c **** {
+  97              		.loc 1 100 1 is_stmt 1 view -0
+  98              		.cfi_startproc
+  99              		@ args = 0, pretend = 0, frame = 0
+ 100              		@ frame_needed = 0, uses_anonymous_args = 0
+ 101              		@ link register save eliminated.
+ 101:cpu/STM32F103/stm32f10x_pwr.c ****   /* Check the parameters */
+ 102:cpu/STM32F103/stm32f10x_pwr.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 102              		.loc 1 102 3 view .LVU13
+ 103:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 104:cpu/STM32F103/stm32f10x_pwr.c ****   *(vu32 *) CR_PVDE_BB = (u32)NewState;
+ 103              		.loc 1 104 3 view .LVU14
+ 104              		.loc 1 104 24 is_stmt 0 view .LVU15
+ 105 0028 014B     		ldr	r3, .L8
+ 106 002a 1861     		str	r0, [r3, #16]
+ 105:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 107              		.loc 1 105 1 view .LVU16
+ 108 002c 7047     		bx	lr
+ 109              	.L9:
+ 110 002e 00BF     		.align	2
+ 111              	.L8:
+ 112 0030 00000E42 		.word	1108213760
+ 113              		.cfi_endproc
+ 114              	.LFE2:
+ 116              		.align	1
+ 117              		.p2align 2,,3
+ 118              		.global	PWR_PVDLevelConfig
+ 119              		.syntax unified
+ 120              		.thumb
+ 121              		.thumb_func
+ 123              	PWR_PVDLevelConfig:
+ 124              	.LVL4:
+ 125              	.LFB3:
+ 106:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 107:cpu/STM32F103/stm32f10x_pwr.c **** /*******************************************************************************
+ 108:cpu/STM32F103/stm32f10x_pwr.c **** * Function Name  : PWR_PVDLevelConfig
+ 109:cpu/STM32F103/stm32f10x_pwr.c **** * Description    : Configures the voltage threshold detected by the Power Voltage
+ 110:cpu/STM32F103/stm32f10x_pwr.c **** *                  Detector(PVD).
+ 111:cpu/STM32F103/stm32f10x_pwr.c **** * Input          : - PWR_PVDLevel: specifies the PVD detection level
+ 112:cpu/STM32F103/stm32f10x_pwr.c **** *                    This parameter can be one of the following values:
+ 113:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_PVDLevel_2V2: PVD detection level set to 2.2V
+ 114:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_PVDLevel_2V3: PVD detection level set to 2.3V
+ 115:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_PVDLevel_2V4: PVD detection level set to 2.4V
+ 116:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_PVDLevel_2V5: PVD detection level set to 2.5V
+ 117:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_PVDLevel_2V6: PVD detection level set to 2.6V
+ 118:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_PVDLevel_2V7: PVD detection level set to 2.7V
+ 119:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_PVDLevel_2V8: PVD detection level set to 2.8V
+ 120:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_PVDLevel_2V9: PVD detection level set to 2.9V
+ 121:cpu/STM32F103/stm32f10x_pwr.c **** * Output         : None
+ 122:cpu/STM32F103/stm32f10x_pwr.c **** * Return         : None
+ 123:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+ 124:cpu/STM32F103/stm32f10x_pwr.c **** void PWR_PVDLevelConfig(u32 PWR_PVDLevel)
+ 125:cpu/STM32F103/stm32f10x_pwr.c **** {
+ 126              		.loc 1 125 1 is_stmt 1 view -0
+ 127              		.cfi_startproc
+ 128              		@ args = 0, pretend = 0, frame = 0
+ 129              		@ frame_needed = 0, uses_anonymous_args = 0
+ 130              		@ link register save eliminated.
+ 126:cpu/STM32F103/stm32f10x_pwr.c ****   u32 tmpreg = 0;
+ 131              		.loc 1 126 3 view .LVU18
+ 127:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 128:cpu/STM32F103/stm32f10x_pwr.c ****   /* Check the parameters */
+ 129:cpu/STM32F103/stm32f10x_pwr.c ****   assert_param(IS_PWR_PVD_LEVEL(PWR_PVDLevel));
+ 132              		.loc 1 129 3 view .LVU19
+ 130:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 131:cpu/STM32F103/stm32f10x_pwr.c ****   tmpreg = PWR->CR;
+ 133              		.loc 1 131 3 view .LVU20
+ 134              		.loc 1 131 10 is_stmt 0 view .LVU21
+ 135 0034 034A     		ldr	r2, .L11
+ 136 0036 1368     		ldr	r3, [r2]
+ 137              	.LVL5:
+ 132:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 133:cpu/STM32F103/stm32f10x_pwr.c ****   /* Clear PLS[7:5] bits */
+ 134:cpu/STM32F103/stm32f10x_pwr.c ****   tmpreg &= CR_PLS_Mask;
+ 138              		.loc 1 134 3 is_stmt 1 view .LVU22
+ 139              		.loc 1 134 10 is_stmt 0 view .LVU23
+ 140 0038 23F0E003 		bic	r3, r3, #224
+ 141              	.LVL6:
+ 135:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 136:cpu/STM32F103/stm32f10x_pwr.c ****   /* Set PLS[7:5] bits according to PWR_PVDLevel value */
+ 137:cpu/STM32F103/stm32f10x_pwr.c ****   tmpreg |= PWR_PVDLevel;
+ 142              		.loc 1 137 3 is_stmt 1 view .LVU24
+ 143              		.loc 1 137 10 is_stmt 0 view .LVU25
+ 144 003c 0343     		orrs	r3, r3, r0
+ 145              	.LVL7:
+ 138:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 139:cpu/STM32F103/stm32f10x_pwr.c ****   /* Store the new value */
+ 140:cpu/STM32F103/stm32f10x_pwr.c ****   PWR->CR = tmpreg;
+ 146              		.loc 1 140 3 is_stmt 1 view .LVU26
+ 147              		.loc 1 140 11 is_stmt 0 view .LVU27
+ 148 003e 1360     		str	r3, [r2]
+ 141:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 149              		.loc 1 141 1 view .LVU28
+ 150 0040 7047     		bx	lr
+ 151              	.L12:
+ 152 0042 00BF     		.align	2
+ 153              	.L11:
+ 154 0044 00700040 		.word	1073770496
+ 155              		.cfi_endproc
+ 156              	.LFE3:
+ 158              		.align	1
+ 159              		.p2align 2,,3
+ 160              		.global	PWR_WakeUpPinCmd
+ 161              		.syntax unified
+ 162              		.thumb
+ 163              		.thumb_func
+ 165              	PWR_WakeUpPinCmd:
+ 166              	.LVL8:
+ 167              	.LFB4:
+ 142:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 143:cpu/STM32F103/stm32f10x_pwr.c **** /*******************************************************************************
+ 144:cpu/STM32F103/stm32f10x_pwr.c **** * Function Name  : PWR_WakeUpPinCmd
+ 145:cpu/STM32F103/stm32f10x_pwr.c **** * Description    : Enables or disables the WakeUp Pin functionality.
+ 146:cpu/STM32F103/stm32f10x_pwr.c **** * Input          : - NewState: new state of the WakeUp Pin functionality.
+ 147:cpu/STM32F103/stm32f10x_pwr.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 148:cpu/STM32F103/stm32f10x_pwr.c **** * Output         : None
+ 149:cpu/STM32F103/stm32f10x_pwr.c **** * Return         : None
+ 150:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+ 151:cpu/STM32F103/stm32f10x_pwr.c **** void PWR_WakeUpPinCmd(FunctionalState NewState)
+ 152:cpu/STM32F103/stm32f10x_pwr.c **** {
+ 168              		.loc 1 152 1 is_stmt 1 view -0
+ 169              		.cfi_startproc
+ 170              		@ args = 0, pretend = 0, frame = 0
+ 171              		@ frame_needed = 0, uses_anonymous_args = 0
+ 172              		@ link register save eliminated.
+ 153:cpu/STM32F103/stm32f10x_pwr.c ****   /* Check the parameters */
+ 154:cpu/STM32F103/stm32f10x_pwr.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 173              		.loc 1 154 3 view .LVU30
+ 155:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 156:cpu/STM32F103/stm32f10x_pwr.c ****   *(vu32 *) CSR_EWUP_BB = (u32)NewState;
+ 174              		.loc 1 156 3 view .LVU31
+ 175              		.loc 1 156 25 is_stmt 0 view .LVU32
+ 176 0048 014B     		ldr	r3, .L14
+ 177 004a C3F8A000 		str	r0, [r3, #160]
+ 157:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 178              		.loc 1 157 1 view .LVU33
+ 179 004e 7047     		bx	lr
+ 180              	.L15:
+ 181              		.align	2
+ 182              	.L14:
+ 183 0050 00000E42 		.word	1108213760
+ 184              		.cfi_endproc
+ 185              	.LFE4:
+ 187              		.align	1
+ 188              		.p2align 2,,3
+ 189              		.global	PWR_EnterSTOPMode
+ 190              		.syntax unified
+ 191              		.thumb
+ 192              		.thumb_func
+ 194              	PWR_EnterSTOPMode:
+ 195              	.LVL9:
+ 196              	.LFB5:
+ 158:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 159:cpu/STM32F103/stm32f10x_pwr.c **** /*******************************************************************************
+ 160:cpu/STM32F103/stm32f10x_pwr.c **** * Function Name  : PWR_EnterSTOPMode
+ 161:cpu/STM32F103/stm32f10x_pwr.c **** * Description    : Enters STOP mode.
+ 162:cpu/STM32F103/stm32f10x_pwr.c **** * Input          : - PWR_Regulator: specifies the regulator state in STOP mode.
+ 163:cpu/STM32F103/stm32f10x_pwr.c **** *                    This parameter can be one of the following values:
+ 164:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_Regulator_ON: STOP mode with regulator ON
+ 165:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_Regulator_LowPower: STOP mode with
+ 166:cpu/STM32F103/stm32f10x_pwr.c **** *                         regulator in low power mode
+ 167:cpu/STM32F103/stm32f10x_pwr.c **** *                  - PWR_STOPEntry: specifies if STOP mode in entered with WFI or 
+ 168:cpu/STM32F103/stm32f10x_pwr.c **** *                    WFE instruction.
+ 169:cpu/STM32F103/stm32f10x_pwr.c **** *                    This parameter can be one of the following values:
+ 170:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_STOPEntry_WFI: enter STOP mode with WFI instruction
+ 171:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_STOPEntry_WFE: enter STOP mode with WFE instruction
+ 172:cpu/STM32F103/stm32f10x_pwr.c **** * Output         : None
+ 173:cpu/STM32F103/stm32f10x_pwr.c **** * Return         : None
+ 174:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+ 175:cpu/STM32F103/stm32f10x_pwr.c **** void PWR_EnterSTOPMode(u32 PWR_Regulator, u8 PWR_STOPEntry)
+ 176:cpu/STM32F103/stm32f10x_pwr.c **** {
+ 197              		.loc 1 176 1 is_stmt 1 view -0
+ 198              		.cfi_startproc
+ 199              		@ args = 0, pretend = 0, frame = 0
+ 200              		@ frame_needed = 0, uses_anonymous_args = 0
+ 201              		@ link register save eliminated.
+ 177:cpu/STM32F103/stm32f10x_pwr.c ****   u32 tmpreg = 0;
+ 202              		.loc 1 177 3 view .LVU35
+ 178:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 179:cpu/STM32F103/stm32f10x_pwr.c ****   /* Check the parameters */
+ 180:cpu/STM32F103/stm32f10x_pwr.c ****   assert_param(IS_PWR_REGULATOR(PWR_Regulator));
+ 203              		.loc 1 180 3 view .LVU36
+ 181:cpu/STM32F103/stm32f10x_pwr.c ****   assert_param(IS_PWR_STOP_ENTRY(PWR_STOPEntry));
+ 204              		.loc 1 181 3 view .LVU37
+ 182:cpu/STM32F103/stm32f10x_pwr.c ****   
+ 183:cpu/STM32F103/stm32f10x_pwr.c ****   /* Select the regulator state in STOP mode ---------------------------------*/
+ 184:cpu/STM32F103/stm32f10x_pwr.c ****   tmpreg = PWR->CR;
+ 205              		.loc 1 184 3 view .LVU38
+ 185:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 186:cpu/STM32F103/stm32f10x_pwr.c ****   /* Clear PDDS and LPDS bits */
+ 187:cpu/STM32F103/stm32f10x_pwr.c ****   tmpreg &= CR_DS_Mask;
+ 188:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 189:cpu/STM32F103/stm32f10x_pwr.c ****   /* Set LPDS bit according to PWR_Regulator value */
+ 190:cpu/STM32F103/stm32f10x_pwr.c ****   tmpreg |= PWR_Regulator;
+ 191:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 192:cpu/STM32F103/stm32f10x_pwr.c ****   /* Store the new value */
+ 193:cpu/STM32F103/stm32f10x_pwr.c ****   PWR->CR = tmpreg;
+ 194:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 195:cpu/STM32F103/stm32f10x_pwr.c ****   /* Set SLEEPDEEP bit of Cortex System Control Register */
+ 196:cpu/STM32F103/stm32f10x_pwr.c ****   *(vu32 *) SCB_SysCtrl |= SysCtrl_SLEEPDEEP_Set;
+ 206              		.loc 1 196 25 is_stmt 0 view .LVU39
+ 207 0054 4FF0E022 		mov	r2, #-536813568
+ 176:cpu/STM32F103/stm32f10x_pwr.c ****   u32 tmpreg = 0;
+ 208              		.loc 1 176 1 view .LVU40
+ 209 0058 10B4     		push	{r4}
+ 210              	.LCFI2:
+ 211              		.cfi_def_cfa_offset 4
+ 212              		.cfi_offset 4, -4
+ 184:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 213              		.loc 1 184 10 view .LVU41
+ 214 005a 0A4C     		ldr	r4, .L20
+ 197:cpu/STM32F103/stm32f10x_pwr.c ****   
+ 198:cpu/STM32F103/stm32f10x_pwr.c ****   /* Select STOP mode entry --------------------------------------------------*/
+ 199:cpu/STM32F103/stm32f10x_pwr.c ****   if(PWR_STOPEntry == PWR_STOPEntry_WFI)
+ 215              		.loc 1 199 5 view .LVU42
+ 216 005c 0129     		cmp	r1, #1
+ 184:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 217              		.loc 1 184 10 view .LVU43
+ 218 005e 2368     		ldr	r3, [r4]
+ 219              	.LVL10:
+ 187:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 220              		.loc 1 187 3 is_stmt 1 view .LVU44
+ 187:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 221              		.loc 1 187 10 is_stmt 0 view .LVU45
+ 222 0060 23F00303 		bic	r3, r3, #3
+ 223              	.LVL11:
+ 190:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 224              		.loc 1 190 3 is_stmt 1 view .LVU46
+ 190:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 225              		.loc 1 190 10 is_stmt 0 view .LVU47
+ 226 0064 43EA0003 		orr	r3, r3, r0
+ 227              	.LVL12:
+ 193:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 228              		.loc 1 193 3 is_stmt 1 view .LVU48
+ 193:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 229              		.loc 1 193 11 is_stmt 0 view .LVU49
+ 230 0068 2360     		str	r3, [r4]
+ 196:cpu/STM32F103/stm32f10x_pwr.c ****   
+ 231              		.loc 1 196 3 is_stmt 1 view .LVU50
+ 196:cpu/STM32F103/stm32f10x_pwr.c ****   
+ 232              		.loc 1 196 25 is_stmt 0 view .LVU51
+ 233 006a D2F8103D 		ldr	r3, [r2, #3344]
+ 234              	.LVL13:
+ 196:cpu/STM32F103/stm32f10x_pwr.c ****   
+ 235              		.loc 1 196 25 view .LVU52
+ 236 006e 43F00403 		orr	r3, r3, #4
+ 237 0072 C2F8103D 		str	r3, [r2, #3344]
+ 238              	.LVL14:
+ 239              		.loc 1 199 3 is_stmt 1 view .LVU53
+ 240              		.loc 1 199 5 is_stmt 0 view .LVU54
+ 241 0076 02D0     		beq	.L19
+ 200:cpu/STM32F103/stm32f10x_pwr.c ****   {   
+ 201:cpu/STM32F103/stm32f10x_pwr.c ****     /* Request Wait For Interrupt */
+ 202:cpu/STM32F103/stm32f10x_pwr.c ****     __WFI();
+ 203:cpu/STM32F103/stm32f10x_pwr.c ****   }
+ 204:cpu/STM32F103/stm32f10x_pwr.c ****   else
+ 205:cpu/STM32F103/stm32f10x_pwr.c ****   {
+ 206:cpu/STM32F103/stm32f10x_pwr.c ****     /* Request Wait For Event */
+ 207:cpu/STM32F103/stm32f10x_pwr.c ****     __WFE();
+ 242              		.loc 1 207 5 is_stmt 1 view .LVU55
+ 208:cpu/STM32F103/stm32f10x_pwr.c ****   }
+ 209:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 243              		.loc 1 209 1 is_stmt 0 view .LVU56
+ 244 0078 10BC     		pop	{r4}
+ 245              	.LCFI3:
+ 246              		.cfi_remember_state
+ 247              		.cfi_restore 4
+ 248              		.cfi_def_cfa_offset 0
+ 207:cpu/STM32F103/stm32f10x_pwr.c ****   }
+ 249              		.loc 1 207 5 view .LVU57
+ 250 007a FFF7FEBF 		b	__WFE
+ 251              	.LVL15:
+ 252              	.L19:
+ 253              	.LCFI4:
+ 254              		.cfi_restore_state
+ 202:cpu/STM32F103/stm32f10x_pwr.c ****   }
+ 255              		.loc 1 202 5 is_stmt 1 view .LVU58
+ 256              		.loc 1 209 1 is_stmt 0 view .LVU59
+ 257 007e 10BC     		pop	{r4}
+ 258              	.LCFI5:
+ 259              		.cfi_restore 4
+ 260              		.cfi_def_cfa_offset 0
+ 202:cpu/STM32F103/stm32f10x_pwr.c ****   }
+ 261              		.loc 1 202 5 view .LVU60
+ 262 0080 FFF7FEBF 		b	__WFI
+ 263              	.LVL16:
+ 264              	.L21:
+ 202:cpu/STM32F103/stm32f10x_pwr.c ****   }
+ 265              		.loc 1 202 5 view .LVU61
+ 266              		.align	2
+ 267              	.L20:
+ 268 0084 00700040 		.word	1073770496
+ 269              		.cfi_endproc
+ 270              	.LFE5:
+ 272              		.align	1
+ 273              		.p2align 2,,3
+ 274              		.global	PWR_EnterSTANDBYMode
+ 275              		.syntax unified
+ 276              		.thumb
+ 277              		.thumb_func
+ 279              	PWR_EnterSTANDBYMode:
+ 280              	.LFB6:
+ 210:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 211:cpu/STM32F103/stm32f10x_pwr.c **** /*******************************************************************************
+ 212:cpu/STM32F103/stm32f10x_pwr.c **** * Function Name  : PWR_EnterSTANDBYMode
+ 213:cpu/STM32F103/stm32f10x_pwr.c **** * Description    : Enters STANDBY mode.
+ 214:cpu/STM32F103/stm32f10x_pwr.c **** * Input          : None
+ 215:cpu/STM32F103/stm32f10x_pwr.c **** * Output         : None
+ 216:cpu/STM32F103/stm32f10x_pwr.c **** * Return         : None
+ 217:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+ 218:cpu/STM32F103/stm32f10x_pwr.c **** void PWR_EnterSTANDBYMode(void)
+ 219:cpu/STM32F103/stm32f10x_pwr.c **** {
+ 281              		.loc 1 219 1 is_stmt 1 view -0
+ 282              		.cfi_startproc
+ 283              		@ args = 0, pretend = 0, frame = 0
+ 284              		@ frame_needed = 0, uses_anonymous_args = 0
+ 285              		@ link register save eliminated.
+ 220:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 221:cpu/STM32F103/stm32f10x_pwr.c ****   /* Clear Wake-up flag */
+ 222:cpu/STM32F103/stm32f10x_pwr.c ****   PWR->CR |= CR_CWUF_Set;
+ 286              		.loc 1 222 3 view .LVU63
+ 223:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 224:cpu/STM32F103/stm32f10x_pwr.c ****   /* Select STANDBY mode */
+ 225:cpu/STM32F103/stm32f10x_pwr.c ****   PWR->CR |= CR_PDDS_Set;
+ 226:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 227:cpu/STM32F103/stm32f10x_pwr.c ****   /* Set SLEEPDEEP bit of Cortex System Control Register */
+ 228:cpu/STM32F103/stm32f10x_pwr.c ****   *(vu32 *) SCB_SysCtrl |= SysCtrl_SLEEPDEEP_Set;
+ 287              		.loc 1 228 25 is_stmt 0 view .LVU64
+ 288 0088 4FF0E021 		mov	r1, #-536813568
+ 219:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 289              		.loc 1 219 1 view .LVU65
+ 290 008c 10B4     		push	{r4}
+ 291              	.LCFI6:
+ 292              		.cfi_def_cfa_offset 4
+ 293              		.cfi_offset 4, -4
+ 294              	.LBB4:
+ 295              	.LBB5:
+ 156:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 296              		.loc 1 156 25 view .LVU66
+ 297 008e 0124     		movs	r4, #1
+ 298              	.LBE5:
+ 299              	.LBE4:
+ 222:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 300              		.loc 1 222 11 view .LVU67
+ 301 0090 0A4B     		ldr	r3, .L24
+ 302              	.LBB8:
+ 303              	.LBB6:
+ 156:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 304              		.loc 1 156 25 view .LVU68
+ 305 0092 0B48     		ldr	r0, .L24+4
+ 306              	.LBE6:
+ 307              	.LBE8:
+ 222:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 308              		.loc 1 222 11 view .LVU69
+ 309 0094 1A68     		ldr	r2, [r3]
+ 310 0096 42F00402 		orr	r2, r2, #4
+ 311 009a 1A60     		str	r2, [r3]
+ 225:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 312              		.loc 1 225 3 is_stmt 1 view .LVU70
+ 225:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 313              		.loc 1 225 11 is_stmt 0 view .LVU71
+ 314 009c 1A68     		ldr	r2, [r3]
+ 315 009e 42F00202 		orr	r2, r2, #2
+ 316 00a2 1A60     		str	r2, [r3]
+ 317              		.loc 1 228 3 is_stmt 1 view .LVU72
+ 318              		.loc 1 228 25 is_stmt 0 view .LVU73
+ 319 00a4 D1F8103D 		ldr	r3, [r1, #3344]
+ 320 00a8 43F00403 		orr	r3, r3, #4
+ 321 00ac C1F8103D 		str	r3, [r1, #3344]
+ 229:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 230:cpu/STM32F103/stm32f10x_pwr.c ****   PWR_WakeUpPinCmd(ENABLE);
+ 322              		.loc 1 230 3 is_stmt 1 view .LVU74
+ 323              	.LVL17:
+ 324              	.LBB9:
+ 325              	.LBI4:
+ 151:cpu/STM32F103/stm32f10x_pwr.c **** {
+ 326              		.loc 1 151 6 view .LVU75
+ 327              	.LBB7:
+ 154:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 328              		.loc 1 154 3 view .LVU76
+ 156:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 329              		.loc 1 156 3 view .LVU77
+ 156:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 330              		.loc 1 156 25 is_stmt 0 view .LVU78
+ 331 00b0 C0F8A040 		str	r4, [r0, #160]
+ 332              	.LVL18:
+ 156:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 333              		.loc 1 156 25 view .LVU79
+ 334              	.LBE7:
+ 335              	.LBE9:
+ 231:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 232:cpu/STM32F103/stm32f10x_pwr.c ****   /* Request Wait For Interrupt */
+ 233:cpu/STM32F103/stm32f10x_pwr.c ****   __WFI();
+ 336              		.loc 1 233 3 is_stmt 1 view .LVU80
+ 234:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 337              		.loc 1 234 1 is_stmt 0 view .LVU81
+ 338 00b4 10BC     		pop	{r4}
+ 339              	.LCFI7:
+ 340              		.cfi_restore 4
+ 341              		.cfi_def_cfa_offset 0
+ 233:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 342              		.loc 1 233 3 view .LVU82
+ 343 00b6 FFF7FEBF 		b	__WFI
+ 344              	.LVL19:
+ 345              	.L25:
+ 346 00ba 00BF     		.align	2
+ 347              	.L24:
+ 348 00bc 00700040 		.word	1073770496
+ 349 00c0 00000E42 		.word	1108213760
+ 350              		.cfi_endproc
+ 351              	.LFE6:
+ 353              		.align	1
+ 354              		.p2align 2,,3
+ 355              		.global	PWR_GetFlagStatus
+ 356              		.syntax unified
+ 357              		.thumb
+ 358              		.thumb_func
+ 360              	PWR_GetFlagStatus:
+ 361              	.LVL20:
+ 362              	.LFB7:
+ 235:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 236:cpu/STM32F103/stm32f10x_pwr.c **** /*******************************************************************************
+ 237:cpu/STM32F103/stm32f10x_pwr.c **** * Function Name  : PWR_GetFlagStatus
+ 238:cpu/STM32F103/stm32f10x_pwr.c **** * Description    : Checks whether the specified PWR flag is set or not.
+ 239:cpu/STM32F103/stm32f10x_pwr.c **** * Input          : - PWR_FLAG: specifies the flag to check.
+ 240:cpu/STM32F103/stm32f10x_pwr.c **** *                    This parameter can be one of the following values:
+ 241:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_FLAG_WU: Wake Up flag
+ 242:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_FLAG_SB: StandBy flag
+ 243:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_FLAG_PVDO: PVD Output
+ 244:cpu/STM32F103/stm32f10x_pwr.c **** * Output         : None
+ 245:cpu/STM32F103/stm32f10x_pwr.c **** * Return         : The new state of PWR_FLAG (SET or RESET).
+ 246:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+ 247:cpu/STM32F103/stm32f10x_pwr.c **** FlagStatus PWR_GetFlagStatus(u32 PWR_FLAG)
+ 248:cpu/STM32F103/stm32f10x_pwr.c **** {
+ 363              		.loc 1 248 1 is_stmt 1 view -0
+ 364              		.cfi_startproc
+ 365              		@ args = 0, pretend = 0, frame = 0
+ 366              		@ frame_needed = 0, uses_anonymous_args = 0
+ 367              		@ link register save eliminated.
+ 249:cpu/STM32F103/stm32f10x_pwr.c ****   FlagStatus bitstatus = RESET;
+ 368              		.loc 1 249 3 view .LVU84
+ 250:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 251:cpu/STM32F103/stm32f10x_pwr.c ****   /* Check the parameters */
+ 252:cpu/STM32F103/stm32f10x_pwr.c ****   assert_param(IS_PWR_GET_FLAG(PWR_FLAG));
+ 369              		.loc 1 252 3 view .LVU85
+ 253:cpu/STM32F103/stm32f10x_pwr.c ****   
+ 254:cpu/STM32F103/stm32f10x_pwr.c ****   if ((PWR->CSR & PWR_FLAG) != (u32)RESET)
+ 370              		.loc 1 254 3 view .LVU86
+ 371              		.loc 1 254 11 is_stmt 0 view .LVU87
+ 372 00c4 034B     		ldr	r3, .L27
+ 373 00c6 5B68     		ldr	r3, [r3, #4]
+ 374              	.LVL21:
+ 255:cpu/STM32F103/stm32f10x_pwr.c ****   {
+ 256:cpu/STM32F103/stm32f10x_pwr.c ****     bitstatus = SET;
+ 257:cpu/STM32F103/stm32f10x_pwr.c ****   }
+ 258:cpu/STM32F103/stm32f10x_pwr.c ****   else
+ 259:cpu/STM32F103/stm32f10x_pwr.c ****   {
+ 260:cpu/STM32F103/stm32f10x_pwr.c ****     bitstatus = RESET;
+ 261:cpu/STM32F103/stm32f10x_pwr.c ****   }
+ 262:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 263:cpu/STM32F103/stm32f10x_pwr.c ****   /* Return the flag status */
+ 264:cpu/STM32F103/stm32f10x_pwr.c ****   return bitstatus;
+ 375              		.loc 1 264 3 is_stmt 1 view .LVU88
+ 254:cpu/STM32F103/stm32f10x_pwr.c ****   {
+ 376              		.loc 1 254 6 is_stmt 0 view .LVU89
+ 377 00c8 0342     		tst	r3, r0
+ 265:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 378              		.loc 1 265 1 view .LVU90
+ 379 00ca 14BF     		ite	ne
+ 380 00cc 0120     		movne	r0, #1
+ 381              	.LVL22:
+ 382              		.loc 1 265 1 view .LVU91
+ 383 00ce 0020     		moveq	r0, #0
+ 384 00d0 7047     		bx	lr
+ 385              	.L28:
+ 386 00d2 00BF     		.align	2
+ 387              	.L27:
+ 388 00d4 00700040 		.word	1073770496
+ 389              		.cfi_endproc
+ 390              	.LFE7:
+ 392              		.align	1
+ 393              		.p2align 2,,3
+ 394              		.global	PWR_ClearFlag
+ 395              		.syntax unified
+ 396              		.thumb
+ 397              		.thumb_func
+ 399              	PWR_ClearFlag:
+ 400              	.LVL23:
+ 401              	.LFB8:
+ 266:cpu/STM32F103/stm32f10x_pwr.c **** 
+ 267:cpu/STM32F103/stm32f10x_pwr.c **** /*******************************************************************************
+ 268:cpu/STM32F103/stm32f10x_pwr.c **** * Function Name  : PWR_ClearFlag
+ 269:cpu/STM32F103/stm32f10x_pwr.c **** * Description    : Clears the PWR's pending flags.
+ 270:cpu/STM32F103/stm32f10x_pwr.c **** * Input          : - PWR_FLAG: specifies the flag to clear.
+ 271:cpu/STM32F103/stm32f10x_pwr.c **** *                    This parameter can be one of the following values:
+ 272:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_FLAG_WU: Wake Up flag
+ 273:cpu/STM32F103/stm32f10x_pwr.c **** *                       - PWR_FLAG_SB: StandBy flag
+ 274:cpu/STM32F103/stm32f10x_pwr.c **** * Output         : None
+ 275:cpu/STM32F103/stm32f10x_pwr.c **** * Return         : None
+ 276:cpu/STM32F103/stm32f10x_pwr.c **** *******************************************************************************/
+ 277:cpu/STM32F103/stm32f10x_pwr.c **** void PWR_ClearFlag(u32 PWR_FLAG)
+ 278:cpu/STM32F103/stm32f10x_pwr.c **** {
+ 402              		.loc 1 278 1 is_stmt 1 view -0
+ 403              		.cfi_startproc
+ 404              		@ args = 0, pretend = 0, frame = 0
+ 405              		@ frame_needed = 0, uses_anonymous_args = 0
+ 406              		@ link register save eliminated.
+ 279:cpu/STM32F103/stm32f10x_pwr.c ****   /* Check the parameters */
+ 280:cpu/STM32F103/stm32f10x_pwr.c ****   assert_param(IS_PWR_CLEAR_FLAG(PWR_FLAG));
+ 407              		.loc 1 280 3 view .LVU93
+ 281:cpu/STM32F103/stm32f10x_pwr.c ****          
+ 282:cpu/STM32F103/stm32f10x_pwr.c ****   PWR->CR |=  PWR_FLAG << 2;
+ 408              		.loc 1 282 3 view .LVU94
+ 409              		.loc 1 282 11 is_stmt 0 view .LVU95
+ 410 00d8 024A     		ldr	r2, .L30
+ 411 00da 1368     		ldr	r3, [r2]
+ 412 00dc 43EA8003 		orr	r3, r3, r0, lsl #2
+ 413 00e0 1360     		str	r3, [r2]
+ 283:cpu/STM32F103/stm32f10x_pwr.c **** }
+ 414              		.loc 1 283 1 view .LVU96
+ 415 00e2 7047     		bx	lr
+ 416              	.L31:
+ 417              		.align	2
+ 418              	.L30:
+ 419 00e4 00700040 		.word	1073770496
+ 420              		.cfi_endproc
+ 421              	.LFE8:
+ 423              	.Letext0:
+ 424              		.file 2 "cpu/STM32F103/stm32f10x_type.h"
+ 425              		.file 3 "cpu/STM32F103/stm32f10x_map.h"
+ 426              		.file 4 "cpu/STM32F103/cortexm3_macro.h"
+ 427              		.file 5 "cpu/STM32F103/stm32f10x_rcc.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f10x_pwr.c
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:24     .text:00000000 PWR_DeInit
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:65     .text:0000001c PWR_BackupAccessCmd
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:83     .text:00000024 $d
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:87     .text:00000028 $t
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:94     .text:00000028 PWR_PVDCmd
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:112    .text:00000030 $d
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:116    .text:00000034 $t
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:123    .text:00000034 PWR_PVDLevelConfig
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:154    .text:00000044 $d
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:158    .text:00000048 $t
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:165    .text:00000048 PWR_WakeUpPinCmd
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:183    .text:00000050 $d
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:187    .text:00000054 $t
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:194    .text:00000054 PWR_EnterSTOPMode
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:268    .text:00000084 $d
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:272    .text:00000088 $t
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:279    .text:00000088 PWR_EnterSTANDBYMode
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:348    .text:000000bc $d
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:353    .text:000000c4 $t
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:360    .text:000000c4 PWR_GetFlagStatus
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:388    .text:000000d4 $d
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:392    .text:000000d8 $t
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:399    .text:000000d8 PWR_ClearFlag
+C:\Users\forre\AppData\Local\Temp\ccaydbqf.s:419    .text:000000e4 $d
+
+UNDEFINED SYMBOLS
+RCC_APB1PeriphResetCmd
+__WFE
+__WFI

@@ -1,0 +1,271 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"stm32f10x_flash.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	FLASH_SetLatency
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	FLASH_SetLatency:
+  25              	.LVL0:
+  26              	.LFB0:
+  27              		.file 1 "cpu/STM32F103/stm32f10x_flash.c"
+   1:cpu/STM32F103/stm32f10x_flash.c **** /******************** (C) COPYRIGHT 2008 STMicroelectronics ********************
+   2:cpu/STM32F103/stm32f10x_flash.c **** * File Name          : stm32f10x_flash.c
+   3:cpu/STM32F103/stm32f10x_flash.c **** * Author             : MCD Application Team
+   4:cpu/STM32F103/stm32f10x_flash.c **** * Version            : V2.0
+   5:cpu/STM32F103/stm32f10x_flash.c **** * Date               : 05/23/2008
+   6:cpu/STM32F103/stm32f10x_flash.c **** * Description        : This file provides all the FLASH firmware functions.
+   7:cpu/STM32F103/stm32f10x_flash.c **** ********************************************************************************
+   8:cpu/STM32F103/stm32f10x_flash.c **** * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+   9:cpu/STM32F103/stm32f10x_flash.c **** * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+  10:cpu/STM32F103/stm32f10x_flash.c **** * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+  11:cpu/STM32F103/stm32f10x_flash.c **** * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+  12:cpu/STM32F103/stm32f10x_flash.c **** * CONTENT OF SUCH SOFTWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+  13:cpu/STM32F103/stm32f10x_flash.c **** * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  14:cpu/STM32F103/stm32f10x_flash.c **** * FOR MORE INFORMATION PLEASE CAREFULLY READ THE LICENSE AGREEMENT FILE LOCATED 
+  15:cpu/STM32F103/stm32f10x_flash.c **** * IN THE ROOT DIRECTORY OF THIS FIRMWARE PACKAGE.
+  16:cpu/STM32F103/stm32f10x_flash.c **** *******************************************************************************/
+  17:cpu/STM32F103/stm32f10x_flash.c **** 
+  18:cpu/STM32F103/stm32f10x_flash.c **** /* Includes ------------------------------------------------------------------*/
+  19:cpu/STM32F103/stm32f10x_flash.c **** #include "stm32f10x_flash.h"
+  20:cpu/STM32F103/stm32f10x_flash.c **** 
+  21:cpu/STM32F103/stm32f10x_flash.c **** /* Private typedef -----------------------------------------------------------*/
+  22:cpu/STM32F103/stm32f10x_flash.c **** /* Private define ------------------------------------------------------------*/
+  23:cpu/STM32F103/stm32f10x_flash.c **** /* Flash Access Control Register bits */
+  24:cpu/STM32F103/stm32f10x_flash.c **** #define ACR_LATENCY_Mask         ((u32)0x00000038)
+  25:cpu/STM32F103/stm32f10x_flash.c **** #define ACR_HLFCYA_Mask          ((u32)0xFFFFFFF7)
+  26:cpu/STM32F103/stm32f10x_flash.c **** #define ACR_PRFTBE_Mask          ((u32)0xFFFFFFEF)
+  27:cpu/STM32F103/stm32f10x_flash.c **** 
+  28:cpu/STM32F103/stm32f10x_flash.c **** #ifdef _FLASH_PROG
+  29:cpu/STM32F103/stm32f10x_flash.c **** /* Flash Access Control Register bits */
+  30:cpu/STM32F103/stm32f10x_flash.c **** #define ACR_PRFTBS_Mask          ((u32)0x00000020) 
+  31:cpu/STM32F103/stm32f10x_flash.c **** 
+  32:cpu/STM32F103/stm32f10x_flash.c **** /* Flash Control Register bits */
+  33:cpu/STM32F103/stm32f10x_flash.c **** #define CR_PG_Set                ((u32)0x00000001)
+  34:cpu/STM32F103/stm32f10x_flash.c **** #define CR_PG_Reset              ((u32)0x00001FFE) 
+  35:cpu/STM32F103/stm32f10x_flash.c **** 
+  36:cpu/STM32F103/stm32f10x_flash.c **** #define CR_PER_Set               ((u32)0x00000002)
+  37:cpu/STM32F103/stm32f10x_flash.c **** #define CR_PER_Reset             ((u32)0x00001FFD)
+  38:cpu/STM32F103/stm32f10x_flash.c **** 
+  39:cpu/STM32F103/stm32f10x_flash.c **** #define CR_MER_Set               ((u32)0x00000004)
+  40:cpu/STM32F103/stm32f10x_flash.c **** #define CR_MER_Reset             ((u32)0x00001FFB)
+  41:cpu/STM32F103/stm32f10x_flash.c **** 
+  42:cpu/STM32F103/stm32f10x_flash.c **** #define CR_OPTPG_Set             ((u32)0x00000010)
+  43:cpu/STM32F103/stm32f10x_flash.c **** #define CR_OPTPG_Reset           ((u32)0x00001FEF)
+  44:cpu/STM32F103/stm32f10x_flash.c **** 
+  45:cpu/STM32F103/stm32f10x_flash.c **** #define CR_OPTER_Set             ((u32)0x00000020)
+  46:cpu/STM32F103/stm32f10x_flash.c **** #define CR_OPTER_Reset           ((u32)0x00001FDF)
+  47:cpu/STM32F103/stm32f10x_flash.c **** 
+  48:cpu/STM32F103/stm32f10x_flash.c **** #define CR_STRT_Set              ((u32)0x00000040)
+  49:cpu/STM32F103/stm32f10x_flash.c **** 							 
+  50:cpu/STM32F103/stm32f10x_flash.c **** #define CR_LOCK_Set              ((u32)0x00000080)
+  51:cpu/STM32F103/stm32f10x_flash.c **** 
+  52:cpu/STM32F103/stm32f10x_flash.c **** /* FLASH Mask */
+  53:cpu/STM32F103/stm32f10x_flash.c **** #define RDPRT_Mask               ((u32)0x00000002)
+  54:cpu/STM32F103/stm32f10x_flash.c **** #define WRP0_Mask                ((u32)0x000000FF)
+  55:cpu/STM32F103/stm32f10x_flash.c **** #define WRP1_Mask                ((u32)0x0000FF00)
+  56:cpu/STM32F103/stm32f10x_flash.c **** #define WRP2_Mask                ((u32)0x00FF0000)
+  57:cpu/STM32F103/stm32f10x_flash.c **** #define WRP3_Mask                ((u32)0xFF000000)
+  58:cpu/STM32F103/stm32f10x_flash.c **** 
+  59:cpu/STM32F103/stm32f10x_flash.c **** /* FLASH Keys */
+  60:cpu/STM32F103/stm32f10x_flash.c **** #define RDP_Key                  ((u16)0x00A5)
+  61:cpu/STM32F103/stm32f10x_flash.c **** #define FLASH_KEY1               ((u32)0x45670123)
+  62:cpu/STM32F103/stm32f10x_flash.c **** #define FLASH_KEY2               ((u32)0xCDEF89AB)
+  63:cpu/STM32F103/stm32f10x_flash.c **** 
+  64:cpu/STM32F103/stm32f10x_flash.c **** /* Delay definition */   
+  65:cpu/STM32F103/stm32f10x_flash.c **** #define EraseTimeout             ((u32)0x00000FFF)
+  66:cpu/STM32F103/stm32f10x_flash.c **** #define ProgramTimeout           ((u32)0x0000000F)
+  67:cpu/STM32F103/stm32f10x_flash.c **** #endif
+  68:cpu/STM32F103/stm32f10x_flash.c **** 
+  69:cpu/STM32F103/stm32f10x_flash.c **** /* Private macro -------------------------------------------------------------*/
+  70:cpu/STM32F103/stm32f10x_flash.c **** /* Private variables ---------------------------------------------------------*/
+  71:cpu/STM32F103/stm32f10x_flash.c **** /* Private function prototypes -----------------------------------------------*/
+  72:cpu/STM32F103/stm32f10x_flash.c **** #ifdef _FLASH_PROG
+  73:cpu/STM32F103/stm32f10x_flash.c **** static void delay(void);
+  74:cpu/STM32F103/stm32f10x_flash.c **** #endif
+  75:cpu/STM32F103/stm32f10x_flash.c **** 
+  76:cpu/STM32F103/stm32f10x_flash.c **** /* Private functions ---------------------------------------------------------*/
+  77:cpu/STM32F103/stm32f10x_flash.c **** /*******************************************************************************
+  78:cpu/STM32F103/stm32f10x_flash.c **** * Function Name  : FLASH_SetLatency
+  79:cpu/STM32F103/stm32f10x_flash.c **** * Description    : Sets the code latency value.
+  80:cpu/STM32F103/stm32f10x_flash.c **** * Input          : - FLASH_Latency: specifies the FLASH Latency value.
+  81:cpu/STM32F103/stm32f10x_flash.c **** *                    This parameter can be one of the following values:
+  82:cpu/STM32F103/stm32f10x_flash.c **** *                       - FLASH_Latency_0: FLASH Zero Latency cycle
+  83:cpu/STM32F103/stm32f10x_flash.c **** *                       - FLASH_Latency_1: FLASH One Latency cycle
+  84:cpu/STM32F103/stm32f10x_flash.c **** *                       - FLASH_Latency_2: FLASH Two Latency cycles
+  85:cpu/STM32F103/stm32f10x_flash.c **** * Output         : None
+  86:cpu/STM32F103/stm32f10x_flash.c **** * Return         : None
+  87:cpu/STM32F103/stm32f10x_flash.c **** *******************************************************************************/
+  88:cpu/STM32F103/stm32f10x_flash.c **** void FLASH_SetLatency(u32 FLASH_Latency)
+  89:cpu/STM32F103/stm32f10x_flash.c **** {
+  28              		.loc 1 89 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  90:cpu/STM32F103/stm32f10x_flash.c ****   /* Check the parameters */
+  91:cpu/STM32F103/stm32f10x_flash.c ****   assert_param(IS_FLASH_LATENCY(FLASH_Latency));
+  33              		.loc 1 91 3 view .LVU1
+  92:cpu/STM32F103/stm32f10x_flash.c ****   
+  93:cpu/STM32F103/stm32f10x_flash.c ****   /* Sets the Latency value */
+  94:cpu/STM32F103/stm32f10x_flash.c ****   FLASH->ACR &= ACR_LATENCY_Mask;
+  34              		.loc 1 94 3 view .LVU2
+  35              		.loc 1 94 14 is_stmt 0 view .LVU3
+  36 0000 044B     		ldr	r3, .L3
+  37 0002 1968     		ldr	r1, [r3]
+  38 0004 01F03801 		and	r1, r1, #56
+  39 0008 1960     		str	r1, [r3]
+  95:cpu/STM32F103/stm32f10x_flash.c ****   FLASH->ACR |= FLASH_Latency;
+  40              		.loc 1 95 3 is_stmt 1 view .LVU4
+  41              		.loc 1 95 14 is_stmt 0 view .LVU5
+  42 000a 1A68     		ldr	r2, [r3]
+  43 000c 0243     		orrs	r2, r2, r0
+  44 000e 1A60     		str	r2, [r3]
+  96:cpu/STM32F103/stm32f10x_flash.c **** }
+  45              		.loc 1 96 1 view .LVU6
+  46 0010 7047     		bx	lr
+  47              	.L4:
+  48 0012 00BF     		.align	2
+  49              	.L3:
+  50 0014 00200240 		.word	1073881088
+  51              		.cfi_endproc
+  52              	.LFE0:
+  54              		.align	1
+  55              		.p2align 2,,3
+  56              		.global	FLASH_HalfCycleAccessCmd
+  57              		.syntax unified
+  58              		.thumb
+  59              		.thumb_func
+  61              	FLASH_HalfCycleAccessCmd:
+  62              	.LVL1:
+  63              	.LFB1:
+  97:cpu/STM32F103/stm32f10x_flash.c **** 
+  98:cpu/STM32F103/stm32f10x_flash.c **** /*******************************************************************************
+  99:cpu/STM32F103/stm32f10x_flash.c **** * Function Name  : FLASH_HalfCycleAccessCmd
+ 100:cpu/STM32F103/stm32f10x_flash.c **** * Description    : Enables or disables the Half cycle flash access.
+ 101:cpu/STM32F103/stm32f10x_flash.c **** * Input          : - FLASH_HalfCycle: specifies the FLASH Half cycle Access mode.
+ 102:cpu/STM32F103/stm32f10x_flash.c **** *                    This parameter can be one of the following values:
+ 103:cpu/STM32F103/stm32f10x_flash.c **** *                       - FLASH_HalfCycleAccess_Enable: FLASH Half Cycle Enable
+ 104:cpu/STM32F103/stm32f10x_flash.c **** *                       - FLASH_HalfCycleAccess_Disable: FLASH Half Cycle Disable
+ 105:cpu/STM32F103/stm32f10x_flash.c **** * Output         : None
+ 106:cpu/STM32F103/stm32f10x_flash.c **** * Return         : None
+ 107:cpu/STM32F103/stm32f10x_flash.c **** *******************************************************************************/
+ 108:cpu/STM32F103/stm32f10x_flash.c **** void FLASH_HalfCycleAccessCmd(u32 FLASH_HalfCycleAccess)
+ 109:cpu/STM32F103/stm32f10x_flash.c **** {
+  64              		.loc 1 109 1 is_stmt 1 view -0
+  65              		.cfi_startproc
+  66              		@ args = 0, pretend = 0, frame = 0
+  67              		@ frame_needed = 0, uses_anonymous_args = 0
+  68              		@ link register save eliminated.
+ 110:cpu/STM32F103/stm32f10x_flash.c ****   /* Check the parameters */
+ 111:cpu/STM32F103/stm32f10x_flash.c ****   assert_param(IS_FLASH_HALFCYCLEACCESS_STATE(FLASH_HalfCycleAccess));
+  69              		.loc 1 111 3 view .LVU8
+ 112:cpu/STM32F103/stm32f10x_flash.c ****   
+ 113:cpu/STM32F103/stm32f10x_flash.c ****   /* Enable or disable the Half cycle access */
+ 114:cpu/STM32F103/stm32f10x_flash.c ****   FLASH->ACR &= ACR_HLFCYA_Mask;
+  70              		.loc 1 114 3 view .LVU9
+  71              		.loc 1 114 14 is_stmt 0 view .LVU10
+  72 0018 044B     		ldr	r3, .L6
+  73 001a 1968     		ldr	r1, [r3]
+  74 001c 21F00801 		bic	r1, r1, #8
+  75 0020 1960     		str	r1, [r3]
+ 115:cpu/STM32F103/stm32f10x_flash.c ****   FLASH->ACR |= FLASH_HalfCycleAccess;
+  76              		.loc 1 115 3 is_stmt 1 view .LVU11
+  77              		.loc 1 115 14 is_stmt 0 view .LVU12
+  78 0022 1A68     		ldr	r2, [r3]
+  79 0024 0243     		orrs	r2, r2, r0
+  80 0026 1A60     		str	r2, [r3]
+ 116:cpu/STM32F103/stm32f10x_flash.c **** }
+  81              		.loc 1 116 1 view .LVU13
+  82 0028 7047     		bx	lr
+  83              	.L7:
+  84 002a 00BF     		.align	2
+  85              	.L6:
+  86 002c 00200240 		.word	1073881088
+  87              		.cfi_endproc
+  88              	.LFE1:
+  90              		.align	1
+  91              		.p2align 2,,3
+  92              		.global	FLASH_PrefetchBufferCmd
+  93              		.syntax unified
+  94              		.thumb
+  95              		.thumb_func
+  97              	FLASH_PrefetchBufferCmd:
+  98              	.LVL2:
+  99              	.LFB2:
+ 117:cpu/STM32F103/stm32f10x_flash.c **** 
+ 118:cpu/STM32F103/stm32f10x_flash.c **** /*******************************************************************************
+ 119:cpu/STM32F103/stm32f10x_flash.c **** * Function Name  : FLASH_PrefetchBufferCmd
+ 120:cpu/STM32F103/stm32f10x_flash.c **** * Description    : Enables or disables the Prefetch Buffer.
+ 121:cpu/STM32F103/stm32f10x_flash.c **** * Input          : - FLASH_PrefetchBuffer: specifies the Prefetch buffer status.
+ 122:cpu/STM32F103/stm32f10x_flash.c **** *                    This parameter can be one of the following values:
+ 123:cpu/STM32F103/stm32f10x_flash.c **** *                       - FLASH_PrefetchBuffer_Enable: FLASH Prefetch Buffer Enable
+ 124:cpu/STM32F103/stm32f10x_flash.c **** *                       - FLASH_PrefetchBuffer_Disable: FLASH Prefetch Buffer Disable
+ 125:cpu/STM32F103/stm32f10x_flash.c **** * Output         : None
+ 126:cpu/STM32F103/stm32f10x_flash.c **** * Return         : None
+ 127:cpu/STM32F103/stm32f10x_flash.c **** *******************************************************************************/
+ 128:cpu/STM32F103/stm32f10x_flash.c **** void FLASH_PrefetchBufferCmd(u32 FLASH_PrefetchBuffer)
+ 129:cpu/STM32F103/stm32f10x_flash.c **** {
+ 100              		.loc 1 129 1 is_stmt 1 view -0
+ 101              		.cfi_startproc
+ 102              		@ args = 0, pretend = 0, frame = 0
+ 103              		@ frame_needed = 0, uses_anonymous_args = 0
+ 104              		@ link register save eliminated.
+ 130:cpu/STM32F103/stm32f10x_flash.c ****   /* Check the parameters */
+ 131:cpu/STM32F103/stm32f10x_flash.c ****   assert_param(IS_FLASH_PREFETCHBUFFER_STATE(FLASH_PrefetchBuffer));
+ 105              		.loc 1 131 3 view .LVU15
+ 132:cpu/STM32F103/stm32f10x_flash.c ****   
+ 133:cpu/STM32F103/stm32f10x_flash.c ****   /* Enable or disable the Prefetch Buffer */
+ 134:cpu/STM32F103/stm32f10x_flash.c ****   FLASH->ACR &= ACR_PRFTBE_Mask;
+ 106              		.loc 1 134 3 view .LVU16
+ 107              		.loc 1 134 14 is_stmt 0 view .LVU17
+ 108 0030 044B     		ldr	r3, .L9
+ 109 0032 1968     		ldr	r1, [r3]
+ 110 0034 21F01001 		bic	r1, r1, #16
+ 111 0038 1960     		str	r1, [r3]
+ 135:cpu/STM32F103/stm32f10x_flash.c ****   FLASH->ACR |= FLASH_PrefetchBuffer;
+ 112              		.loc 1 135 3 is_stmt 1 view .LVU18
+ 113              		.loc 1 135 14 is_stmt 0 view .LVU19
+ 114 003a 1A68     		ldr	r2, [r3]
+ 115 003c 0243     		orrs	r2, r2, r0
+ 116 003e 1A60     		str	r2, [r3]
+ 136:cpu/STM32F103/stm32f10x_flash.c **** }
+ 117              		.loc 1 136 1 view .LVU20
+ 118 0040 7047     		bx	lr
+ 119              	.L10:
+ 120 0042 00BF     		.align	2
+ 121              	.L9:
+ 122 0044 00200240 		.word	1073881088
+ 123              		.cfi_endproc
+ 124              	.LFE2:
+ 126              	.Letext0:
+ 127              		.file 2 "cpu/STM32F103/stm32f10x_map.h"
+ 128              		.file 3 "cpu/STM32F103/stm32f10x_type.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f10x_flash.c
+C:\Users\forre\AppData\Local\Temp\ccTWMqtR.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\ccTWMqtR.s:24     .text:00000000 FLASH_SetLatency
+C:\Users\forre\AppData\Local\Temp\ccTWMqtR.s:50     .text:00000014 $d
+C:\Users\forre\AppData\Local\Temp\ccTWMqtR.s:54     .text:00000018 $t
+C:\Users\forre\AppData\Local\Temp\ccTWMqtR.s:61     .text:00000018 FLASH_HalfCycleAccessCmd
+C:\Users\forre\AppData\Local\Temp\ccTWMqtR.s:86     .text:0000002c $d
+C:\Users\forre\AppData\Local\Temp\ccTWMqtR.s:90     .text:00000030 $t
+C:\Users\forre\AppData\Local\Temp\ccTWMqtR.s:97     .text:00000030 FLASH_PrefetchBufferCmd
+C:\Users\forre\AppData\Local\Temp\ccTWMqtR.s:122    .text:00000044 $d
+
+NO UNDEFINED SYMBOLS

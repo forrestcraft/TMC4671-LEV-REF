@@ -1,0 +1,621 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"SPI.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	spi_init
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	spi_init:
+  25              	.LFB0:
+  26              		.file 1 "hal/comm/SPI.c"
+   1:hal/comm/SPI.c **** /*
+   2:hal/comm/SPI.c ****  * SPI.c
+   3:hal/comm/SPI.c ****  *
+   4:hal/comm/SPI.c ****  *  Created on: 13.11.2019
+   5:hal/comm/SPI.c ****  *      Author: ED
+   6:hal/comm/SPI.c ****  */
+   7:hal/comm/SPI.c **** #include "SPI.h"
+   8:hal/comm/SPI.c **** 
+   9:hal/comm/SPI.c **** void spi_init()
+  10:hal/comm/SPI.c **** {
+  27              		.loc 1 10 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 24
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  11:hal/comm/SPI.c **** 	// enable clock for SPI2
+  12:hal/comm/SPI.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+  31              		.loc 1 12 2 view .LVU1
+  10:hal/comm/SPI.c **** 	// enable clock for SPI2
+  32              		.loc 1 10 1 is_stmt 0 view .LVU2
+  33 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 20
+  36              		.cfi_offset 4, -20
+  37              		.cfi_offset 5, -16
+  38              		.cfi_offset 6, -12
+  39              		.cfi_offset 7, -8
+  40              		.cfi_offset 14, -4
+  41              		.loc 1 12 2 view .LVU3
+  42 0002 0121     		movs	r1, #1
+  10:hal/comm/SPI.c **** 	// enable clock for SPI2
+  43              		.loc 1 10 1 view .LVU4
+  44 0004 87B0     		sub	sp, sp, #28
+  45              	.LCFI1:
+  46              		.cfi_def_cfa_offset 48
+  47              		.loc 1 12 2 view .LVU5
+  48 0006 4FF48040 		mov	r0, #16384
+  49 000a FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+  50              	.LVL0:
+  13:hal/comm/SPI.c **** 
+  14:hal/comm/SPI.c **** 	// enable clock for GPIOB
+  15:hal/comm/SPI.c **** 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+  51              		.loc 1 15 2 is_stmt 1 view .LVU6
+  52 000e 0121     		movs	r1, #1
+  53 0010 0820     		movs	r0, #8
+  54 0012 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  55              	.LVL1:
+  16:hal/comm/SPI.c **** 
+  17:hal/comm/SPI.c **** 	// use pins B13..B15 for SPI2
+  18:hal/comm/SPI.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  56              		.loc 1 18 2 view .LVU7
+  19:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13|GPIO_Pin_15;
+  57              		.loc 1 19 2 view .LVU8
+  20:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  58              		.loc 1 20 2 view .LVU9
+  21:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+  59              		.loc 1 21 2 view .LVU10
+  20:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  60              		.loc 1 20 32 is_stmt 0 view .LVU11
+  61 0016 41F60307 		movw	r7, #6147
+  19:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13|GPIO_Pin_15;
+  62              		.loc 1 19 30 view .LVU12
+  63 001a 4FF42043 		mov	r3, #40960
+  22:hal/comm/SPI.c **** 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+  64              		.loc 1 22 2 view .LVU13
+  65 001e 1C4E     		ldr	r6, .L4
+  66 0020 6946     		mov	r1, sp
+  67 0022 3046     		mov	r0, r6
+  19:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  68              		.loc 1 19 30 view .LVU14
+  69 0024 ADF80030 		strh	r3, [sp]	@ movhi
+  20:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+  70              		.loc 1 20 32 view .LVU15
+  71 0028 ADF80270 		strh	r7, [sp, #2]	@ movhi
+  72              		.loc 1 22 2 is_stmt 1 view .LVU16
+  73 002c FFF7FEFF 		bl	GPIO_Init
+  74              	.LVL2:
+  23:hal/comm/SPI.c **** 
+  24:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
+  75              		.loc 1 24 2 view .LVU17
+  25:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  76              		.loc 1 25 2 view .LVU18
+  26:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+  77              		.loc 1 26 2 view .LVU19
+  24:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  78              		.loc 1 24 30 is_stmt 0 view .LVU20
+  79 0030 4FF48043 		mov	r3, #16384
+  27:hal/comm/SPI.c **** 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+  80              		.loc 1 27 2 view .LVU21
+  81 0034 6946     		mov	r1, sp
+  82 0036 3046     		mov	r0, r6
+  24:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  83              		.loc 1 24 30 view .LVU22
+  84 0038 ADF80030 		strh	r3, [sp]	@ movhi
+  25:hal/comm/SPI.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+  85              		.loc 1 25 32 view .LVU23
+  86 003c ADF80270 		strh	r7, [sp, #2]	@ movhi
+  87              		.loc 1 27 2 is_stmt 1 view .LVU24
+  88 0040 FFF7FEFF 		bl	GPIO_Init
+  89              	.LVL3:
+  28:hal/comm/SPI.c **** 
+  29:hal/comm/SPI.c **** 	// initialize SPI2
+  30:hal/comm/SPI.c **** 	SPI_InitTypeDef SPIInit;
+  90              		.loc 1 30 2 view .LVU25
+  31:hal/comm/SPI.c **** 	SPIInit.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+  91              		.loc 1 31 2 view .LVU26
+  32:hal/comm/SPI.c **** 	SPIInit.SPI_Mode = SPI_Mode_Master;
+  33:hal/comm/SPI.c **** 	SPIInit.SPI_DataSize = SPI_DataSize_8b;
+  34:hal/comm/SPI.c **** 	SPIInit.SPI_CPOL = SPI_CPOL_High;
+  92              		.loc 1 34 19 is_stmt 0 view .LVU27
+  93 0044 0222     		movs	r2, #2
+  32:hal/comm/SPI.c **** 	SPIInit.SPI_Mode = SPI_Mode_Master;
+  94              		.loc 1 32 19 view .LVU28
+  95 0046 4FF48271 		mov	r1, #260
+  35:hal/comm/SPI.c **** 	SPIInit.SPI_CPHA = SPI_CPHA_2Edge;
+  36:hal/comm/SPI.c **** 	SPIInit.SPI_NSS = SPI_NSS_Soft;
+  96              		.loc 1 36 18 view .LVU29
+  97 004a 4FF40070 		mov	r0, #512
+  31:hal/comm/SPI.c **** 	SPIInit.SPI_Mode = SPI_Mode_Master;
+  98              		.loc 1 31 24 view .LVU30
+  99 004e 0023     		movs	r3, #0
+  35:hal/comm/SPI.c **** 	SPIInit.SPI_CPHA = SPI_CPHA_2Edge;
+ 100              		.loc 1 35 19 view .LVU31
+ 101 0050 0125     		movs	r5, #1
+  34:hal/comm/SPI.c **** 	SPIInit.SPI_CPHA = SPI_CPHA_2Edge;
+ 102              		.loc 1 34 19 view .LVU32
+ 103 0052 ADF80A20 		strh	r2, [sp, #10]	@ movhi
+  37:hal/comm/SPI.c **** 	SPIInit.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+ 104              		.loc 1 37 32 view .LVU33
+ 105 0056 1822     		movs	r2, #24
+  38:hal/comm/SPI.c **** 	SPIInit.SPI_FirstBit = SPI_FirstBit_MSB;
+  39:hal/comm/SPI.c **** 	SPIInit.SPI_CRCPolynomial = 0;
+  40:hal/comm/SPI.c **** 	SPI_Init(SPI2, &SPIInit);
+ 106              		.loc 1 40 2 view .LVU34
+ 107 0058 0E4C     		ldr	r4, .L4+4
+  36:hal/comm/SPI.c **** 	SPIInit.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+ 108              		.loc 1 36 18 view .LVU35
+ 109 005a ADF80E00 		strh	r0, [sp, #14]	@ movhi
+  32:hal/comm/SPI.c **** 	SPIInit.SPI_DataSize = SPI_DataSize_8b;
+ 110              		.loc 1 32 19 view .LVU36
+ 111 005e ADF80610 		strh	r1, [sp, #6]	@ movhi
+ 112              		.loc 1 40 2 view .LVU37
+ 113 0062 2046     		mov	r0, r4
+ 114 0064 01A9     		add	r1, sp, #4
+  31:hal/comm/SPI.c **** 	SPIInit.SPI_Mode = SPI_Mode_Master;
+ 115              		.loc 1 31 24 view .LVU38
+ 116 0066 ADF80430 		strh	r3, [sp, #4]	@ movhi
+  32:hal/comm/SPI.c **** 	SPIInit.SPI_DataSize = SPI_DataSize_8b;
+ 117              		.loc 1 32 2 is_stmt 1 view .LVU39
+  33:hal/comm/SPI.c **** 	SPIInit.SPI_CPOL = SPI_CPOL_High;
+ 118              		.loc 1 33 2 view .LVU40
+  33:hal/comm/SPI.c **** 	SPIInit.SPI_CPOL = SPI_CPOL_High;
+ 119              		.loc 1 33 23 is_stmt 0 view .LVU41
+ 120 006a ADF80830 		strh	r3, [sp, #8]	@ movhi
+  34:hal/comm/SPI.c **** 	SPIInit.SPI_CPHA = SPI_CPHA_2Edge;
+ 121              		.loc 1 34 2 is_stmt 1 view .LVU42
+  35:hal/comm/SPI.c **** 	SPIInit.SPI_NSS = SPI_NSS_Soft;
+ 122              		.loc 1 35 2 view .LVU43
+  36:hal/comm/SPI.c **** 	SPIInit.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+ 123              		.loc 1 36 2 view .LVU44
+  37:hal/comm/SPI.c **** 	SPIInit.SPI_FirstBit = SPI_FirstBit_MSB;
+ 124              		.loc 1 37 2 view .LVU45
+  38:hal/comm/SPI.c **** 	SPIInit.SPI_CRCPolynomial = 0;
+ 125              		.loc 1 38 23 is_stmt 0 view .LVU46
+ 126 006e ADF81230 		strh	r3, [sp, #18]	@ movhi
+  39:hal/comm/SPI.c **** 	SPI_Init(SPI2, &SPIInit);
+ 127              		.loc 1 39 28 view .LVU47
+ 128 0072 ADF81430 		strh	r3, [sp, #20]	@ movhi
+  37:hal/comm/SPI.c **** 	SPIInit.SPI_FirstBit = SPI_FirstBit_MSB;
+ 129              		.loc 1 37 32 view .LVU48
+ 130 0076 ADF81020 		strh	r2, [sp, #16]	@ movhi
+  38:hal/comm/SPI.c **** 	SPIInit.SPI_CRCPolynomial = 0;
+ 131              		.loc 1 38 2 is_stmt 1 view .LVU49
+  39:hal/comm/SPI.c **** 	SPI_Init(SPI2, &SPIInit);
+ 132              		.loc 1 39 2 view .LVU50
+ 133              		.loc 1 40 2 view .LVU51
+  35:hal/comm/SPI.c **** 	SPIInit.SPI_NSS = SPI_NSS_Soft;
+ 134              		.loc 1 35 19 is_stmt 0 view .LVU52
+ 135 007a ADF80C50 		strh	r5, [sp, #12]	@ movhi
+ 136              		.loc 1 40 2 view .LVU53
+ 137 007e FFF7FEFF 		bl	SPI_Init
+ 138              	.LVL4:
+  41:hal/comm/SPI.c **** 
+  42:hal/comm/SPI.c **** 	SPI_Cmd(SPI2, ENABLE);
+ 139              		.loc 1 42 2 is_stmt 1 view .LVU54
+ 140 0082 2946     		mov	r1, r5
+ 141 0084 2046     		mov	r0, r4
+ 142 0086 FFF7FEFF 		bl	SPI_Cmd
+ 143              	.LVL5:
+  43:hal/comm/SPI.c **** }
+ 144              		.loc 1 43 1 is_stmt 0 view .LVU55
+ 145 008a 07B0     		add	sp, sp, #28
+ 146              	.LCFI2:
+ 147              		.cfi_def_cfa_offset 20
+ 148              		@ sp needed
+ 149 008c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 150              	.L5:
+ 151 008e 00BF     		.align	2
+ 152              	.L4:
+ 153 0090 000C0140 		.word	1073810432
+ 154 0094 00380040 		.word	1073756160
+ 155              		.cfi_endproc
+ 156              	.LFE0:
+ 158              		.align	1
+ 159              		.p2align 2,,3
+ 160              		.global	eeprom_spi_readWriteByte
+ 161              		.syntax unified
+ 162              		.thumb
+ 163              		.thumb_func
+ 165              	eeprom_spi_readWriteByte:
+ 166              	.LVL6:
+ 167              	.LFB1:
+  44:hal/comm/SPI.c **** 
+  45:hal/comm/SPI.c **** uint8_t eeprom_spi_readWriteByte(uint8_t data, uint8_t lastTransfer)
+  46:hal/comm/SPI.c **** {
+ 168              		.loc 1 46 1 is_stmt 1 view -0
+ 169              		.cfi_startproc
+ 170              		@ args = 0, pretend = 0, frame = 0
+ 171              		@ frame_needed = 0, uses_anonymous_args = 0
+  47:hal/comm/SPI.c **** 	SPI_TypeDef *spiChannel = SPI2;
+ 172              		.loc 1 47 2 view .LVU57
+  48:hal/comm/SPI.c **** 
+  49:hal/comm/SPI.c **** 	// set CS signal low
+  50:hal/comm/SPI.c **** 	tmcm_enableCsMem();
+ 173              		.loc 1 50 2 view .LVU58
+  46:hal/comm/SPI.c **** 	SPI_TypeDef *spiChannel = SPI2;
+ 174              		.loc 1 46 1 is_stmt 0 view .LVU59
+ 175 0098 70B5     		push	{r4, r5, r6, lr}
+ 176              	.LCFI3:
+ 177              		.cfi_def_cfa_offset 16
+ 178              		.cfi_offset 4, -16
+ 179              		.cfi_offset 5, -12
+ 180              		.cfi_offset 6, -8
+ 181              		.cfi_offset 14, -4
+  46:hal/comm/SPI.c **** 	SPI_TypeDef *spiChannel = SPI2;
+ 182              		.loc 1 46 1 view .LVU60
+ 183 009a 0646     		mov	r6, r0
+ 184 009c 0D46     		mov	r5, r1
+  51:hal/comm/SPI.c **** 
+  52:hal/comm/SPI.c **** 	while(SPI_I2S_GetFlagStatus(spiChannel, SPI_I2S_FLAG_TXE)==RESET);
+ 185              		.loc 1 52 8 view .LVU61
+ 186 009e 0F4C     		ldr	r4, .L19
+  50:hal/comm/SPI.c **** 
+ 187              		.loc 1 50 2 view .LVU62
+ 188 00a0 FFF7FEFF 		bl	tmcm_enableCsMem
+ 189              	.LVL7:
+ 190              		.loc 1 52 2 is_stmt 1 view .LVU63
+ 191              	.L7:
+ 192              		.loc 1 52 67 discriminator 1 view .LVU64
+ 193              		.loc 1 52 7 discriminator 1 view .LVU65
+ 194              		.loc 1 52 8 is_stmt 0 discriminator 1 view .LVU66
+ 195 00a4 0221     		movs	r1, #2
+ 196 00a6 2046     		mov	r0, r4
+ 197 00a8 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 198              	.LVL8:
+ 199              		.loc 1 52 7 discriminator 1 view .LVU67
+ 200 00ac 0028     		cmp	r0, #0
+ 201 00ae F9D0     		beq	.L7
+  53:hal/comm/SPI.c **** 	SPI_I2S_SendData(spiChannel, data);
+ 202              		.loc 1 53 2 is_stmt 1 view .LVU68
+ 203 00b0 3146     		mov	r1, r6
+ 204 00b2 0A48     		ldr	r0, .L19
+ 205 00b4 FFF7FEFF 		bl	SPI_I2S_SendData
+ 206              	.LVL9:
+  54:hal/comm/SPI.c **** 	while(SPI_I2S_GetFlagStatus(spiChannel, SPI_I2S_FLAG_RXNE)==RESET);
+ 207              		.loc 1 54 2 view .LVU69
+ 208              		.loc 1 54 8 is_stmt 0 view .LVU70
+ 209 00b8 084C     		ldr	r4, .L19
+ 210              	.L8:
+ 211              		.loc 1 54 68 is_stmt 1 discriminator 1 view .LVU71
+ 212              		.loc 1 54 7 discriminator 1 view .LVU72
+ 213              		.loc 1 54 8 is_stmt 0 discriminator 1 view .LVU73
+ 214 00ba 0121     		movs	r1, #1
+ 215 00bc 2046     		mov	r0, r4
+ 216 00be FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 217              	.LVL10:
+ 218              		.loc 1 54 7 discriminator 1 view .LVU74
+ 219 00c2 0028     		cmp	r0, #0
+ 220 00c4 F9D0     		beq	.L8
+  55:hal/comm/SPI.c **** 	u8 data2 = SPI_I2S_ReceiveData(spiChannel);
+ 221              		.loc 1 55 2 is_stmt 1 view .LVU75
+ 222              		.loc 1 55 13 is_stmt 0 view .LVU76
+ 223 00c6 0548     		ldr	r0, .L19
+ 224 00c8 FFF7FEFF 		bl	SPI_I2S_ReceiveData
+ 225              	.LVL11:
+ 226              		.loc 1 55 5 view .LVU77
+ 227 00cc C4B2     		uxtb	r4, r0
+ 228              	.LVL12:
+  56:hal/comm/SPI.c **** 
+  57:hal/comm/SPI.c **** 	// set CS signal high after last transfer
+  58:hal/comm/SPI.c **** 	if(lastTransfer)
+ 229              		.loc 1 58 2 is_stmt 1 view .LVU78
+ 230              		.loc 1 58 4 is_stmt 0 view .LVU79
+ 231 00ce 0DB9     		cbnz	r5, .L18
+  59:hal/comm/SPI.c **** 		tmcm_disableCsMem();
+  60:hal/comm/SPI.c **** 
+  61:hal/comm/SPI.c **** 	return data2;
+ 232              		.loc 1 61 2 is_stmt 1 view .LVU80
+  62:hal/comm/SPI.c **** }
+ 233              		.loc 1 62 1 is_stmt 0 view .LVU81
+ 234 00d0 2046     		mov	r0, r4
+ 235 00d2 70BD     		pop	{r4, r5, r6, pc}
+ 236              	.LVL13:
+ 237              	.L18:
+  59:hal/comm/SPI.c **** 		tmcm_disableCsMem();
+ 238              		.loc 1 59 3 is_stmt 1 view .LVU82
+ 239 00d4 FFF7FEFF 		bl	tmcm_disableCsMem
+ 240              	.LVL14:
+  61:hal/comm/SPI.c **** }
+ 241              		.loc 1 61 2 view .LVU83
+ 242              		.loc 1 62 1 is_stmt 0 view .LVU84
+ 243 00d8 2046     		mov	r0, r4
+ 244 00da 70BD     		pop	{r4, r5, r6, pc}
+ 245              	.LVL15:
+ 246              	.L20:
+ 247              		.loc 1 62 1 view .LVU85
+ 248              		.align	2
+ 249              	.L19:
+ 250 00dc 00380040 		.word	1073756160
+ 251              		.cfi_endproc
+ 252              	.LFE1:
+ 254              		.align	1
+ 255              		.p2align 2,,3
+ 256              		.global	weasel_spi_readWriteByte
+ 257              		.syntax unified
+ 258              		.thumb
+ 259              		.thumb_func
+ 261              	weasel_spi_readWriteByte:
+ 262              	.LVL16:
+ 263              	.LFB2:
+  63:hal/comm/SPI.c **** 
+  64:hal/comm/SPI.c **** uint8_t weasel_spi_readWriteByte(uint8_t data, uint8_t lastTransfer)
+  65:hal/comm/SPI.c **** {
+ 264              		.loc 1 65 1 is_stmt 1 view -0
+ 265              		.cfi_startproc
+ 266              		@ args = 0, pretend = 0, frame = 0
+ 267              		@ frame_needed = 0, uses_anonymous_args = 0
+  66:hal/comm/SPI.c **** 	SPI_TypeDef *spiChannel = SPI2;
+ 268              		.loc 1 66 2 view .LVU87
+  67:hal/comm/SPI.c **** 
+  68:hal/comm/SPI.c **** 	// set CS signal low
+  69:hal/comm/SPI.c **** 	tmcm_enableCsWeasel();
+ 269              		.loc 1 69 2 view .LVU88
+  65:hal/comm/SPI.c **** 	SPI_TypeDef *spiChannel = SPI2;
+ 270              		.loc 1 65 1 is_stmt 0 view .LVU89
+ 271 00e0 70B5     		push	{r4, r5, r6, lr}
+ 272              	.LCFI4:
+ 273              		.cfi_def_cfa_offset 16
+ 274              		.cfi_offset 4, -16
+ 275              		.cfi_offset 5, -12
+ 276              		.cfi_offset 6, -8
+ 277              		.cfi_offset 14, -4
+  65:hal/comm/SPI.c **** 	SPI_TypeDef *spiChannel = SPI2;
+ 278              		.loc 1 65 1 view .LVU90
+ 279 00e2 0646     		mov	r6, r0
+ 280 00e4 0D46     		mov	r5, r1
+  70:hal/comm/SPI.c **** 
+  71:hal/comm/SPI.c **** 	while(SPI_I2S_GetFlagStatus(spiChannel, SPI_I2S_FLAG_TXE)==RESET);
+ 281              		.loc 1 71 8 view .LVU91
+ 282 00e6 0F4C     		ldr	r4, .L34
+  69:hal/comm/SPI.c **** 
+ 283              		.loc 1 69 2 view .LVU92
+ 284 00e8 FFF7FEFF 		bl	tmcm_enableCsWeasel
+ 285              	.LVL17:
+ 286              		.loc 1 71 2 is_stmt 1 view .LVU93
+ 287              	.L22:
+ 288              		.loc 1 71 67 discriminator 1 view .LVU94
+ 289              		.loc 1 71 7 discriminator 1 view .LVU95
+ 290              		.loc 1 71 8 is_stmt 0 discriminator 1 view .LVU96
+ 291 00ec 0221     		movs	r1, #2
+ 292 00ee 2046     		mov	r0, r4
+ 293 00f0 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 294              	.LVL18:
+ 295              		.loc 1 71 7 discriminator 1 view .LVU97
+ 296 00f4 0028     		cmp	r0, #0
+ 297 00f6 F9D0     		beq	.L22
+  72:hal/comm/SPI.c **** 	SPI_I2S_SendData(spiChannel, data);
+ 298              		.loc 1 72 2 is_stmt 1 view .LVU98
+ 299 00f8 3146     		mov	r1, r6
+ 300 00fa 0A48     		ldr	r0, .L34
+ 301 00fc FFF7FEFF 		bl	SPI_I2S_SendData
+ 302              	.LVL19:
+  73:hal/comm/SPI.c **** 	while(SPI_I2S_GetFlagStatus(spiChannel, SPI_I2S_FLAG_RXNE)==RESET);
+ 303              		.loc 1 73 2 view .LVU99
+ 304              		.loc 1 73 8 is_stmt 0 view .LVU100
+ 305 0100 084C     		ldr	r4, .L34
+ 306              	.L23:
+ 307              		.loc 1 73 68 is_stmt 1 discriminator 1 view .LVU101
+ 308              		.loc 1 73 7 discriminator 1 view .LVU102
+ 309              		.loc 1 73 8 is_stmt 0 discriminator 1 view .LVU103
+ 310 0102 0121     		movs	r1, #1
+ 311 0104 2046     		mov	r0, r4
+ 312 0106 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 313              	.LVL20:
+ 314              		.loc 1 73 7 discriminator 1 view .LVU104
+ 315 010a 0028     		cmp	r0, #0
+ 316 010c F9D0     		beq	.L23
+  74:hal/comm/SPI.c **** 	u8 data2 = SPI_I2S_ReceiveData(spiChannel);
+ 317              		.loc 1 74 2 is_stmt 1 view .LVU105
+ 318              		.loc 1 74 13 is_stmt 0 view .LVU106
+ 319 010e 0548     		ldr	r0, .L34
+ 320 0110 FFF7FEFF 		bl	SPI_I2S_ReceiveData
+ 321              	.LVL21:
+ 322              		.loc 1 74 5 view .LVU107
+ 323 0114 C4B2     		uxtb	r4, r0
+ 324              	.LVL22:
+  75:hal/comm/SPI.c **** 
+  76:hal/comm/SPI.c **** 	// set CS signal high after last transfer
+  77:hal/comm/SPI.c **** 	if(lastTransfer)
+ 325              		.loc 1 77 2 is_stmt 1 view .LVU108
+ 326              		.loc 1 77 4 is_stmt 0 view .LVU109
+ 327 0116 0DB9     		cbnz	r5, .L33
+  78:hal/comm/SPI.c **** 		tmcm_disableCsWeasel();
+  79:hal/comm/SPI.c **** 
+  80:hal/comm/SPI.c **** 	return data2;
+ 328              		.loc 1 80 2 is_stmt 1 view .LVU110
+  81:hal/comm/SPI.c **** }
+ 329              		.loc 1 81 1 is_stmt 0 view .LVU111
+ 330 0118 2046     		mov	r0, r4
+ 331 011a 70BD     		pop	{r4, r5, r6, pc}
+ 332              	.LVL23:
+ 333              	.L33:
+  78:hal/comm/SPI.c **** 		tmcm_disableCsWeasel();
+ 334              		.loc 1 78 3 is_stmt 1 view .LVU112
+ 335 011c FFF7FEFF 		bl	tmcm_disableCsWeasel
+ 336              	.LVL24:
+  80:hal/comm/SPI.c **** }
+ 337              		.loc 1 80 2 view .LVU113
+ 338              		.loc 1 81 1 is_stmt 0 view .LVU114
+ 339 0120 2046     		mov	r0, r4
+ 340 0122 70BD     		pop	{r4, r5, r6, pc}
+ 341              	.LVL25:
+ 342              	.L35:
+ 343              		.loc 1 81 1 view .LVU115
+ 344              		.align	2
+ 345              	.L34:
+ 346 0124 00380040 		.word	1073756160
+ 347              		.cfi_endproc
+ 348              	.LFE2:
+ 350              		.align	1
+ 351              		.p2align 2,,3
+ 352              		.global	dragon_spi_readWriteByte
+ 353              		.syntax unified
+ 354              		.thumb
+ 355              		.thumb_func
+ 357              	dragon_spi_readWriteByte:
+ 358              	.LVL26:
+ 359              	.LFB3:
+  82:hal/comm/SPI.c **** 
+  83:hal/comm/SPI.c **** uint8_t dragon_spi_readWriteByte(uint8_t data, uint8_t lastTransfer)
+  84:hal/comm/SPI.c **** {
+ 360              		.loc 1 84 1 is_stmt 1 view -0
+ 361              		.cfi_startproc
+ 362              		@ args = 0, pretend = 0, frame = 0
+ 363              		@ frame_needed = 0, uses_anonymous_args = 0
+  85:hal/comm/SPI.c **** 	SPI_TypeDef *spiChannel = SPI2;
+ 364              		.loc 1 85 2 view .LVU117
+  86:hal/comm/SPI.c **** 
+  87:hal/comm/SPI.c **** 	// set CS signal low
+  88:hal/comm/SPI.c **** 	tmcm_enableCsDragon();
+ 365              		.loc 1 88 2 view .LVU118
+  84:hal/comm/SPI.c **** 	SPI_TypeDef *spiChannel = SPI2;
+ 366              		.loc 1 84 1 is_stmt 0 view .LVU119
+ 367 0128 70B5     		push	{r4, r5, r6, lr}
+ 368              	.LCFI5:
+ 369              		.cfi_def_cfa_offset 16
+ 370              		.cfi_offset 4, -16
+ 371              		.cfi_offset 5, -12
+ 372              		.cfi_offset 6, -8
+ 373              		.cfi_offset 14, -4
+  84:hal/comm/SPI.c **** 	SPI_TypeDef *spiChannel = SPI2;
+ 374              		.loc 1 84 1 view .LVU120
+ 375 012a 0646     		mov	r6, r0
+ 376 012c 0D46     		mov	r5, r1
+  89:hal/comm/SPI.c **** 
+  90:hal/comm/SPI.c **** 	while(SPI_I2S_GetFlagStatus(spiChannel, SPI_I2S_FLAG_TXE)==RESET);
+ 377              		.loc 1 90 8 view .LVU121
+ 378 012e 0F4C     		ldr	r4, .L49
+  88:hal/comm/SPI.c **** 
+ 379              		.loc 1 88 2 view .LVU122
+ 380 0130 FFF7FEFF 		bl	tmcm_enableCsDragon
+ 381              	.LVL27:
+ 382              		.loc 1 90 2 is_stmt 1 view .LVU123
+ 383              	.L37:
+ 384              		.loc 1 90 67 discriminator 1 view .LVU124
+ 385              		.loc 1 90 7 discriminator 1 view .LVU125
+ 386              		.loc 1 90 8 is_stmt 0 discriminator 1 view .LVU126
+ 387 0134 0221     		movs	r1, #2
+ 388 0136 2046     		mov	r0, r4
+ 389 0138 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 390              	.LVL28:
+ 391              		.loc 1 90 7 discriminator 1 view .LVU127
+ 392 013c 0028     		cmp	r0, #0
+ 393 013e F9D0     		beq	.L37
+  91:hal/comm/SPI.c **** 	SPI_I2S_SendData(spiChannel, data);
+ 394              		.loc 1 91 2 is_stmt 1 view .LVU128
+ 395 0140 3146     		mov	r1, r6
+ 396 0142 0A48     		ldr	r0, .L49
+ 397 0144 FFF7FEFF 		bl	SPI_I2S_SendData
+ 398              	.LVL29:
+  92:hal/comm/SPI.c **** 	while(SPI_I2S_GetFlagStatus(spiChannel, SPI_I2S_FLAG_RXNE)==RESET);
+ 399              		.loc 1 92 2 view .LVU129
+ 400              		.loc 1 92 8 is_stmt 0 view .LVU130
+ 401 0148 084C     		ldr	r4, .L49
+ 402              	.L38:
+ 403              		.loc 1 92 68 is_stmt 1 discriminator 1 view .LVU131
+ 404              		.loc 1 92 7 discriminator 1 view .LVU132
+ 405              		.loc 1 92 8 is_stmt 0 discriminator 1 view .LVU133
+ 406 014a 0121     		movs	r1, #1
+ 407 014c 2046     		mov	r0, r4
+ 408 014e FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 409              	.LVL30:
+ 410              		.loc 1 92 7 discriminator 1 view .LVU134
+ 411 0152 0028     		cmp	r0, #0
+ 412 0154 F9D0     		beq	.L38
+  93:hal/comm/SPI.c **** 	u8 data2 = SPI_I2S_ReceiveData(spiChannel);
+ 413              		.loc 1 93 2 is_stmt 1 view .LVU135
+ 414              		.loc 1 93 13 is_stmt 0 view .LVU136
+ 415 0156 0548     		ldr	r0, .L49
+ 416 0158 FFF7FEFF 		bl	SPI_I2S_ReceiveData
+ 417              	.LVL31:
+ 418              		.loc 1 93 5 view .LVU137
+ 419 015c C4B2     		uxtb	r4, r0
+ 420              	.LVL32:
+  94:hal/comm/SPI.c **** 
+  95:hal/comm/SPI.c **** 	// set CS signal high after last transfer
+  96:hal/comm/SPI.c **** 	if(lastTransfer)
+ 421              		.loc 1 96 2 is_stmt 1 view .LVU138
+ 422              		.loc 1 96 4 is_stmt 0 view .LVU139
+ 423 015e 0DB9     		cbnz	r5, .L48
+  97:hal/comm/SPI.c **** 		tmcm_disableCsDragon();
+  98:hal/comm/SPI.c **** 
+  99:hal/comm/SPI.c **** 	return data2;
+ 424              		.loc 1 99 2 is_stmt 1 view .LVU140
+ 100:hal/comm/SPI.c **** }
+ 425              		.loc 1 100 1 is_stmt 0 view .LVU141
+ 426 0160 2046     		mov	r0, r4
+ 427 0162 70BD     		pop	{r4, r5, r6, pc}
+ 428              	.LVL33:
+ 429              	.L48:
+  97:hal/comm/SPI.c **** 		tmcm_disableCsDragon();
+ 430              		.loc 1 97 3 is_stmt 1 view .LVU142
+ 431 0164 FFF7FEFF 		bl	tmcm_disableCsDragon
+ 432              	.LVL34:
+  99:hal/comm/SPI.c **** }
+ 433              		.loc 1 99 2 view .LVU143
+ 434              		.loc 1 100 1 is_stmt 0 view .LVU144
+ 435 0168 2046     		mov	r0, r4
+ 436 016a 70BD     		pop	{r4, r5, r6, pc}
+ 437              	.LVL35:
+ 438              	.L50:
+ 439              		.loc 1 100 1 view .LVU145
+ 440              		.align	2
+ 441              	.L49:
+ 442 016c 00380040 		.word	1073756160
+ 443              		.cfi_endproc
+ 444              	.LFE3:
+ 446              	.Letext0:
+ 447              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 448              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 449              		.file 4 "hal/comm/../../TMC-API/tmc/helpers/Types.h"
+ 450              		.file 5 "./cpu/STM32F103/stm32f10x_type.h"
+ 451              		.file 6 "./cpu/STM32F103/stm32f10x_map.h"
+ 452              		.file 7 "./cpu/STM32F103/stm32f10x_gpio.h"
+ 453              		.file 8 "./cpu/STM32F103/stm32f10x_spi.h"
+ 454              		.file 9 "hal/comm/../../Definitions.h"
+ 455              		.file 10 "./cpu/STM32F103/stm32f10x_rcc.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 SPI.c
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:24     .text:00000000 spi_init
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:153    .text:00000090 $d
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:158    .text:00000098 $t
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:165    .text:00000098 eeprom_spi_readWriteByte
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:250    .text:000000dc $d
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:254    .text:000000e0 $t
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:261    .text:000000e0 weasel_spi_readWriteByte
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:346    .text:00000124 $d
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:350    .text:00000128 $t
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:357    .text:00000128 dragon_spi_readWriteByte
+C:\Users\forre\AppData\Local\Temp\ccAhz9La.s:442    .text:0000016c $d
+
+UNDEFINED SYMBOLS
+RCC_APB1PeriphClockCmd
+RCC_APB2PeriphClockCmd
+GPIO_Init
+SPI_Init
+SPI_Cmd
+tmcm_enableCsMem
+SPI_I2S_GetFlagStatus
+SPI_I2S_SendData
+SPI_I2S_ReceiveData
+tmcm_disableCsMem
+tmcm_enableCsWeasel
+tmcm_disableCsWeasel
+tmcm_enableCsDragon
+tmcm_disableCsDragon

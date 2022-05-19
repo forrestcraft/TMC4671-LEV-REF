@@ -1,0 +1,270 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"Cpu.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	cpu_init
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	cpu_init:
+  25              	.LFB0:
+  26              		.file 1 "hal/system/Cpu.c"
+   1:hal/system/Cpu.c **** /*
+   2:hal/system/Cpu.c ****  * Cpu.c
+   3:hal/system/Cpu.c ****  *
+   4:hal/system/Cpu.c ****  *  Created on: 31.03.2019
+   5:hal/system/Cpu.c ****  *      Author: ED
+   6:hal/system/Cpu.c ****  */
+   7:hal/system/Cpu.c **** #include "Cpu.h"
+   8:hal/system/Cpu.c **** 
+   9:hal/system/Cpu.c **** void cpu_init()
+  10:hal/system/Cpu.c **** {
+  27              		.loc 1 10 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  11:hal/system/Cpu.c **** 	// configure system clock
+  12:hal/system/Cpu.c **** 	ErrorStatus HSEStartUpStatus;
+  31              		.loc 1 12 2 view .LVU1
+  13:hal/system/Cpu.c **** 
+  14:hal/system/Cpu.c **** 	/* RCC system reset(for debug purpose) */
+  15:hal/system/Cpu.c **** 	RCC_DeInit();
+  32              		.loc 1 15 2 view .LVU2
+  10:hal/system/Cpu.c **** 	// configure system clock
+  33              		.loc 1 10 1 is_stmt 0 view .LVU3
+  34 0000 10B5     		push	{r4, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 4, -8
+  38              		.cfi_offset 14, -4
+  39              		.loc 1 15 2 view .LVU4
+  40 0002 FFF7FEFF 		bl	RCC_DeInit
+  41              	.LVL0:
+  16:hal/system/Cpu.c **** 
+  17:hal/system/Cpu.c **** 	/* Enable HSE */
+  18:hal/system/Cpu.c **** 	RCC_HSEConfig(RCC_HSE_ON);
+  42              		.loc 1 18 2 is_stmt 1 view .LVU5
+  43 0006 4FF48030 		mov	r0, #65536
+  44 000a FFF7FEFF 		bl	RCC_HSEConfig
+  45              	.LVL1:
+  19:hal/system/Cpu.c **** 
+  20:hal/system/Cpu.c **** 	/* Wait till HSE is ready */
+  21:hal/system/Cpu.c **** 	HSEStartUpStatus = RCC_WaitForHSEStartUp();
+  46              		.loc 1 21 2 view .LVU6
+  47              		.loc 1 21 21 is_stmt 0 view .LVU7
+  48 000e FFF7FEFF 		bl	RCC_WaitForHSEStartUp
+  49              	.LVL2:
+  22:hal/system/Cpu.c **** 
+  23:hal/system/Cpu.c **** 	if(HSEStartUpStatus == SUCCESS)
+  50              		.loc 1 23 2 is_stmt 1 view .LVU8
+  51              		.loc 1 23 4 is_stmt 0 view .LVU9
+  52 0012 0128     		cmp	r0, #1
+  53 0014 0FD0     		beq	.L10
+  54              	.LVL3:
+  55              	.L2:
+  24:hal/system/Cpu.c **** 	{
+  25:hal/system/Cpu.c **** 		/* Enable Prefetch Buffer */
+  26:hal/system/Cpu.c **** 		FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
+  27:hal/system/Cpu.c **** 
+  28:hal/system/Cpu.c **** 		/* Flash 2 wait state */
+  29:hal/system/Cpu.c **** 		FLASH_SetLatency(FLASH_Latency_2);
+  30:hal/system/Cpu.c **** 
+  31:hal/system/Cpu.c **** 		/* HCLK = SYSCLK */
+  32:hal/system/Cpu.c **** 		RCC_HCLKConfig(RCC_SYSCLK_Div1);
+  33:hal/system/Cpu.c **** 
+  34:hal/system/Cpu.c **** 		/* PCLK2 = HCLK */
+  35:hal/system/Cpu.c **** 		RCC_PCLK2Config(RCC_HCLK_Div1);
+  36:hal/system/Cpu.c **** 
+  37:hal/system/Cpu.c **** 		/* PCLK1 = HCLK/2 */
+  38:hal/system/Cpu.c **** 		RCC_PCLK1Config(RCC_HCLK_Div2);
+  39:hal/system/Cpu.c **** 
+  40:hal/system/Cpu.c **** 	    /* PLLCLK = 16MHz / 2 * 9 = 72 MHz */
+  41:hal/system/Cpu.c **** 	    RCC_PLLConfig(RCC_PLLSource_HSE_Div2, RCC_PLLMul_9);
+  42:hal/system/Cpu.c **** 
+  43:hal/system/Cpu.c **** 		/* Enable PLL */
+  44:hal/system/Cpu.c **** 		RCC_PLLCmd(ENABLE);
+  45:hal/system/Cpu.c **** 
+  46:hal/system/Cpu.c **** 		/* Wait till PLL is ready */
+  47:hal/system/Cpu.c **** 		while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET) {}
+  48:hal/system/Cpu.c **** 
+  49:hal/system/Cpu.c **** 		/* Select PLL as system clock source */
+  50:hal/system/Cpu.c **** 		RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
+  51:hal/system/Cpu.c **** 
+  52:hal/system/Cpu.c **** 		/* Wait till PLL is used as system clock source */
+  53:hal/system/Cpu.c **** 		while(RCC_GetSYSCLKSource() != 0x08) {}
+  54:hal/system/Cpu.c **** 	}
+  55:hal/system/Cpu.c **** 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+  56              		.loc 1 55 2 is_stmt 1 view .LVU10
+  57 0016 0121     		movs	r1, #1
+  58 0018 0846     		mov	r0, r1
+  59 001a FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  60              	.LVL4:
+  56:hal/system/Cpu.c **** 
+  57:hal/system/Cpu.c **** 	// configure NVIC
+  58:hal/system/Cpu.c **** #ifdef  VECT_TAB_RAM
+  59:hal/system/Cpu.c **** 	/* Set the Vector Table base location at 0x20000000 */
+  60:hal/system/Cpu.c **** 	NVIC_SetVectorTable(NVIC_VectTab_RAM, 0x0);
+  61:hal/system/Cpu.c **** #else  /* VECT_TAB_FLASH  */
+  62:hal/system/Cpu.c **** 	#if defined(BOOTLOADER)
+  63:hal/system/Cpu.c **** 	//Set the vector table base location at 0x08004000 (right after the TMCM boot loader)
+  64:hal/system/Cpu.c **** 	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x4000);
+  65:hal/system/Cpu.c ****   	#else
+  66:hal/system/Cpu.c **** 	/* Set the Vector Table base location at 0x08000000 */
+  67:hal/system/Cpu.c **** 	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0);
+  61              		.loc 1 67 2 view .LVU11
+  62 001e 0021     		movs	r1, #0
+  63 0020 4FF00060 		mov	r0, #134217728
+  64 0024 FFF7FEFF 		bl	NVIC_SetVectorTable
+  65              	.LVL5:
+  68:hal/system/Cpu.c ****   	#endif
+  69:hal/system/Cpu.c **** #endif
+  70:hal/system/Cpu.c **** 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+  66              		.loc 1 70 2 view .LVU12
+  67 0028 4FF44070 		mov	r0, #768
+  68 002c FFF7FEFF 		bl	NVIC_PriorityGroupConfig
+  69              	.LVL6:
+  71:hal/system/Cpu.c **** 
+  72:hal/system/Cpu.c **** 	asm volatile("CPSID I\n");
+  70              		.loc 1 72 2 view .LVU13
+  71              		.syntax unified
+  72              	@ 72 "hal/system/Cpu.c" 1
+  73 0030 72B6     		CPSID I
+  74              	
+  75              	@ 0 "" 2
+  73:hal/system/Cpu.c **** 	asm volatile("CPSIE I\n");
+  76              		.loc 1 73 2 view .LVU14
+  77              	@ 73 "hal/system/Cpu.c" 1
+  78 0032 62B6     		CPSIE I
+  79              	
+  80              	@ 0 "" 2
+  74:hal/system/Cpu.c **** }
+  81              		.loc 1 74 1 is_stmt 0 view .LVU15
+  82              		.thumb
+  83              		.syntax unified
+  84 0034 10BD     		pop	{r4, pc}
+  85              	.LVL7:
+  86              	.L10:
+  87              		.loc 1 74 1 view .LVU16
+  88 0036 0446     		mov	r4, r0
+  26:hal/system/Cpu.c **** 
+  89              		.loc 1 26 3 is_stmt 1 view .LVU17
+  90 0038 1020     		movs	r0, #16
+  91              	.LVL8:
+  26:hal/system/Cpu.c **** 
+  92              		.loc 1 26 3 is_stmt 0 view .LVU18
+  93 003a FFF7FEFF 		bl	FLASH_PrefetchBufferCmd
+  94              	.LVL9:
+  29:hal/system/Cpu.c **** 
+  95              		.loc 1 29 3 is_stmt 1 view .LVU19
+  96 003e 0220     		movs	r0, #2
+  97 0040 FFF7FEFF 		bl	FLASH_SetLatency
+  98              	.LVL10:
+  32:hal/system/Cpu.c **** 
+  99              		.loc 1 32 3 view .LVU20
+ 100 0044 0020     		movs	r0, #0
+ 101 0046 FFF7FEFF 		bl	RCC_HCLKConfig
+ 102              	.LVL11:
+  35:hal/system/Cpu.c **** 
+ 103              		.loc 1 35 3 view .LVU21
+ 104 004a 0020     		movs	r0, #0
+ 105 004c FFF7FEFF 		bl	RCC_PCLK2Config
+ 106              	.LVL12:
+  38:hal/system/Cpu.c **** 
+ 107              		.loc 1 38 3 view .LVU22
+ 108 0050 4FF48060 		mov	r0, #1024
+ 109 0054 FFF7FEFF 		bl	RCC_PCLK1Config
+ 110              	.LVL13:
+  41:hal/system/Cpu.c **** 
+ 111              		.loc 1 41 6 view .LVU23
+ 112 0058 4FF44030 		mov	r0, #196608
+ 113 005c 4FF4E011 		mov	r1, #1835008
+ 114 0060 FFF7FEFF 		bl	RCC_PLLConfig
+ 115              	.LVL14:
+  44:hal/system/Cpu.c **** 
+ 116              		.loc 1 44 3 view .LVU24
+ 117 0064 2046     		mov	r0, r4
+ 118 0066 FFF7FEFF 		bl	RCC_PLLCmd
+ 119              	.LVL15:
+  47:hal/system/Cpu.c **** 
+ 120              		.loc 1 47 3 view .LVU25
+ 121              	.L3:
+  47:hal/system/Cpu.c **** 
+ 122              		.loc 1 47 55 discriminator 1 view .LVU26
+  47:hal/system/Cpu.c **** 
+ 123              		.loc 1 47 8 discriminator 1 view .LVU27
+  47:hal/system/Cpu.c **** 
+ 124              		.loc 1 47 9 is_stmt 0 discriminator 1 view .LVU28
+ 125 006a 3920     		movs	r0, #57
+ 126 006c FFF7FEFF 		bl	RCC_GetFlagStatus
+ 127              	.LVL16:
+  47:hal/system/Cpu.c **** 
+ 128              		.loc 1 47 8 discriminator 1 view .LVU29
+ 129 0070 0028     		cmp	r0, #0
+ 130 0072 FAD0     		beq	.L3
+  50:hal/system/Cpu.c **** 
+ 131              		.loc 1 50 3 is_stmt 1 view .LVU30
+ 132 0074 0220     		movs	r0, #2
+ 133 0076 FFF7FEFF 		bl	RCC_SYSCLKConfig
+ 134              	.LVL17:
+  53:hal/system/Cpu.c **** 	}
+ 135              		.loc 1 53 3 view .LVU31
+ 136              	.L4:
+  53:hal/system/Cpu.c **** 	}
+ 137              		.loc 1 53 41 discriminator 1 view .LVU32
+  53:hal/system/Cpu.c **** 	}
+ 138              		.loc 1 53 8 discriminator 1 view .LVU33
+  53:hal/system/Cpu.c **** 	}
+ 139              		.loc 1 53 9 is_stmt 0 discriminator 1 view .LVU34
+ 140 007a FFF7FEFF 		bl	RCC_GetSYSCLKSource
+ 141              	.LVL18:
+  53:hal/system/Cpu.c **** 	}
+ 142              		.loc 1 53 8 discriminator 1 view .LVU35
+ 143 007e 0828     		cmp	r0, #8
+ 144 0080 FBD1     		bne	.L4
+ 145 0082 C8E7     		b	.L2
+ 146              		.cfi_endproc
+ 147              	.LFE0:
+ 149              	.Letext0:
+ 150              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 151              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 152              		.file 4 "hal/system/../../TMC-API/tmc/helpers/Types.h"
+ 153              		.file 5 "./cpu/STM32F103/stm32f10x_type.h"
+ 154              		.file 6 "./cpu/STM32F103/stm32f10x_rcc.h"
+ 155              		.file 7 "./cpu/STM32F103/stm32f10x_nvic.h"
+ 156              		.file 8 "./cpu/STM32F103/stm32f10x_flash.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 Cpu.c
+C:\Users\forre\AppData\Local\Temp\cckUUn0c.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\cckUUn0c.s:24     .text:00000000 cpu_init
+
+UNDEFINED SYMBOLS
+RCC_DeInit
+RCC_HSEConfig
+RCC_WaitForHSEStartUp
+RCC_APB2PeriphClockCmd
+NVIC_SetVectorTable
+NVIC_PriorityGroupConfig
+FLASH_PrefetchBufferCmd
+FLASH_SetLatency
+RCC_HCLKConfig
+RCC_PCLK2Config
+RCC_PCLK1Config
+RCC_PLLConfig
+RCC_PLLCmd
+RCC_GetFlagStatus
+RCC_SYSCLKConfig
+RCC_GetSYSCLKSource

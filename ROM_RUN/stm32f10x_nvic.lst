@@ -1,0 +1,2356 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"stm32f10x_nvic.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	NVIC_DeInit
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	NVIC_DeInit:
+  25              	.LFB0:
+  26              		.file 1 "cpu/STM32F103/stm32f10x_nvic.c"
+   1:cpu/STM32F103/stm32f10x_nvic.c **** /******************** (C) COPYRIGHT 2008 STMicroelectronics ********************
+   2:cpu/STM32F103/stm32f10x_nvic.c **** * File Name          : stm32f10x_nvic.c
+   3:cpu/STM32F103/stm32f10x_nvic.c **** * Author             : MCD Application Team
+   4:cpu/STM32F103/stm32f10x_nvic.c **** * Version            : V2.0
+   5:cpu/STM32F103/stm32f10x_nvic.c **** * Date               : 05/23/2008
+   6:cpu/STM32F103/stm32f10x_nvic.c **** * Description        : This file provides all the NVIC firmware functions.
+   7:cpu/STM32F103/stm32f10x_nvic.c **** ********************************************************************************
+   8:cpu/STM32F103/stm32f10x_nvic.c **** * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+   9:cpu/STM32F103/stm32f10x_nvic.c **** * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
+  10:cpu/STM32F103/stm32f10x_nvic.c **** * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
+  11:cpu/STM32F103/stm32f10x_nvic.c **** * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
+  12:cpu/STM32F103/stm32f10x_nvic.c **** * CONTENT OF SUCH SOFTWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
+  13:cpu/STM32F103/stm32f10x_nvic.c **** * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  14:cpu/STM32F103/stm32f10x_nvic.c **** * FOR MORE INFORMATION PLEASE CAREFULLY READ THE LICENSE AGREEMENT FILE LOCATED 
+  15:cpu/STM32F103/stm32f10x_nvic.c **** * IN THE ROOT DIRECTORY OF THIS FIRMWARE PACKAGE.
+  16:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+  17:cpu/STM32F103/stm32f10x_nvic.c **** 
+  18:cpu/STM32F103/stm32f10x_nvic.c **** /* Includes ------------------------------------------------------------------*/
+  19:cpu/STM32F103/stm32f10x_nvic.c **** #include "stm32f10x_nvic.h"
+  20:cpu/STM32F103/stm32f10x_nvic.c **** 
+  21:cpu/STM32F103/stm32f10x_nvic.c **** /* Private typedef -----------------------------------------------------------*/
+  22:cpu/STM32F103/stm32f10x_nvic.c **** /* Private define ------------------------------------------------------------*/
+  23:cpu/STM32F103/stm32f10x_nvic.c **** #define AIRCR_VECTKEY_MASK    ((u32)0x05FA0000)
+  24:cpu/STM32F103/stm32f10x_nvic.c **** 
+  25:cpu/STM32F103/stm32f10x_nvic.c **** /* Private macro -------------------------------------------------------------*/
+  26:cpu/STM32F103/stm32f10x_nvic.c **** /* Private variables ---------------------------------------------------------*/
+  27:cpu/STM32F103/stm32f10x_nvic.c **** /* Private function prototypes -----------------------------------------------*/
+  28:cpu/STM32F103/stm32f10x_nvic.c **** /* Private functions ---------------------------------------------------------*/
+  29:cpu/STM32F103/stm32f10x_nvic.c **** 
+  30:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+  31:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_DeInit
+  32:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Deinitializes the NVIC peripheral registers to their default
+  33:cpu/STM32F103/stm32f10x_nvic.c **** *                  reset values.
+  34:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+  35:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+  36:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+  37:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+  38:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_DeInit(void)
+  39:cpu/STM32F103/stm32f10x_nvic.c **** {
+  27              		.loc 1 39 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  40:cpu/STM32F103/stm32f10x_nvic.c ****   u32 index = 0;
+  32              		.loc 1 40 3 view .LVU1
+  33              	.LVL0:
+  41:cpu/STM32F103/stm32f10x_nvic.c ****   
+  42:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICER[0] = 0xFFFFFFFF;
+  34              		.loc 1 42 3 view .LVU2
+  43:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICER[1] = 0x0FFFFFFF;
+  44:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICPR[0] = 0xFFFFFFFF;
+  45:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICPR[1] = 0x0FFFFFFF;
+  46:cpu/STM32F103/stm32f10x_nvic.c ****   
+  47:cpu/STM32F103/stm32f10x_nvic.c ****   for(index = 0; index < 0x0F; index++)
+  35              		.loc 1 47 13 is_stmt 0 view .LVU3
+  36 0000 0023     		movs	r3, #0
+  39:cpu/STM32F103/stm32f10x_nvic.c ****   u32 index = 0;
+  37              		.loc 1 39 1 view .LVU4
+  38 0002 10B4     		push	{r4}
+  39              	.LCFI0:
+  40              		.cfi_def_cfa_offset 4
+  41              		.cfi_offset 4, -4
+  43:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICER[1] = 0x0FFFFFFF;
+  42              		.loc 1 43 17 view .LVU5
+  43 0004 6FF07042 		mvn	r2, #-268435456
+  42:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICER[1] = 0x0FFFFFFF;
+  44              		.loc 1 42 17 view .LVU6
+  45 0008 4FF0FF34 		mov	r4, #-1
+  48:cpu/STM32F103/stm32f10x_nvic.c ****   {
+  49:cpu/STM32F103/stm32f10x_nvic.c ****      NVIC->IPR[index] = 0x00000000;
+  46              		.loc 1 49 23 view .LVU7
+  47 000c 1846     		mov	r0, r3
+  42:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICER[1] = 0x0FFFFFFF;
+  48              		.loc 1 42 17 view .LVU8
+  49 000e 0949     		ldr	r1, .L6
+  50 0010 C1F88040 		str	r4, [r1, #128]
+  43:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICPR[0] = 0xFFFFFFFF;
+  51              		.loc 1 43 3 is_stmt 1 view .LVU9
+  43:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICPR[0] = 0xFFFFFFFF;
+  52              		.loc 1 43 17 is_stmt 0 view .LVU10
+  53 0014 C1F88420 		str	r2, [r1, #132]
+  44:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICPR[1] = 0x0FFFFFFF;
+  54              		.loc 1 44 3 is_stmt 1 view .LVU11
+  44:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICPR[1] = 0x0FFFFFFF;
+  55              		.loc 1 44 17 is_stmt 0 view .LVU12
+  56 0018 C1F88041 		str	r4, [r1, #384]
+  45:cpu/STM32F103/stm32f10x_nvic.c ****   
+  57              		.loc 1 45 3 is_stmt 1 view .LVU13
+  45:cpu/STM32F103/stm32f10x_nvic.c ****   
+  58              		.loc 1 45 17 is_stmt 0 view .LVU14
+  59 001c C1F88421 		str	r2, [r1, #388]
+  47:cpu/STM32F103/stm32f10x_nvic.c ****   {
+  60              		.loc 1 47 3 is_stmt 1 view .LVU15
+  47:cpu/STM32F103/stm32f10x_nvic.c ****   {
+  61              		.loc 1 47 18 view .LVU16
+  62              	.LVL1:
+  63              	.L2:
+  64              		.loc 1 49 6 discriminator 3 view .LVU17
+  65              		.loc 1 49 23 is_stmt 0 discriminator 3 view .LVU18
+  66 0020 03F1C002 		add	r2, r3, #192
+  47:cpu/STM32F103/stm32f10x_nvic.c ****   {
+  67              		.loc 1 47 37 discriminator 3 view .LVU19
+  68 0024 0133     		adds	r3, r3, #1
+  69              	.LVL2:
+  47:cpu/STM32F103/stm32f10x_nvic.c ****   {
+  70              		.loc 1 47 3 discriminator 3 view .LVU20
+  71 0026 0F2B     		cmp	r3, #15
+  72              		.loc 1 49 23 discriminator 3 view .LVU21
+  73 0028 41F82200 		str	r0, [r1, r2, lsl #2]
+  47:cpu/STM32F103/stm32f10x_nvic.c ****   {
+  74              		.loc 1 47 32 is_stmt 1 discriminator 3 view .LVU22
+  75              	.LVL3:
+  47:cpu/STM32F103/stm32f10x_nvic.c ****   {
+  76              		.loc 1 47 18 discriminator 3 view .LVU23
+  47:cpu/STM32F103/stm32f10x_nvic.c ****   {
+  77              		.loc 1 47 3 is_stmt 0 discriminator 3 view .LVU24
+  78 002c F8D1     		bne	.L2
+  50:cpu/STM32F103/stm32f10x_nvic.c ****   } 
+  51:cpu/STM32F103/stm32f10x_nvic.c **** }
+  79              		.loc 1 51 1 view .LVU25
+  80 002e 10BC     		pop	{r4}
+  81              	.LCFI1:
+  82              		.cfi_restore 4
+  83              		.cfi_def_cfa_offset 0
+  84 0030 7047     		bx	lr
+  85              	.L7:
+  86 0032 00BF     		.align	2
+  87              	.L6:
+  88 0034 00E100E0 		.word	-536813312
+  89              		.cfi_endproc
+  90              	.LFE0:
+  92              		.align	1
+  93              		.p2align 2,,3
+  94              		.global	NVIC_SCBDeInit
+  95              		.syntax unified
+  96              		.thumb
+  97              		.thumb_func
+  99              	NVIC_SCBDeInit:
+ 100              	.LFB1:
+  52:cpu/STM32F103/stm32f10x_nvic.c **** 
+  53:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+  54:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_SCBDeInit
+  55:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Deinitializes the SCB peripheral registers to their default 
+  56:cpu/STM32F103/stm32f10x_nvic.c **** *                  reset values.
+  57:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+  58:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+  59:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+  60:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+  61:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_SCBDeInit(void)
+  62:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 101              		.loc 1 62 1 is_stmt 1 view -0
+ 102              		.cfi_startproc
+ 103              		@ args = 0, pretend = 0, frame = 0
+ 104              		@ frame_needed = 0, uses_anonymous_args = 0
+ 105              		@ link register save eliminated.
+  63:cpu/STM32F103/stm32f10x_nvic.c ****   u32 index = 0x00;
+ 106              		.loc 1 63 3 view .LVU27
+ 107              	.LVL4:
+  64:cpu/STM32F103/stm32f10x_nvic.c ****   
+  65:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->ICSR = 0x0A000000;
+ 108              		.loc 1 65 3 view .LVU28
+  62:cpu/STM32F103/stm32f10x_nvic.c ****   u32 index = 0x00;
+ 109              		.loc 1 62 1 is_stmt 0 view .LVU29
+ 110 0038 10B4     		push	{r4}
+ 111              	.LCFI2:
+ 112              		.cfi_def_cfa_offset 4
+ 113              		.cfi_offset 4, -4
+  66:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->VTOR = 0x00000000;
+ 114              		.loc 1 66 13 view .LVU30
+ 115 003a 0022     		movs	r2, #0
+  67:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->AIRCR = AIRCR_VECTKEY_MASK;
+  68:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->SCR = 0x00000000;
+  69:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->CCR = 0x00000000;
+  70:cpu/STM32F103/stm32f10x_nvic.c ****   for(index = 0; index < 0x03; index++)
+  71:cpu/STM32F103/stm32f10x_nvic.c ****   {
+  72:cpu/STM32F103/stm32f10x_nvic.c ****      SCB->SHPR[index] = 0;
+  73:cpu/STM32F103/stm32f10x_nvic.c ****   }
+  74:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->SHCSR = 0x00000000;
+  75:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->CFSR = 0xFFFFFFFF;
+ 116              		.loc 1 75 13 view .LVU31
+ 117 003c 4FF0FF31 		mov	r1, #-1
+  65:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->VTOR = 0x00000000;
+ 118              		.loc 1 65 13 view .LVU32
+ 119 0040 4FF02064 		mov	r4, #167772160
+ 120 0044 074B     		ldr	r3, .L10
+  67:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->AIRCR = AIRCR_VECTKEY_MASK;
+ 121              		.loc 1 67 14 view .LVU33
+ 122 0046 0848     		ldr	r0, .L10+4
+  65:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->VTOR = 0x00000000;
+ 123              		.loc 1 65 13 view .LVU34
+ 124 0048 5C60     		str	r4, [r3, #4]
+  66:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->VTOR = 0x00000000;
+ 125              		.loc 1 66 3 is_stmt 1 view .LVU35
+  66:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->VTOR = 0x00000000;
+ 126              		.loc 1 66 13 is_stmt 0 view .LVU36
+ 127 004a 9A60     		str	r2, [r3, #8]
+  67:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->AIRCR = AIRCR_VECTKEY_MASK;
+ 128              		.loc 1 67 3 is_stmt 1 view .LVU37
+  76:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->HFSR = 0xFFFFFFFF;
+  77:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->DFSR = 0xFFFFFFFF;
+  78:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 129              		.loc 1 78 1 is_stmt 0 view .LVU38
+ 130 004c 10BC     		pop	{r4}
+ 131              	.LCFI3:
+ 132              		.cfi_restore 4
+ 133              		.cfi_def_cfa_offset 0
+  67:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->SCR = 0x00000000;
+ 134              		.loc 1 67 14 view .LVU39
+ 135 004e D860     		str	r0, [r3, #12]
+  68:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->CCR = 0x00000000;
+ 136              		.loc 1 68 3 is_stmt 1 view .LVU40
+  68:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->CCR = 0x00000000;
+ 137              		.loc 1 68 12 is_stmt 0 view .LVU41
+ 138 0050 1A61     		str	r2, [r3, #16]
+  69:cpu/STM32F103/stm32f10x_nvic.c ****   for(index = 0; index < 0x03; index++)
+ 139              		.loc 1 69 3 is_stmt 1 view .LVU42
+  69:cpu/STM32F103/stm32f10x_nvic.c ****   for(index = 0; index < 0x03; index++)
+ 140              		.loc 1 69 12 is_stmt 0 view .LVU43
+ 141 0052 5A61     		str	r2, [r3, #20]
+  70:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 142              		.loc 1 70 3 is_stmt 1 view .LVU44
+  70:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 143              		.loc 1 70 18 view .LVU45
+  72:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 144              		.loc 1 72 6 view .LVU46
+  72:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 145              		.loc 1 72 23 is_stmt 0 view .LVU47
+ 146 0054 9A61     		str	r2, [r3, #24]
+  70:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 147              		.loc 1 70 32 is_stmt 1 view .LVU48
+ 148              	.LVL5:
+  70:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 149              		.loc 1 70 18 view .LVU49
+  72:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 150              		.loc 1 72 6 view .LVU50
+  72:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 151              		.loc 1 72 23 is_stmt 0 view .LVU51
+ 152 0056 DA61     		str	r2, [r3, #28]
+  70:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 153              		.loc 1 70 32 is_stmt 1 view .LVU52
+ 154              	.LVL6:
+  70:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 155              		.loc 1 70 18 view .LVU53
+  72:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 156              		.loc 1 72 6 view .LVU54
+  72:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 157              		.loc 1 72 23 is_stmt 0 view .LVU55
+ 158 0058 1A62     		str	r2, [r3, #32]
+  70:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 159              		.loc 1 70 32 is_stmt 1 view .LVU56
+ 160              	.LVL7:
+  70:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 161              		.loc 1 70 18 view .LVU57
+  74:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->CFSR = 0xFFFFFFFF;
+ 162              		.loc 1 74 3 view .LVU58
+  74:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->CFSR = 0xFFFFFFFF;
+ 163              		.loc 1 74 14 is_stmt 0 view .LVU59
+ 164 005a 5A62     		str	r2, [r3, #36]
+  75:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->HFSR = 0xFFFFFFFF;
+ 165              		.loc 1 75 3 is_stmt 1 view .LVU60
+  75:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->HFSR = 0xFFFFFFFF;
+ 166              		.loc 1 75 13 is_stmt 0 view .LVU61
+ 167 005c 9962     		str	r1, [r3, #40]
+  76:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->DFSR = 0xFFFFFFFF;
+ 168              		.loc 1 76 3 is_stmt 1 view .LVU62
+  76:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->DFSR = 0xFFFFFFFF;
+ 169              		.loc 1 76 13 is_stmt 0 view .LVU63
+ 170 005e D962     		str	r1, [r3, #44]
+  77:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 171              		.loc 1 77 3 is_stmt 1 view .LVU64
+  77:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 172              		.loc 1 77 13 is_stmt 0 view .LVU65
+ 173 0060 1963     		str	r1, [r3, #48]
+ 174              		.loc 1 78 1 view .LVU66
+ 175 0062 7047     		bx	lr
+ 176              	.L11:
+ 177              		.align	2
+ 178              	.L10:
+ 179 0064 00ED00E0 		.word	-536810240
+ 180 0068 0000FA05 		.word	100270080
+ 181              		.cfi_endproc
+ 182              	.LFE1:
+ 184              		.align	1
+ 185              		.p2align 2,,3
+ 186              		.global	NVIC_PriorityGroupConfig
+ 187              		.syntax unified
+ 188              		.thumb
+ 189              		.thumb_func
+ 191              	NVIC_PriorityGroupConfig:
+ 192              	.LVL8:
+ 193              	.LFB2:
+  79:cpu/STM32F103/stm32f10x_nvic.c **** 
+  80:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+  81:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_PriorityGroupConfig
+  82:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Configures the priority grouping: pre-emption priority
+  83:cpu/STM32F103/stm32f10x_nvic.c **** *                  and subpriority.
+  84:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - NVIC_PriorityGroup: specifies the priority grouping bits
+  85:cpu/STM32F103/stm32f10x_nvic.c **** *                    length. This parameter can be one of the following values:
+  86:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_PriorityGroup_0: 0 bits for pre-emption priority
+  87:cpu/STM32F103/stm32f10x_nvic.c **** *                         4 bits for subpriority
+  88:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_PriorityGroup_1: 1 bits for pre-emption priority
+  89:cpu/STM32F103/stm32f10x_nvic.c **** *                         3 bits for subpriority
+  90:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_PriorityGroup_2: 2 bits for pre-emption priority
+  91:cpu/STM32F103/stm32f10x_nvic.c **** *                         2 bits for subpriority
+  92:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_PriorityGroup_3: 3 bits for pre-emption priority
+  93:cpu/STM32F103/stm32f10x_nvic.c **** *                         1 bits for subpriority
+  94:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_PriorityGroup_4: 4 bits for pre-emption priority
+  95:cpu/STM32F103/stm32f10x_nvic.c **** *                         0 bits for subpriority
+  96:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+  97:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+  98:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+  99:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_PriorityGroupConfig(u32 NVIC_PriorityGroup)
+ 100:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 194              		.loc 1 100 1 is_stmt 1 view -0
+ 195              		.cfi_startproc
+ 196              		@ args = 0, pretend = 0, frame = 0
+ 197              		@ frame_needed = 0, uses_anonymous_args = 0
+ 198              		@ link register save eliminated.
+ 101:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 102:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_PRIORITY_GROUP(NVIC_PriorityGroup));
+ 199              		.loc 1 102 3 view .LVU68
+ 103:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 104:cpu/STM32F103/stm32f10x_nvic.c ****   /* Set the PRIGROUP[10:8] bits according to NVIC_PriorityGroup value */
+ 105:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->AIRCR = AIRCR_VECTKEY_MASK | NVIC_PriorityGroup;
+ 200              		.loc 1 105 3 view .LVU69
+ 201              		.loc 1 105 14 is_stmt 0 view .LVU70
+ 202 006c 034B     		ldr	r3, .L13
+ 203              		.loc 1 105 35 view .LVU71
+ 204 006e 40F0BF60 		orr	r0, r0, #100139008
+ 205              	.LVL9:
+ 206              		.loc 1 105 35 view .LVU72
+ 207 0072 40F40030 		orr	r0, r0, #131072
+ 208              		.loc 1 105 14 view .LVU73
+ 209 0076 D860     		str	r0, [r3, #12]
+ 106:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 210              		.loc 1 106 1 view .LVU74
+ 211 0078 7047     		bx	lr
+ 212              	.L14:
+ 213 007a 00BF     		.align	2
+ 214              	.L13:
+ 215 007c 00ED00E0 		.word	-536810240
+ 216              		.cfi_endproc
+ 217              	.LFE2:
+ 219              		.align	1
+ 220              		.p2align 2,,3
+ 221              		.global	NVIC_Init
+ 222              		.syntax unified
+ 223              		.thumb
+ 224              		.thumb_func
+ 226              	NVIC_Init:
+ 227              	.LVL10:
+ 228              	.LFB3:
+ 107:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 108:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 109:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_Init
+ 110:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Initializes the NVIC peripheral according to the specified
+ 111:cpu/STM32F103/stm32f10x_nvic.c **** *                  parameters in the NVIC_InitStruct.
+ 112:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - NVIC_InitStruct: pointer to a NVIC_InitTypeDef structure
+ 113:cpu/STM32F103/stm32f10x_nvic.c **** *                    that contains the configuration information for the
+ 114:cpu/STM32F103/stm32f10x_nvic.c **** *                    specified NVIC peripheral.
+ 115:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 116:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 117:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 118:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_Init(NVIC_InitTypeDef* NVIC_InitStruct)
+ 119:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 229              		.loc 1 119 1 is_stmt 1 view -0
+ 230              		.cfi_startproc
+ 231              		@ args = 0, pretend = 0, frame = 0
+ 232              		@ frame_needed = 0, uses_anonymous_args = 0
+ 120:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmppriority = 0x00, tmpreg = 0x00, tmpmask = 0x00;
+ 233              		.loc 1 120 3 view .LVU76
+ 121:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmppre = 0, tmpsub = 0x0F;
+ 234              		.loc 1 121 3 view .LVU77
+ 122:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 123:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 124:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_FUNCTIONAL_STATE(NVIC_InitStruct->NVIC_IRQChannelCmd));
+ 235              		.loc 1 124 3 view .LVU78
+ 125:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_IRQ_CHANNEL(NVIC_InitStruct->NVIC_IRQChannel));
+ 236              		.loc 1 125 3 view .LVU79
+ 126:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_PREEMPTION_PRIORITY(NVIC_InitStruct->NVIC_IRQChannelPreemptionPriority));  
+ 237              		.loc 1 126 3 view .LVU80
+ 127:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_SUB_PRIORITY(NVIC_InitStruct->NVIC_IRQChannelSubPriority));
+ 238              		.loc 1 127 3 view .LVU81
+ 128:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 129:cpu/STM32F103/stm32f10x_nvic.c ****   if (NVIC_InitStruct->NVIC_IRQChannelCmd != DISABLE)
+ 239              		.loc 1 129 3 view .LVU82
+ 240              		.loc 1 129 6 is_stmt 0 view .LVU83
+ 241 0080 C378     		ldrb	r3, [r0, #3]	@ zero_extendqisi2
+ 242 0082 C3B3     		cbz	r3, .L16
+ 130:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 131:cpu/STM32F103/stm32f10x_nvic.c ****     /* Compute the Corresponding IRQ Priority --------------------------------*/    
+ 132:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority = (0x700 - (SCB->AIRCR & (u32)0x700))>> 0x08;
+ 243              		.loc 1 132 5 is_stmt 1 view .LVU84
+ 244              		.loc 1 132 32 is_stmt 0 view .LVU85
+ 245 0084 224A     		ldr	r2, .L22
+ 119:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmppriority = 0x00, tmpreg = 0x00, tmpmask = 0x00;
+ 246              		.loc 1 119 1 view .LVU86
+ 247 0086 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 248              	.LCFI4:
+ 249              		.cfi_def_cfa_offset 28
+ 250              		.cfi_offset 4, -28
+ 251              		.cfi_offset 5, -24
+ 252              		.cfi_offset 6, -20
+ 253              		.cfi_offset 7, -16
+ 254              		.cfi_offset 8, -12
+ 255              		.cfi_offset 9, -8
+ 256              		.cfi_offset 14, -4
+ 257              		.loc 1 132 32 view .LVU87
+ 258 008a D268     		ldr	r2, [r2, #12]
+ 133:cpu/STM32F103/stm32f10x_nvic.c ****     tmppre = (0x4 - tmppriority);
+ 134:cpu/STM32F103/stm32f10x_nvic.c ****     tmpsub = tmpsub >> tmppriority;
+ 135:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 136:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority = (u32)NVIC_InitStruct->NVIC_IRQChannelPreemptionPriority << tmppre;
+ 137:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority |=  NVIC_InitStruct->NVIC_IRQChannelSubPriority & tmpsub;
+ 138:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 139:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority = tmppriority << 0x04;
+ 140:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority = ((u32)tmppriority) << ((NVIC_InitStruct->NVIC_IRQChannel & (u8)0x03) * 0x08);
+ 141:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 142:cpu/STM32F103/stm32f10x_nvic.c ****     tmpreg = NVIC->IPR[(NVIC_InitStruct->NVIC_IRQChannel >> 0x02)];
+ 143:cpu/STM32F103/stm32f10x_nvic.c ****     tmpmask = (u32)0xFF << ((NVIC_InitStruct->NVIC_IRQChannel & (u8)0x03) * 0x08);
+ 144:cpu/STM32F103/stm32f10x_nvic.c ****     tmpreg &= ~tmpmask;
+ 145:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority &= tmpmask;  
+ 146:cpu/STM32F103/stm32f10x_nvic.c ****     tmpreg |= tmppriority;
+ 147:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 148:cpu/STM32F103/stm32f10x_nvic.c ****     NVIC->IPR[(NVIC_InitStruct->NVIC_IRQChannel >> 0x02)] = tmpreg;
+ 149:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 150:cpu/STM32F103/stm32f10x_nvic.c ****     /* Enable the Selected IRQ Channels --------------------------------------*/
+ 151:cpu/STM32F103/stm32f10x_nvic.c ****     NVIC->ISER[(NVIC_InitStruct->NVIC_IRQChannel >> 0x05)] =
+ 152:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 259              		.loc 1 152 17 view .LVU88
+ 260 008c 4FF00109 		mov	r9, #1
+ 132:cpu/STM32F103/stm32f10x_nvic.c ****     tmppre = (0x4 - tmppriority);
+ 261              		.loc 1 132 26 view .LVU89
+ 262 0090 6FEA020C 		mvn	ip, r2
+ 134:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 263              		.loc 1 134 12 view .LVU90
+ 264 0094 0F23     		movs	r3, #15
+ 143:cpu/STM32F103/stm32f10x_nvic.c ****     tmpreg &= ~tmpmask;
+ 265              		.loc 1 143 13 view .LVU91
+ 266 0096 FF27     		movs	r7, #255
+ 140:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 267              		.loc 1 140 58 view .LVU92
+ 268 0098 0178     		ldrb	r1, [r0]	@ zero_extendqisi2
+ 136:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority |=  NVIC_InitStruct->NVIC_IRQChannelSubPriority & tmpsub;
+ 269              		.loc 1 136 19 view .LVU93
+ 270 009a 90F80180 		ldrb	r8, [r0, #1]	@ zero_extendqisi2
+ 137:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 271              		.loc 1 137 36 view .LVU94
+ 272 009e 8278     		ldrb	r2, [r0, #2]	@ zero_extendqisi2
+ 273              		.loc 1 152 54 view .LVU95
+ 274 00a0 01F01F04 		and	r4, r1, #31
+ 132:cpu/STM32F103/stm32f10x_nvic.c ****     tmppre = (0x4 - tmppriority);
+ 275              		.loc 1 132 17 view .LVU96
+ 276 00a4 CCF3022C 		ubfx	ip, ip, #8, #3
+ 277              	.LVL11:
+ 133:cpu/STM32F103/stm32f10x_nvic.c ****     tmpsub = tmpsub >> tmppriority;
+ 278              		.loc 1 133 5 is_stmt 1 view .LVU97
+ 279 00a8 01F0FC00 		and	r0, r1, #252
+ 280              	.LVL12:
+ 281              		.loc 1 152 17 is_stmt 0 view .LVU98
+ 282 00ac 09FA04F4 		lsl	r4, r9, r4
+ 134:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 283              		.loc 1 134 12 view .LVU99
+ 284 00b0 23FA0CF3 		lsr	r3, r3, ip
+ 133:cpu/STM32F103/stm32f10x_nvic.c ****     tmpsub = tmpsub >> tmppriority;
+ 285              		.loc 1 133 12 view .LVU100
+ 286 00b4 CCF10409 		rsb	r9, ip, #4
+ 287              	.LVL13:
+ 134:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 288              		.loc 1 134 5 is_stmt 1 view .LVU101
+ 136:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority |=  NVIC_InitStruct->NVIC_IRQChannelSubPriority & tmpsub;
+ 289              		.loc 1 136 5 view .LVU102
+ 290 00b8 00F16040 		add	r0, r0, #-536870912
+ 136:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority |=  NVIC_InitStruct->NVIC_IRQChannelSubPriority & tmpsub;
+ 291              		.loc 1 136 17 is_stmt 0 view .LVU103
+ 292 00bc 08FA09F8 		lsl	r8, r8, r9
+ 293              	.LVL14:
+ 137:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 294              		.loc 1 137 5 is_stmt 1 view .LVU104
+ 137:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 295              		.loc 1 137 65 is_stmt 0 view .LVU105
+ 296 00c0 1340     		ands	r3, r3, r2
+ 297              	.LVL15:
+ 137:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 298              		.loc 1 137 65 view .LVU106
+ 299 00c2 00F56140 		add	r0, r0, #57600
+ 140:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 300              		.loc 1 140 76 view .LVU107
+ 301 00c6 01F0030E 		and	lr, r1, #3
+ 137:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 302              		.loc 1 137 17 view .LVU108
+ 303 00ca 43EA0803 		orr	r3, r3, r8
+ 304              	.LVL16:
+ 139:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority = ((u32)tmppriority) << ((NVIC_InitStruct->NVIC_IRQChannel & (u8)0x03) * 0x08);
+ 305              		.loc 1 139 5 is_stmt 1 view .LVU109
+ 142:cpu/STM32F103/stm32f10x_nvic.c ****     tmpmask = (u32)0xFF << ((NVIC_InitStruct->NVIC_IRQChannel & (u8)0x03) * 0x08);
+ 306              		.loc 1 142 12 is_stmt 0 view .LVU110
+ 307 00ce D0F80063 		ldr	r6, [r0, #768]
+ 308              	.LVL17:
+ 140:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 309              		.loc 1 140 88 view .LVU111
+ 310 00d2 4FEACE0E 		lsl	lr, lr, #3
+ 139:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority = ((u32)tmppriority) << ((NVIC_InitStruct->NVIC_IRQChannel & (u8)0x03) * 0x08);
+ 311              		.loc 1 139 17 view .LVU112
+ 312 00d6 1B01     		lsls	r3, r3, #4
+ 313              	.LVL18:
+ 140:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 314              		.loc 1 140 5 is_stmt 1 view .LVU113
+ 142:cpu/STM32F103/stm32f10x_nvic.c ****     tmpmask = (u32)0xFF << ((NVIC_InitStruct->NVIC_IRQChannel & (u8)0x03) * 0x08);
+ 315              		.loc 1 142 5 view .LVU114
+ 143:cpu/STM32F103/stm32f10x_nvic.c ****     tmpreg &= ~tmpmask;
+ 316              		.loc 1 143 5 view .LVU115
+ 144:cpu/STM32F103/stm32f10x_nvic.c ****     tmppriority &= tmpmask;  
+ 317              		.loc 1 144 5 view .LVU116
+ 145:cpu/STM32F103/stm32f10x_nvic.c ****     tmpreg |= tmppriority;
+ 318              		.loc 1 145 5 view .LVU117
+ 146:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 319              		.loc 1 146 5 view .LVU118
+ 140:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 320              		.loc 1 140 17 is_stmt 0 view .LVU119
+ 321 00d8 03FA0EF3 		lsl	r3, r3, lr
+ 322              	.LVL19:
+ 143:cpu/STM32F103/stm32f10x_nvic.c ****     tmpreg &= ~tmpmask;
+ 323              		.loc 1 143 13 view .LVU120
+ 324 00dc 07FA0EF7 		lsl	r7, r7, lr
+ 325              	.LVL20:
+ 143:cpu/STM32F103/stm32f10x_nvic.c ****     tmpreg &= ~tmpmask;
+ 326              		.loc 1 143 13 view .LVU121
+ 327 00e0 7340     		eors	r3, r3, r6
+ 151:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 328              		.loc 1 151 60 view .LVU122
+ 329 00e2 0C4D     		ldr	r5, .L22+4
+ 330 00e4 3B40     		ands	r3, r3, r7
+ 151:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 331              		.loc 1 151 50 view .LVU123
+ 332 00e6 4909     		lsrs	r1, r1, #5
+ 146:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 333              		.loc 1 146 12 view .LVU124
+ 334 00e8 7340     		eors	r3, r3, r6
+ 335              	.LVL21:
+ 148:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 336              		.loc 1 148 5 is_stmt 1 view .LVU125
+ 148:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 337              		.loc 1 148 59 is_stmt 0 view .LVU126
+ 338 00ea C0F80033 		str	r3, [r0, #768]
+ 151:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 339              		.loc 1 151 5 is_stmt 1 view .LVU127
+ 151:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 340              		.loc 1 151 60 is_stmt 0 view .LVU128
+ 341 00ee 45F82140 		str	r4, [r5, r1, lsl #2]
+ 153:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 154:cpu/STM32F103/stm32f10x_nvic.c ****   else
+ 155:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 156:cpu/STM32F103/stm32f10x_nvic.c ****     /* Disable the Selected IRQ Channels -------------------------------------*/
+ 157:cpu/STM32F103/stm32f10x_nvic.c ****     NVIC->ICER[(NVIC_InitStruct->NVIC_IRQChannel >> 0x05)] =
+ 158:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 159:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 160:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 342              		.loc 1 160 1 view .LVU129
+ 343 00f2 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 344              	.LVL22:
+ 345              	.L16:
+ 346              	.LCFI5:
+ 347              		.cfi_def_cfa_offset 0
+ 348              		.cfi_restore 4
+ 349              		.cfi_restore 5
+ 350              		.cfi_restore 6
+ 351              		.cfi_restore 7
+ 352              		.cfi_restore 8
+ 353              		.cfi_restore 9
+ 354              		.cfi_restore 14
+ 157:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 355              		.loc 1 157 5 is_stmt 1 view .LVU130
+ 158:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 356              		.loc 1 158 17 is_stmt 0 view .LVU131
+ 357 00f6 0121     		movs	r1, #1
+ 158:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 358              		.loc 1 158 36 view .LVU132
+ 359 00f8 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 157:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 360              		.loc 1 157 60 view .LVU133
+ 361 00fa 0648     		ldr	r0, .L22+4
+ 362              	.LVL23:
+ 157:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 363              		.loc 1 157 50 view .LVU134
+ 364 00fc 5A09     		lsrs	r2, r3, #5
+ 158:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 365              		.loc 1 158 54 view .LVU135
+ 366 00fe 03F01F03 		and	r3, r3, #31
+ 157:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 367              		.loc 1 157 60 view .LVU136
+ 368 0102 2032     		adds	r2, r2, #32
+ 158:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 369              		.loc 1 158 17 view .LVU137
+ 370 0104 01FA03F3 		lsl	r3, r1, r3
+ 157:cpu/STM32F103/stm32f10x_nvic.c ****       (u32)0x01 << (NVIC_InitStruct->NVIC_IRQChannel & (u8)0x1F);
+ 371              		.loc 1 157 60 view .LVU138
+ 372 0108 40F82230 		str	r3, [r0, r2, lsl #2]
+ 373 010c 7047     		bx	lr
+ 374              	.L23:
+ 375 010e 00BF     		.align	2
+ 376              	.L22:
+ 377 0110 00ED00E0 		.word	-536810240
+ 378 0114 00E100E0 		.word	-536813312
+ 379              		.cfi_endproc
+ 380              	.LFE3:
+ 382              		.align	1
+ 383              		.p2align 2,,3
+ 384              		.global	NVIC_StructInit
+ 385              		.syntax unified
+ 386              		.thumb
+ 387              		.thumb_func
+ 389              	NVIC_StructInit:
+ 390              	.LVL24:
+ 391              	.LFB4:
+ 161:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 162:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 163:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_StructInit
+ 164:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Fills each NVIC_InitStruct member with its default value.
+ 165:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - NVIC_InitStruct: pointer to a NVIC_InitTypeDef structure which
+ 166:cpu/STM32F103/stm32f10x_nvic.c **** *                    will be initialized.
+ 167:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 168:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 169:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 170:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_StructInit(NVIC_InitTypeDef* NVIC_InitStruct)
+ 171:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 392              		.loc 1 171 1 is_stmt 1 view -0
+ 393              		.cfi_startproc
+ 394              		@ args = 0, pretend = 0, frame = 0
+ 395              		@ frame_needed = 0, uses_anonymous_args = 0
+ 396              		@ link register save eliminated.
+ 172:cpu/STM32F103/stm32f10x_nvic.c ****   /* NVIC_InitStruct members default value */
+ 173:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC_InitStruct->NVIC_IRQChannel = 0x00;
+ 397              		.loc 1 173 3 view .LVU140
+ 398              		.loc 1 173 36 is_stmt 0 view .LVU141
+ 399 0118 0023     		movs	r3, #0
+ 400 011a 0370     		strb	r3, [r0]
+ 174:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC_InitStruct->NVIC_IRQChannelPreemptionPriority = 0x00;
+ 401              		.loc 1 174 3 is_stmt 1 view .LVU142
+ 402              		.loc 1 174 54 is_stmt 0 view .LVU143
+ 403 011c 4370     		strb	r3, [r0, #1]
+ 175:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC_InitStruct->NVIC_IRQChannelSubPriority = 0x00;
+ 404              		.loc 1 175 3 is_stmt 1 view .LVU144
+ 405              		.loc 1 175 47 is_stmt 0 view .LVU145
+ 406 011e 8370     		strb	r3, [r0, #2]
+ 176:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC_InitStruct->NVIC_IRQChannelCmd = DISABLE;
+ 407              		.loc 1 176 3 is_stmt 1 view .LVU146
+ 408              		.loc 1 176 39 is_stmt 0 view .LVU147
+ 409 0120 C370     		strb	r3, [r0, #3]
+ 177:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 410              		.loc 1 177 1 view .LVU148
+ 411 0122 7047     		bx	lr
+ 412              		.cfi_endproc
+ 413              	.LFE4:
+ 415              		.align	1
+ 416              		.p2align 2,,3
+ 417              		.global	NVIC_SETPRIMASK
+ 418              		.syntax unified
+ 419              		.thumb
+ 420              		.thumb_func
+ 422              	NVIC_SETPRIMASK:
+ 423              	.LFB5:
+ 178:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 179:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 180:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_SETPRIMASK
+ 181:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Enables the PRIMASK priority: Raises the execution priority to 0.
+ 182:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 183:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 184:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 185:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 186:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_SETPRIMASK(void)
+ 187:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 424              		.loc 1 187 1 is_stmt 1 view -0
+ 425              		.cfi_startproc
+ 426              		@ args = 0, pretend = 0, frame = 0
+ 427              		@ frame_needed = 0, uses_anonymous_args = 0
+ 428              		@ link register save eliminated.
+ 188:cpu/STM32F103/stm32f10x_nvic.c ****   __SETPRIMASK();
+ 429              		.loc 1 188 3 view .LVU150
+ 430 0124 FFF7FEBF 		b	__SETPRIMASK
+ 431              	.LVL25:
+ 432              		.cfi_endproc
+ 433              	.LFE5:
+ 435              		.align	1
+ 436              		.p2align 2,,3
+ 437              		.global	NVIC_RESETPRIMASK
+ 438              		.syntax unified
+ 439              		.thumb
+ 440              		.thumb_func
+ 442              	NVIC_RESETPRIMASK:
+ 443              	.LFB6:
+ 189:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 190:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 191:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 192:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_RESETPRIMASK
+ 193:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Disables the PRIMASK priority.
+ 194:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 195:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 196:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 197:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 198:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_RESETPRIMASK(void)
+ 199:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 444              		.loc 1 199 1 view -0
+ 445              		.cfi_startproc
+ 446              		@ args = 0, pretend = 0, frame = 0
+ 447              		@ frame_needed = 0, uses_anonymous_args = 0
+ 448              		@ link register save eliminated.
+ 200:cpu/STM32F103/stm32f10x_nvic.c ****   __RESETPRIMASK();
+ 449              		.loc 1 200 3 view .LVU152
+ 450 0128 FFF7FEBF 		b	__RESETPRIMASK
+ 451              	.LVL26:
+ 452              		.cfi_endproc
+ 453              	.LFE6:
+ 455              		.align	1
+ 456              		.p2align 2,,3
+ 457              		.global	NVIC_SETFAULTMASK
+ 458              		.syntax unified
+ 459              		.thumb
+ 460              		.thumb_func
+ 462              	NVIC_SETFAULTMASK:
+ 463              	.LFB7:
+ 201:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 202:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 203:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 204:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_SETFAULTMASK
+ 205:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Enables the FAULTMASK priority: Raises the execution priority to -1.
+ 206:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 207:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 208:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 209:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 210:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_SETFAULTMASK(void)
+ 211:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 464              		.loc 1 211 1 view -0
+ 465              		.cfi_startproc
+ 466              		@ args = 0, pretend = 0, frame = 0
+ 467              		@ frame_needed = 0, uses_anonymous_args = 0
+ 468              		@ link register save eliminated.
+ 212:cpu/STM32F103/stm32f10x_nvic.c ****   __SETFAULTMASK();
+ 469              		.loc 1 212 3 view .LVU154
+ 470 012c FFF7FEBF 		b	__SETFAULTMASK
+ 471              	.LVL27:
+ 472              		.cfi_endproc
+ 473              	.LFE7:
+ 475              		.align	1
+ 476              		.p2align 2,,3
+ 477              		.global	NVIC_RESETFAULTMASK
+ 478              		.syntax unified
+ 479              		.thumb
+ 480              		.thumb_func
+ 482              	NVIC_RESETFAULTMASK:
+ 483              	.LFB8:
+ 213:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 214:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 215:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 216:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_RESETFAULTMASK
+ 217:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Disables the FAULTMASK priority.
+ 218:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 219:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 220:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 221:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 222:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_RESETFAULTMASK(void)
+ 223:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 484              		.loc 1 223 1 view -0
+ 485              		.cfi_startproc
+ 486              		@ args = 0, pretend = 0, frame = 0
+ 487              		@ frame_needed = 0, uses_anonymous_args = 0
+ 488              		@ link register save eliminated.
+ 224:cpu/STM32F103/stm32f10x_nvic.c ****   __RESETFAULTMASK();
+ 489              		.loc 1 224 3 view .LVU156
+ 490 0130 FFF7FEBF 		b	__RESETFAULTMASK
+ 491              	.LVL28:
+ 492              		.cfi_endproc
+ 493              	.LFE8:
+ 495              		.align	1
+ 496              		.p2align 2,,3
+ 497              		.global	NVIC_BASEPRICONFIG
+ 498              		.syntax unified
+ 499              		.thumb
+ 500              		.thumb_func
+ 502              	NVIC_BASEPRICONFIG:
+ 503              	.LVL29:
+ 504              	.LFB9:
+ 225:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 226:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 227:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 228:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_BASEPRICONFIG
+ 229:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : The execution priority can be changed from 15 (lowest 
+ 230:cpu/STM32F103/stm32f10x_nvic.c ****                    configurable priority) to 1. Writing a zero  value will disable 
+ 231:cpu/STM32F103/stm32f10x_nvic.c **** *                  the mask of execution priority.
+ 232:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 233:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 234:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 235:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 236:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_BASEPRICONFIG(u32 NewPriority)
+ 237:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 505              		.loc 1 237 1 view -0
+ 506              		.cfi_startproc
+ 507              		@ args = 0, pretend = 0, frame = 0
+ 508              		@ frame_needed = 0, uses_anonymous_args = 0
+ 509              		@ link register save eliminated.
+ 238:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 239:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_BASE_PRI(NewPriority));
+ 510              		.loc 1 239 3 view .LVU158
+ 240:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 241:cpu/STM32F103/stm32f10x_nvic.c ****   __BASEPRICONFIG(NewPriority << 0x04);
+ 511              		.loc 1 241 3 view .LVU159
+ 512 0134 0001     		lsls	r0, r0, #4
+ 513              	.LVL30:
+ 514              		.loc 1 241 3 is_stmt 0 view .LVU160
+ 515 0136 FFF7FEBF 		b	__BASEPRICONFIG
+ 516              	.LVL31:
+ 517              		.cfi_endproc
+ 518              	.LFE9:
+ 520              		.align	1
+ 521 013a 00BF     		.p2align 2,,3
+ 522              		.global	NVIC_GetBASEPRI
+ 523              		.syntax unified
+ 524              		.thumb
+ 525              		.thumb_func
+ 527              	NVIC_GetBASEPRI:
+ 528              	.LFB10:
+ 242:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 243:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 244:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 245:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetBASEPRI
+ 246:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Returns the BASEPRI mask value.
+ 247:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 248:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 249:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : BASEPRI register value
+ 250:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 251:cpu/STM32F103/stm32f10x_nvic.c **** u32 NVIC_GetBASEPRI(void)
+ 252:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 529              		.loc 1 252 1 is_stmt 1 view -0
+ 530              		.cfi_startproc
+ 531              		@ args = 0, pretend = 0, frame = 0
+ 532              		@ frame_needed = 0, uses_anonymous_args = 0
+ 533              		@ link register save eliminated.
+ 253:cpu/STM32F103/stm32f10x_nvic.c ****   return (__GetBASEPRI());
+ 534              		.loc 1 253 3 view .LVU162
+ 535              		.loc 1 253 11 is_stmt 0 view .LVU163
+ 536 013c FFF7FEBF 		b	__GetBASEPRI
+ 537              	.LVL32:
+ 538              		.cfi_endproc
+ 539              	.LFE10:
+ 541              		.align	1
+ 542              		.p2align 2,,3
+ 543              		.global	NVIC_GetCurrentPendingIRQChannel
+ 544              		.syntax unified
+ 545              		.thumb
+ 546              		.thumb_func
+ 548              	NVIC_GetCurrentPendingIRQChannel:
+ 549              	.LFB11:
+ 254:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 255:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 256:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 257:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetCurrentPendingIRQChannel
+ 258:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Returns the current pending IRQ channel identifier.
+ 259:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 260:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 261:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : Pending IRQ Channel Identifier.
+ 262:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 263:cpu/STM32F103/stm32f10x_nvic.c **** u16 NVIC_GetCurrentPendingIRQChannel(void)
+ 264:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 550              		.loc 1 264 1 is_stmt 1 view -0
+ 551              		.cfi_startproc
+ 552              		@ args = 0, pretend = 0, frame = 0
+ 553              		@ frame_needed = 0, uses_anonymous_args = 0
+ 554              		@ link register save eliminated.
+ 265:cpu/STM32F103/stm32f10x_nvic.c ****   return ((u16)((SCB->ICSR & (u32)0x003FF000) >> 0x0C));
+ 555              		.loc 1 265 3 view .LVU165
+ 556              		.loc 1 265 21 is_stmt 0 view .LVU166
+ 557 0140 024B     		ldr	r3, .L32
+ 558 0142 5868     		ldr	r0, [r3, #4]
+ 266:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 559              		.loc 1 266 1 view .LVU167
+ 560 0144 C0F30930 		ubfx	r0, r0, #12, #10
+ 561 0148 7047     		bx	lr
+ 562              	.L33:
+ 563 014a 00BF     		.align	2
+ 564              	.L32:
+ 565 014c 00ED00E0 		.word	-536810240
+ 566              		.cfi_endproc
+ 567              	.LFE11:
+ 569              		.align	1
+ 570              		.p2align 2,,3
+ 571              		.global	NVIC_GetIRQChannelPendingBitStatus
+ 572              		.syntax unified
+ 573              		.thumb
+ 574              		.thumb_func
+ 576              	NVIC_GetIRQChannelPendingBitStatus:
+ 577              	.LVL33:
+ 578              	.LFB12:
+ 267:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 268:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 269:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetIRQChannelPendingBitStatus
+ 270:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Checks whether the specified IRQ Channel pending bit is set
+ 271:cpu/STM32F103/stm32f10x_nvic.c **** *                  or not.
+ 272:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - NVIC_IRQChannel: specifies the interrupt pending bit to check.
+ 273:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 274:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : The new state of IRQ Channel pending bit(SET or RESET).
+ 275:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 276:cpu/STM32F103/stm32f10x_nvic.c **** ITStatus NVIC_GetIRQChannelPendingBitStatus(u8 NVIC_IRQChannel)
+ 277:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 579              		.loc 1 277 1 is_stmt 1 view -0
+ 580              		.cfi_startproc
+ 581              		@ args = 0, pretend = 0, frame = 0
+ 582              		@ frame_needed = 0, uses_anonymous_args = 0
+ 583              		@ link register save eliminated.
+ 278:cpu/STM32F103/stm32f10x_nvic.c ****   ITStatus pendingirqstatus = RESET;
+ 584              		.loc 1 278 3 view .LVU169
+ 279:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmp = 0x00;
+ 585              		.loc 1 279 3 view .LVU170
+ 280:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 281:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 282:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_IRQ_CHANNEL(NVIC_IRQChannel));
+ 586              		.loc 1 282 3 view .LVU171
+ 283:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 284:cpu/STM32F103/stm32f10x_nvic.c ****   tmp = ((u32)0x01 << (NVIC_IRQChannel & (u32)0x1F));
+ 587              		.loc 1 284 3 view .LVU172
+ 588              		.loc 1 284 7 is_stmt 0 view .LVU173
+ 589 0150 0123     		movs	r3, #1
+ 285:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 286:cpu/STM32F103/stm32f10x_nvic.c ****   if (((NVIC->ISPR[(NVIC_IRQChannel >> 0x05)]) & tmp) == tmp)
+ 590              		.loc 1 286 19 view .LVU174
+ 591 0152 0749     		ldr	r1, .L35
+ 592              		.loc 1 286 37 view .LVU175
+ 593 0154 4209     		lsrs	r2, r0, #5
+ 594              		.loc 1 286 19 view .LVU176
+ 595 0156 4032     		adds	r2, r2, #64
+ 596 0158 51F82220 		ldr	r2, [r1, r2, lsl #2]
+ 284:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 597              		.loc 1 284 40 view .LVU177
+ 598 015c 00F01F00 		and	r0, r0, #31
+ 599              	.LVL34:
+ 284:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 600              		.loc 1 284 7 view .LVU178
+ 601 0160 03FA00F0 		lsl	r0, r3, r0
+ 602              	.LVL35:
+ 603              		.loc 1 286 3 is_stmt 1 view .LVU179
+ 287:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 288:cpu/STM32F103/stm32f10x_nvic.c ****     pendingirqstatus = SET;
+ 289:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 290:cpu/STM32F103/stm32f10x_nvic.c ****   else
+ 291:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 292:cpu/STM32F103/stm32f10x_nvic.c ****     pendingirqstatus = RESET;
+ 293:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 294:cpu/STM32F103/stm32f10x_nvic.c ****   return pendingirqstatus;
+ 604              		.loc 1 294 3 view .LVU180
+ 286:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 605              		.loc 1 286 6 is_stmt 0 view .LVU181
+ 606 0164 30EA0203 		bics	r3, r0, r2
+ 295:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 607              		.loc 1 295 1 view .LVU182
+ 608 0168 0CBF     		ite	eq
+ 609 016a 0120     		moveq	r0, #1
+ 610              	.LVL36:
+ 611              		.loc 1 295 1 view .LVU183
+ 612 016c 0020     		movne	r0, #0
+ 613 016e 7047     		bx	lr
+ 614              	.L36:
+ 615              		.align	2
+ 616              	.L35:
+ 617 0170 00E100E0 		.word	-536813312
+ 618              		.cfi_endproc
+ 619              	.LFE12:
+ 621              		.align	1
+ 622              		.p2align 2,,3
+ 623              		.global	NVIC_SetIRQChannelPendingBit
+ 624              		.syntax unified
+ 625              		.thumb
+ 626              		.thumb_func
+ 628              	NVIC_SetIRQChannelPendingBit:
+ 629              	.LVL37:
+ 630              	.LFB13:
+ 296:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 297:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 298:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_SetIRQChannelPendingBit
+ 299:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Sets the NVIC’s interrupt pending bit.
+ 300:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - NVIC_IRQChannel: specifies the interrupt pending bit to Set.
+ 301:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 302:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 303:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 304:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_SetIRQChannelPendingBit(u8 NVIC_IRQChannel)
+ 305:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 631              		.loc 1 305 1 is_stmt 1 view -0
+ 632              		.cfi_startproc
+ 633              		@ args = 0, pretend = 0, frame = 0
+ 634              		@ frame_needed = 0, uses_anonymous_args = 0
+ 635              		@ link register save eliminated.
+ 306:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 307:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_IRQ_CHANNEL(NVIC_IRQChannel));
+ 636              		.loc 1 307 3 view .LVU185
+ 308:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 309:cpu/STM32F103/stm32f10x_nvic.c ****   *(vu32*) 0xE000EF00 = (u32)NVIC_IRQChannel;
+ 637              		.loc 1 309 3 view .LVU186
+ 638              		.loc 1 309 23 is_stmt 0 view .LVU187
+ 639 0174 4FF0E023 		mov	r3, #-536813568
+ 640 0178 C3F8000F 		str	r0, [r3, #3840]
+ 310:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 641              		.loc 1 310 1 view .LVU188
+ 642 017c 7047     		bx	lr
+ 643              		.cfi_endproc
+ 644              	.LFE13:
+ 646              		.align	1
+ 647 017e 00BF     		.p2align 2,,3
+ 648              		.global	NVIC_ClearIRQChannelPendingBit
+ 649              		.syntax unified
+ 650              		.thumb
+ 651              		.thumb_func
+ 653              	NVIC_ClearIRQChannelPendingBit:
+ 654              	.LVL38:
+ 655              	.LFB14:
+ 311:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 312:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 313:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_ClearIRQChannelPendingBit
+ 314:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Clears the NVIC’s interrupt pending bit.
+ 315:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - NVIC_IRQChannel: specifies the interrupt pending bit to clear.
+ 316:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 317:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 318:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 319:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_ClearIRQChannelPendingBit(u8 NVIC_IRQChannel)
+ 320:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 656              		.loc 1 320 1 is_stmt 1 view -0
+ 657              		.cfi_startproc
+ 658              		@ args = 0, pretend = 0, frame = 0
+ 659              		@ frame_needed = 0, uses_anonymous_args = 0
+ 660              		@ link register save eliminated.
+ 321:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 322:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_IRQ_CHANNEL(NVIC_IRQChannel));
+ 661              		.loc 1 322 3 view .LVU190
+ 323:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 324:cpu/STM32F103/stm32f10x_nvic.c ****   NVIC->ICPR[(NVIC_IRQChannel >> 0x05)] = (u32)0x01 << (NVIC_IRQChannel & (u32)0x1F);
+ 662              		.loc 1 324 3 view .LVU191
+ 663              		.loc 1 324 53 is_stmt 0 view .LVU192
+ 664 0180 0122     		movs	r2, #1
+ 665              		.loc 1 324 31 view .LVU193
+ 666 0182 4309     		lsrs	r3, r0, #5
+ 667              		.loc 1 324 41 view .LVU194
+ 668 0184 0449     		ldr	r1, .L39
+ 669              		.loc 1 324 73 view .LVU195
+ 670 0186 00F01F00 		and	r0, r0, #31
+ 671              	.LVL39:
+ 672              		.loc 1 324 53 view .LVU196
+ 673 018a 02FA00F0 		lsl	r0, r2, r0
+ 674              		.loc 1 324 41 view .LVU197
+ 675 018e 6033     		adds	r3, r3, #96
+ 676 0190 41F82300 		str	r0, [r1, r3, lsl #2]
+ 325:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 677              		.loc 1 325 1 view .LVU198
+ 678 0194 7047     		bx	lr
+ 679              	.L40:
+ 680 0196 00BF     		.align	2
+ 681              	.L39:
+ 682 0198 00E100E0 		.word	-536813312
+ 683              		.cfi_endproc
+ 684              	.LFE14:
+ 686              		.align	1
+ 687              		.p2align 2,,3
+ 688              		.global	NVIC_GetCurrentActiveHandler
+ 689              		.syntax unified
+ 690              		.thumb
+ 691              		.thumb_func
+ 693              	NVIC_GetCurrentActiveHandler:
+ 694              	.LFB15:
+ 326:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 327:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 328:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetCurrentActiveHandler
+ 329:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Returns the current active Handler (IRQ Channel and
+ 330:cpu/STM32F103/stm32f10x_nvic.c **** *                  SystemHandler) identifier.
+ 331:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 332:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 333:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : Active Handler Identifier.
+ 334:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 335:cpu/STM32F103/stm32f10x_nvic.c **** u16 NVIC_GetCurrentActiveHandler(void)
+ 336:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 695              		.loc 1 336 1 is_stmt 1 view -0
+ 696              		.cfi_startproc
+ 697              		@ args = 0, pretend = 0, frame = 0
+ 698              		@ frame_needed = 0, uses_anonymous_args = 0
+ 699              		@ link register save eliminated.
+ 337:cpu/STM32F103/stm32f10x_nvic.c ****   return ((u16)(SCB->ICSR & (u32)0x3FF));
+ 700              		.loc 1 337 3 view .LVU200
+ 701              		.loc 1 337 20 is_stmt 0 view .LVU201
+ 702 019c 024B     		ldr	r3, .L42
+ 703 019e 5868     		ldr	r0, [r3, #4]
+ 338:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 704              		.loc 1 338 1 view .LVU202
+ 705 01a0 C0F30900 		ubfx	r0, r0, #0, #10
+ 706 01a4 7047     		bx	lr
+ 707              	.L43:
+ 708 01a6 00BF     		.align	2
+ 709              	.L42:
+ 710 01a8 00ED00E0 		.word	-536810240
+ 711              		.cfi_endproc
+ 712              	.LFE15:
+ 714              		.align	1
+ 715              		.p2align 2,,3
+ 716              		.global	NVIC_GetIRQChannelActiveBitStatus
+ 717              		.syntax unified
+ 718              		.thumb
+ 719              		.thumb_func
+ 721              	NVIC_GetIRQChannelActiveBitStatus:
+ 722              	.LVL40:
+ 723              	.LFB16:
+ 339:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 340:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 341:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetIRQChannelActiveBitStatus
+ 342:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Checks whether the specified IRQ Channel active bit is set
+ 343:cpu/STM32F103/stm32f10x_nvic.c **** *                  or not.
+ 344:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - NVIC_IRQChannel: specifies the interrupt active bit to check.
+ 345:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 346:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : The new state of IRQ Channel active bit(SET or RESET).
+ 347:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 348:cpu/STM32F103/stm32f10x_nvic.c **** ITStatus NVIC_GetIRQChannelActiveBitStatus(u8 NVIC_IRQChannel)
+ 349:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 724              		.loc 1 349 1 is_stmt 1 view -0
+ 725              		.cfi_startproc
+ 726              		@ args = 0, pretend = 0, frame = 0
+ 727              		@ frame_needed = 0, uses_anonymous_args = 0
+ 728              		@ link register save eliminated.
+ 350:cpu/STM32F103/stm32f10x_nvic.c ****   ITStatus activeirqstatus = RESET;
+ 729              		.loc 1 350 3 view .LVU204
+ 351:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmp = 0x00;
+ 730              		.loc 1 351 3 view .LVU205
+ 352:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 353:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 354:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_IRQ_CHANNEL(NVIC_IRQChannel));
+ 731              		.loc 1 354 3 view .LVU206
+ 355:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 356:cpu/STM32F103/stm32f10x_nvic.c ****   tmp = ((u32)0x01 << (NVIC_IRQChannel & (u32)0x1F));
+ 732              		.loc 1 356 3 view .LVU207
+ 733              		.loc 1 356 7 is_stmt 0 view .LVU208
+ 734 01ac 0123     		movs	r3, #1
+ 357:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 358:cpu/STM32F103/stm32f10x_nvic.c ****   if (((NVIC->IABR[(NVIC_IRQChannel >> 0x05)]) & tmp) == tmp )
+ 735              		.loc 1 358 19 view .LVU209
+ 736 01ae 0749     		ldr	r1, .L45
+ 737              		.loc 1 358 37 view .LVU210
+ 738 01b0 4209     		lsrs	r2, r0, #5
+ 739              		.loc 1 358 19 view .LVU211
+ 740 01b2 8032     		adds	r2, r2, #128
+ 741 01b4 51F82220 		ldr	r2, [r1, r2, lsl #2]
+ 356:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 742              		.loc 1 356 40 view .LVU212
+ 743 01b8 00F01F00 		and	r0, r0, #31
+ 744              	.LVL41:
+ 356:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 745              		.loc 1 356 7 view .LVU213
+ 746 01bc 03FA00F0 		lsl	r0, r3, r0
+ 747              	.LVL42:
+ 748              		.loc 1 358 3 is_stmt 1 view .LVU214
+ 359:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 360:cpu/STM32F103/stm32f10x_nvic.c ****     activeirqstatus = SET;
+ 361:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 362:cpu/STM32F103/stm32f10x_nvic.c ****   else
+ 363:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 364:cpu/STM32F103/stm32f10x_nvic.c ****     activeirqstatus = RESET;
+ 365:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 366:cpu/STM32F103/stm32f10x_nvic.c ****   return activeirqstatus;
+ 749              		.loc 1 366 3 view .LVU215
+ 358:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 750              		.loc 1 358 6 is_stmt 0 view .LVU216
+ 751 01c0 30EA0203 		bics	r3, r0, r2
+ 367:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 752              		.loc 1 367 1 view .LVU217
+ 753 01c4 0CBF     		ite	eq
+ 754 01c6 0120     		moveq	r0, #1
+ 755              	.LVL43:
+ 756              		.loc 1 367 1 view .LVU218
+ 757 01c8 0020     		movne	r0, #0
+ 758 01ca 7047     		bx	lr
+ 759              	.L46:
+ 760              		.align	2
+ 761              	.L45:
+ 762 01cc 00E100E0 		.word	-536813312
+ 763              		.cfi_endproc
+ 764              	.LFE16:
+ 766              		.align	1
+ 767              		.p2align 2,,3
+ 768              		.global	NVIC_GetCPUID
+ 769              		.syntax unified
+ 770              		.thumb
+ 771              		.thumb_func
+ 773              	NVIC_GetCPUID:
+ 774              	.LFB17:
+ 368:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 369:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 370:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetCPUID
+ 371:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Returns the ID number, the version number and the implementation
+ 372:cpu/STM32F103/stm32f10x_nvic.c **** *                  details of the Cortex-M3 core.
+ 373:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 374:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 375:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : CPU ID.
+ 376:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 377:cpu/STM32F103/stm32f10x_nvic.c **** u32 NVIC_GetCPUID(void)
+ 378:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 775              		.loc 1 378 1 is_stmt 1 view -0
+ 776              		.cfi_startproc
+ 777              		@ args = 0, pretend = 0, frame = 0
+ 778              		@ frame_needed = 0, uses_anonymous_args = 0
+ 779              		@ link register save eliminated.
+ 379:cpu/STM32F103/stm32f10x_nvic.c ****   return (SCB->CPUID);
+ 780              		.loc 1 379 3 view .LVU220
+ 781              		.loc 1 379 14 is_stmt 0 view .LVU221
+ 782 01d0 014B     		ldr	r3, .L48
+ 783 01d2 1868     		ldr	r0, [r3]
+ 380:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 784              		.loc 1 380 1 view .LVU222
+ 785 01d4 7047     		bx	lr
+ 786              	.L49:
+ 787 01d6 00BF     		.align	2
+ 788              	.L48:
+ 789 01d8 00ED00E0 		.word	-536810240
+ 790              		.cfi_endproc
+ 791              	.LFE17:
+ 793              		.align	1
+ 794              		.p2align 2,,3
+ 795              		.global	NVIC_SetVectorTable
+ 796              		.syntax unified
+ 797              		.thumb
+ 798              		.thumb_func
+ 800              	NVIC_SetVectorTable:
+ 801              	.LVL44:
+ 802              	.LFB18:
+ 381:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 382:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 383:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_SetVectorTable
+ 384:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Sets the vector table location and Offset.
+ 385:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - NVIC_VectTab: specifies if the vector table is in RAM or
+ 386:cpu/STM32F103/stm32f10x_nvic.c **** *                    FLASH memory.
+ 387:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 388:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_VectTab_RAM
+ 389:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_VectTab_FLASH
+ 390:cpu/STM32F103/stm32f10x_nvic.c **** *                  - Offset: Vector Table base offset field. 
+ 391:cpu/STM32F103/stm32f10x_nvic.c **** *                            This value must be a multiple of 0x100.
+ 392:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 393:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 394:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 395:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_SetVectorTable(u32 NVIC_VectTab, u32 Offset)
+ 396:cpu/STM32F103/stm32f10x_nvic.c **** { 
+ 803              		.loc 1 396 1 is_stmt 1 view -0
+ 804              		.cfi_startproc
+ 805              		@ args = 0, pretend = 0, frame = 0
+ 806              		@ frame_needed = 0, uses_anonymous_args = 0
+ 807              		@ link register save eliminated.
+ 397:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 398:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_VECTTAB(NVIC_VectTab));
+ 808              		.loc 1 398 3 view .LVU224
+ 399:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_OFFSET(Offset));  
+ 809              		.loc 1 399 3 view .LVU225
+ 400:cpu/STM32F103/stm32f10x_nvic.c ****    
+ 401:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->VTOR = NVIC_VectTab | (Offset & (u32)0x1FFFFF80);
+ 810              		.loc 1 401 3 view .LVU226
+ 811              		.loc 1 401 38 is_stmt 0 view .LVU227
+ 812 01dc 21F06041 		bic	r1, r1, #-536870912
+ 813              	.LVL45:
+ 814              		.loc 1 401 13 view .LVU228
+ 815 01e0 024B     		ldr	r3, .L51
+ 816              		.loc 1 401 38 view .LVU229
+ 817 01e2 21F07F01 		bic	r1, r1, #127
+ 818              		.loc 1 401 28 view .LVU230
+ 819 01e6 0143     		orrs	r1, r1, r0
+ 820              		.loc 1 401 13 view .LVU231
+ 821 01e8 9960     		str	r1, [r3, #8]
+ 402:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 822              		.loc 1 402 1 view .LVU232
+ 823 01ea 7047     		bx	lr
+ 824              	.L52:
+ 825              		.align	2
+ 826              	.L51:
+ 827 01ec 00ED00E0 		.word	-536810240
+ 828              		.cfi_endproc
+ 829              	.LFE18:
+ 831              		.align	1
+ 832              		.p2align 2,,3
+ 833              		.global	NVIC_GenerateSystemReset
+ 834              		.syntax unified
+ 835              		.thumb
+ 836              		.thumb_func
+ 838              	NVIC_GenerateSystemReset:
+ 839              	.LFB19:
+ 403:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 404:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 405:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GenerateSystemReset
+ 406:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Generates a system reset.
+ 407:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 408:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 409:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 410:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 411:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_GenerateSystemReset(void)
+ 412:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 840              		.loc 1 412 1 is_stmt 1 view -0
+ 841              		.cfi_startproc
+ 842              		@ args = 0, pretend = 0, frame = 0
+ 843              		@ frame_needed = 0, uses_anonymous_args = 0
+ 844              		@ link register save eliminated.
+ 413:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->AIRCR = AIRCR_VECTKEY_MASK | (u32)0x04;
+ 845              		.loc 1 413 3 view .LVU234
+ 846              		.loc 1 413 14 is_stmt 0 view .LVU235
+ 847 01f0 014B     		ldr	r3, .L54
+ 848 01f2 024A     		ldr	r2, .L54+4
+ 849 01f4 DA60     		str	r2, [r3, #12]
+ 414:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 850              		.loc 1 414 1 view .LVU236
+ 851 01f6 7047     		bx	lr
+ 852              	.L55:
+ 853              		.align	2
+ 854              	.L54:
+ 855 01f8 00ED00E0 		.word	-536810240
+ 856 01fc 0400FA05 		.word	100270084
+ 857              		.cfi_endproc
+ 858              	.LFE19:
+ 860              		.align	1
+ 861              		.p2align 2,,3
+ 862              		.global	NVIC_GenerateCoreReset
+ 863              		.syntax unified
+ 864              		.thumb
+ 865              		.thumb_func
+ 867              	NVIC_GenerateCoreReset:
+ 868              	.LFB20:
+ 415:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 416:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 417:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GenerateCoreReset
+ 418:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Generates a Core (Core + NVIC) reset.
+ 419:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : None
+ 420:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 421:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 422:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 423:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_GenerateCoreReset(void)
+ 424:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 869              		.loc 1 424 1 is_stmt 1 view -0
+ 870              		.cfi_startproc
+ 871              		@ args = 0, pretend = 0, frame = 0
+ 872              		@ frame_needed = 0, uses_anonymous_args = 0
+ 873              		@ link register save eliminated.
+ 425:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->AIRCR = AIRCR_VECTKEY_MASK | (u32)0x01;
+ 874              		.loc 1 425 3 view .LVU238
+ 875              		.loc 1 425 14 is_stmt 0 view .LVU239
+ 876 0200 014B     		ldr	r3, .L57
+ 877 0202 024A     		ldr	r2, .L57+4
+ 878 0204 DA60     		str	r2, [r3, #12]
+ 426:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 879              		.loc 1 426 1 view .LVU240
+ 880 0206 7047     		bx	lr
+ 881              	.L58:
+ 882              		.align	2
+ 883              	.L57:
+ 884 0208 00ED00E0 		.word	-536810240
+ 885 020c 0100FA05 		.word	100270081
+ 886              		.cfi_endproc
+ 887              	.LFE20:
+ 889              		.align	1
+ 890              		.p2align 2,,3
+ 891              		.global	NVIC_SystemLPConfig
+ 892              		.syntax unified
+ 893              		.thumb
+ 894              		.thumb_func
+ 896              	NVIC_SystemLPConfig:
+ 897              	.LVL46:
+ 898              	.LFB21:
+ 427:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 428:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 429:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_SystemLPConfig
+ 430:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Selects the condition for the system to enter low power mode.
+ 431:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - LowPowerMode: Specifies the new mode for the system to enter
+ 432:cpu/STM32F103/stm32f10x_nvic.c **** *                    low power mode.
+ 433:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 434:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_LP_SEVONPEND
+ 435:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_LP_SLEEPDEEP
+ 436:cpu/STM32F103/stm32f10x_nvic.c **** *                       - NVIC_LP_SLEEPONEXIT
+ 437:cpu/STM32F103/stm32f10x_nvic.c **** *                  - NewState: new state of LP condition.
+ 438:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 439:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 440:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 441:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 442:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_SystemLPConfig(u8 LowPowerMode, FunctionalState NewState)
+ 443:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 899              		.loc 1 443 1 is_stmt 1 view -0
+ 900              		.cfi_startproc
+ 901              		@ args = 0, pretend = 0, frame = 0
+ 902              		@ frame_needed = 0, uses_anonymous_args = 0
+ 903              		@ link register save eliminated.
+ 444:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 445:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_LP(LowPowerMode));
+ 904              		.loc 1 445 3 view .LVU242
+ 446:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));  
+ 905              		.loc 1 446 3 view .LVU243
+ 447:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 448:cpu/STM32F103/stm32f10x_nvic.c ****   if (NewState != DISABLE)
+ 906              		.loc 1 448 3 view .LVU244
+ 907              		.loc 1 448 6 is_stmt 0 view .LVU245
+ 908 0210 21B1     		cbz	r1, .L60
+ 449:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 450:cpu/STM32F103/stm32f10x_nvic.c ****     SCB->SCR |= LowPowerMode;
+ 909              		.loc 1 450 5 is_stmt 1 view .LVU246
+ 910              		.loc 1 450 14 is_stmt 0 view .LVU247
+ 911 0212 054B     		ldr	r3, .L62
+ 912 0214 1A69     		ldr	r2, [r3, #16]
+ 913 0216 1043     		orrs	r0, r0, r2
+ 914              	.LVL47:
+ 915              		.loc 1 450 14 view .LVU248
+ 916 0218 1861     		str	r0, [r3, #16]
+ 917 021a 7047     		bx	lr
+ 918              	.LVL48:
+ 919              	.L60:
+ 451:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 452:cpu/STM32F103/stm32f10x_nvic.c ****   else
+ 453:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 454:cpu/STM32F103/stm32f10x_nvic.c ****     SCB->SCR &= (u32)(~(u32)LowPowerMode);
+ 920              		.loc 1 454 5 is_stmt 1 view .LVU249
+ 921              		.loc 1 454 14 is_stmt 0 view .LVU250
+ 922 021c 024A     		ldr	r2, .L62
+ 923 021e 1369     		ldr	r3, [r2, #16]
+ 924 0220 23EA0000 		bic	r0, r3, r0
+ 925              	.LVL49:
+ 926              		.loc 1 454 14 view .LVU251
+ 927 0224 1061     		str	r0, [r2, #16]
+ 455:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 456:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 928              		.loc 1 456 1 view .LVU252
+ 929 0226 7047     		bx	lr
+ 930              	.L63:
+ 931              		.align	2
+ 932              	.L62:
+ 933 0228 00ED00E0 		.word	-536810240
+ 934              		.cfi_endproc
+ 935              	.LFE21:
+ 937              		.align	1
+ 938              		.p2align 2,,3
+ 939              		.global	NVIC_SystemHandlerConfig
+ 940              		.syntax unified
+ 941              		.thumb
+ 942              		.thumb_func
+ 944              	NVIC_SystemHandlerConfig:
+ 945              	.LVL50:
+ 946              	.LFB22:
+ 457:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 458:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 459:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_SystemHandlerConfig
+ 460:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Enables or disables the specified System Handlers.
+ 461:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - SystemHandler: specifies the system handler to be enabled
+ 462:cpu/STM32F103/stm32f10x_nvic.c **** *                    or disabled.
+ 463:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 464:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_MemoryManage
+ 465:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_BusFault
+ 466:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_UsageFault
+ 467:cpu/STM32F103/stm32f10x_nvic.c **** *                  - NewState: new state of  specified System Handlers.
+ 468:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be: ENABLE or DISABLE.
+ 469:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 470:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 471:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 472:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_SystemHandlerConfig(u32 SystemHandler, FunctionalState NewState)
+ 473:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 947              		.loc 1 473 1 is_stmt 1 view -0
+ 948              		.cfi_startproc
+ 949              		@ args = 0, pretend = 0, frame = 0
+ 950              		@ frame_needed = 0, uses_anonymous_args = 0
+ 951              		@ link register save eliminated.
+ 474:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmpreg = 0x00;
+ 952              		.loc 1 474 3 view .LVU254
+ 475:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 476:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 477:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_CONFIG_SYSTEM_HANDLER(SystemHandler));
+ 953              		.loc 1 477 3 view .LVU255
+ 478:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState)); 
+ 954              		.loc 1 478 3 view .LVU256
+ 479:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 480:cpu/STM32F103/stm32f10x_nvic.c ****   tmpreg =  (u32)0x01 << (SystemHandler & (u32)0x1F);
+ 955              		.loc 1 480 3 view .LVU257
+ 956              		.loc 1 480 10 is_stmt 0 view .LVU258
+ 957 022c 0123     		movs	r3, #1
+ 481:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 482:cpu/STM32F103/stm32f10x_nvic.c ****   if (NewState != DISABLE)
+ 483:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 484:cpu/STM32F103/stm32f10x_nvic.c ****     SCB->SHCSR |= tmpreg;
+ 958              		.loc 1 484 16 view .LVU259
+ 959 022e 064A     		ldr	r2, .L67
+ 480:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 960              		.loc 1 480 41 view .LVU260
+ 961 0230 00F01F00 		and	r0, r0, #31
+ 962              	.LVL51:
+ 480:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 963              		.loc 1 480 10 view .LVU261
+ 964 0234 8340     		lsls	r3, r3, r0
+ 965              	.LVL52:
+ 482:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 966              		.loc 1 482 3 is_stmt 1 view .LVU262
+ 967              		.loc 1 484 16 is_stmt 0 view .LVU263
+ 968 0236 506A     		ldr	r0, [r2, #36]
+ 482:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 969              		.loc 1 482 6 view .LVU264
+ 970 0238 11B1     		cbz	r1, .L65
+ 971              		.loc 1 484 5 is_stmt 1 view .LVU265
+ 972              		.loc 1 484 16 is_stmt 0 view .LVU266
+ 973 023a 0343     		orrs	r3, r3, r0
+ 974              	.LVL53:
+ 975              		.loc 1 484 16 view .LVU267
+ 976 023c 5362     		str	r3, [r2, #36]
+ 977 023e 7047     		bx	lr
+ 978              	.LVL54:
+ 979              	.L65:
+ 485:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 486:cpu/STM32F103/stm32f10x_nvic.c ****   else
+ 487:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 488:cpu/STM32F103/stm32f10x_nvic.c ****     SCB->SHCSR &= ~tmpreg;
+ 980              		.loc 1 488 5 is_stmt 1 view .LVU268
+ 981              		.loc 1 488 16 is_stmt 0 view .LVU269
+ 982 0240 20EA0303 		bic	r3, r0, r3
+ 983              	.LVL55:
+ 984              		.loc 1 488 16 view .LVU270
+ 985 0244 5362     		str	r3, [r2, #36]
+ 489:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 490:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 986              		.loc 1 490 1 view .LVU271
+ 987 0246 7047     		bx	lr
+ 988              	.L68:
+ 989              		.align	2
+ 990              	.L67:
+ 991 0248 00ED00E0 		.word	-536810240
+ 992              		.cfi_endproc
+ 993              	.LFE22:
+ 995              		.align	1
+ 996              		.p2align 2,,3
+ 997              		.global	NVIC_SystemHandlerPriorityConfig
+ 998              		.syntax unified
+ 999              		.thumb
+ 1000              		.thumb_func
+ 1002              	NVIC_SystemHandlerPriorityConfig:
+ 1003              	.LVL56:
+ 1004              	.LFB23:
+ 491:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 492:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 493:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_SystemHandlerPriorityConfig
+ 494:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Configures the specified System Handlers priority.
+ 495:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - SystemHandler: specifies the system handler to be
+ 496:cpu/STM32F103/stm32f10x_nvic.c **** *                    enabled or disabled.
+ 497:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 498:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_MemoryManage
+ 499:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_BusFault
+ 500:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_UsageFault
+ 501:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_SVCall
+ 502:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_DebugMonitor
+ 503:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_PSV
+ 504:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_SysTick
+ 505:cpu/STM32F103/stm32f10x_nvic.c **** *                  - SystemHandlerPreemptionPriority: new priority group of the
+ 506:cpu/STM32F103/stm32f10x_nvic.c **** *                    specified system handlers.
+ 507:cpu/STM32F103/stm32f10x_nvic.c **** *                  - SystemHandlerSubPriority: new sub priority of the specified
+ 508:cpu/STM32F103/stm32f10x_nvic.c **** *                    system handlers.
+ 509:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 510:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 511:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 512:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_SystemHandlerPriorityConfig(u32 SystemHandler, u8 SystemHandlerPreemptionPriority,
+ 513:cpu/STM32F103/stm32f10x_nvic.c ****                                       u8 SystemHandlerSubPriority)
+ 514:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 1005              		.loc 1 514 1 is_stmt 1 view -0
+ 1006              		.cfi_startproc
+ 1007              		@ args = 0, pretend = 0, frame = 0
+ 1008              		@ frame_needed = 0, uses_anonymous_args = 0
+ 515:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmp1 = 0x00, tmp2 = 0xFF, handlermask = 0x00;
+ 1009              		.loc 1 515 3 view .LVU273
+ 516:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmppriority = 0x00;
+ 1010              		.loc 1 516 3 view .LVU274
+ 517:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 518:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 519:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_PRIORITY_SYSTEM_HANDLER(SystemHandler));
+ 1011              		.loc 1 519 3 view .LVU275
+ 520:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_PREEMPTION_PRIORITY(SystemHandlerPreemptionPriority));  
+ 1012              		.loc 1 520 3 view .LVU276
+ 521:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_NVIC_SUB_PRIORITY(SystemHandlerSubPriority));
+ 1013              		.loc 1 521 3 view .LVU277
+ 522:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 523:cpu/STM32F103/stm32f10x_nvic.c ****   tmppriority = (0x700 - (SCB->AIRCR & (u32)0x700))>> 0x08;
+ 1014              		.loc 1 523 3 view .LVU278
+ 1015              		.loc 1 523 30 is_stmt 0 view .LVU279
+ 1016 024c 134B     		ldr	r3, .L71
+ 524:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = (0x4 - tmppriority);
+ 525:cpu/STM32F103/stm32f10x_nvic.c ****   tmp2 = tmp2 >> tmppriority;
+ 1017              		.loc 1 525 8 view .LVU280
+ 1018 024e 4FF0FF0C 		mov	ip, #255
+ 523:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = (0x4 - tmppriority);
+ 1019              		.loc 1 523 30 view .LVU281
+ 1020 0252 DB68     		ldr	r3, [r3, #12]
+ 514:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmp1 = 0x00, tmp2 = 0xFF, handlermask = 0x00;
+ 1021              		.loc 1 514 1 view .LVU282
+ 1022 0254 00B5     		push	{lr}
+ 1023              	.LCFI6:
+ 1024              		.cfi_def_cfa_offset 4
+ 1025              		.cfi_offset 14, -4
+ 523:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = (0x4 - tmppriority);
+ 1026              		.loc 1 523 24 view .LVU283
+ 1027 0256 DB43     		mvns	r3, r3
+ 523:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = (0x4 - tmppriority);
+ 1028              		.loc 1 523 15 view .LVU284
+ 1029 0258 C3F30223 		ubfx	r3, r3, #8, #3
+ 1030              	.LVL57:
+ 524:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = (0x4 - tmppriority);
+ 1031              		.loc 1 524 3 is_stmt 1 view .LVU285
+ 524:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = (0x4 - tmppriority);
+ 1032              		.loc 1 524 8 is_stmt 0 view .LVU286
+ 1033 025c C3F1040E 		rsb	lr, r3, #4
+ 1034              	.LVL58:
+ 1035              		.loc 1 525 3 is_stmt 1 view .LVU287
+ 526:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 527:cpu/STM32F103/stm32f10x_nvic.c ****   tmppriority = (u32)SystemHandlerPreemptionPriority << tmp1;
+ 1036              		.loc 1 527 3 view .LVU288
+ 525:cpu/STM32F103/stm32f10x_nvic.c ****     
+ 1037              		.loc 1 525 8 is_stmt 0 view .LVU289
+ 1038 0260 2CFA03F3 		lsr	r3, ip, r3
+ 1039              	.LVL59:
+ 528:cpu/STM32F103/stm32f10x_nvic.c ****   tmppriority |=  SystemHandlerSubPriority & tmp2;
+ 1040              		.loc 1 528 44 view .LVU290
+ 1041 0264 1340     		ands	r3, r3, r2
+ 1042              	.LVL60:
+ 529:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 530:cpu/STM32F103/stm32f10x_nvic.c ****   tmppriority = tmppriority << 0x04;
+ 531:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = SystemHandler & (u32)0xC0;
+ 532:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = tmp1 >> 0x06; 
+ 1043              		.loc 1 532 8 view .LVU291
+ 1044 0266 C0F38112 		ubfx	r2, r0, #6, #2
+ 1045              	.LVL61:
+ 1046              		.loc 1 532 8 view .LVU292
+ 1047 026a 9200     		lsls	r2, r2, #2
+ 1048 026c 02F16042 		add	r2, r2, #-536870912
+ 1049 0270 02F56D42 		add	r2, r2, #60672
+ 527:cpu/STM32F103/stm32f10x_nvic.c ****   tmppriority |=  SystemHandlerSubPriority & tmp2;
+ 1050              		.loc 1 527 15 view .LVU293
+ 1051 0274 01FA0EF1 		lsl	r1, r1, lr
+ 1052              	.LVL62:
+ 528:cpu/STM32F103/stm32f10x_nvic.c ****   tmppriority |=  SystemHandlerSubPriority & tmp2;
+ 1053              		.loc 1 528 3 is_stmt 1 view .LVU294
+ 533:cpu/STM32F103/stm32f10x_nvic.c ****   tmp2 = (SystemHandler >> 0x08) & (u32)0x03;
+ 1054              		.loc 1 533 8 is_stmt 0 view .LVU295
+ 1055 0278 C0F30120 		ubfx	r0, r0, #8, #2
+ 1056              	.LVL63:
+ 528:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 1057              		.loc 1 528 15 view .LVU296
+ 1058 027c 0B43     		orrs	r3, r3, r1
+ 1059              	.LVL64:
+ 530:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = SystemHandler & (u32)0xC0;
+ 1060              		.loc 1 530 3 is_stmt 1 view .LVU297
+ 534:cpu/STM32F103/stm32f10x_nvic.c ****   tmppriority = tmppriority << (tmp2 * 0x08);
+ 1061              		.loc 1 534 38 is_stmt 0 view .LVU298
+ 1062 027e C000     		lsls	r0, r0, #3
+ 535:cpu/STM32F103/stm32f10x_nvic.c ****   handlermask = (u32)0xFF << (tmp2 * 0x08);
+ 536:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 537:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->SHPR[tmp1] &= ~handlermask;
+ 1063              		.loc 1 537 19 view .LVU299
+ 1064 0280 9169     		ldr	r1, [r2, #24]
+ 535:cpu/STM32F103/stm32f10x_nvic.c ****   handlermask = (u32)0xFF << (tmp2 * 0x08);
+ 1065              		.loc 1 535 15 view .LVU300
+ 1066 0282 0CFA00FC 		lsl	ip, ip, r0
+ 1067              		.loc 1 537 19 view .LVU301
+ 1068 0286 21EA0C01 		bic	r1, r1, ip
+ 1069 028a 9161     		str	r1, [r2, #24]
+ 538:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->SHPR[tmp1] |= tmppriority;
+ 1070              		.loc 1 538 19 view .LVU302
+ 1071 028c 9169     		ldr	r1, [r2, #24]
+ 530:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = SystemHandler & (u32)0xC0;
+ 1072              		.loc 1 530 15 view .LVU303
+ 1073 028e 1B01     		lsls	r3, r3, #4
+ 1074              	.LVL65:
+ 531:cpu/STM32F103/stm32f10x_nvic.c ****   tmp1 = tmp1 >> 0x06; 
+ 1075              		.loc 1 531 3 is_stmt 1 view .LVU304
+ 532:cpu/STM32F103/stm32f10x_nvic.c ****   tmp2 = (SystemHandler >> 0x08) & (u32)0x03;
+ 1076              		.loc 1 532 3 view .LVU305
+ 533:cpu/STM32F103/stm32f10x_nvic.c ****   tmppriority = tmppriority << (tmp2 * 0x08);
+ 1077              		.loc 1 533 3 view .LVU306
+ 534:cpu/STM32F103/stm32f10x_nvic.c ****   handlermask = (u32)0xFF << (tmp2 * 0x08);
+ 1078              		.loc 1 534 3 view .LVU307
+ 535:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 1079              		.loc 1 535 3 view .LVU308
+ 537:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->SHPR[tmp1] |= tmppriority;
+ 1080              		.loc 1 537 3 view .LVU309
+ 1081              		.loc 1 538 3 view .LVU310
+ 534:cpu/STM32F103/stm32f10x_nvic.c ****   handlermask = (u32)0xFF << (tmp2 * 0x08);
+ 1082              		.loc 1 534 15 is_stmt 0 view .LVU311
+ 1083 0290 8340     		lsls	r3, r3, r0
+ 1084              	.LVL66:
+ 1085              		.loc 1 538 19 view .LVU312
+ 1086 0292 0B43     		orrs	r3, r3, r1
+ 1087              	.LVL67:
+ 1088              		.loc 1 538 19 view .LVU313
+ 1089 0294 9361     		str	r3, [r2, #24]
+ 539:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 1090              		.loc 1 539 1 view .LVU314
+ 1091 0296 5DF804FB 		ldr	pc, [sp], #4
+ 1092              	.L72:
+ 1093 029a 00BF     		.align	2
+ 1094              	.L71:
+ 1095 029c 00ED00E0 		.word	-536810240
+ 1096              		.cfi_endproc
+ 1097              	.LFE23:
+ 1099              		.align	1
+ 1100              		.p2align 2,,3
+ 1101              		.global	NVIC_GetSystemHandlerPendingBitStatus
+ 1102              		.syntax unified
+ 1103              		.thumb
+ 1104              		.thumb_func
+ 1106              	NVIC_GetSystemHandlerPendingBitStatus:
+ 1107              	.LVL68:
+ 1108              	.LFB24:
+ 540:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 541:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 542:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetSystemHandlerPendingBitStatus
+ 543:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Checks whether the specified System handlers pending bit is
+ 544:cpu/STM32F103/stm32f10x_nvic.c **** *                  set or not.
+ 545:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - SystemHandler: specifies the system handler pending bit to
+ 546:cpu/STM32F103/stm32f10x_nvic.c **** *                    check.
+ 547:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 548:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_MemoryManage
+ 549:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_BusFault
+ 550:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_SVCall
+ 551:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 552:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : The new state of System Handler pending bit(SET or RESET).
+ 553:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 554:cpu/STM32F103/stm32f10x_nvic.c **** ITStatus NVIC_GetSystemHandlerPendingBitStatus(u32 SystemHandler)
+ 555:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 1109              		.loc 1 555 1 is_stmt 1 view -0
+ 1110              		.cfi_startproc
+ 1111              		@ args = 0, pretend = 0, frame = 0
+ 1112              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1113              		@ link register save eliminated.
+ 556:cpu/STM32F103/stm32f10x_nvic.c ****   ITStatus bitstatus  = RESET;
+ 1114              		.loc 1 556 3 view .LVU316
+ 557:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmp = 0x00, tmppos = 0x00;
+ 1115              		.loc 1 557 3 view .LVU317
+ 558:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 559:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 560:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_GET_PENDING_SYSTEM_HANDLER(SystemHandler));
+ 1116              		.loc 1 560 3 view .LVU318
+ 561:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 562:cpu/STM32F103/stm32f10x_nvic.c ****   tmppos = (SystemHandler >> 0x0A);
+ 1117              		.loc 1 562 3 view .LVU319
+ 563:cpu/STM32F103/stm32f10x_nvic.c ****   tmppos &= (u32)0x0F;
+ 1118              		.loc 1 563 3 view .LVU320
+ 564:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 565:cpu/STM32F103/stm32f10x_nvic.c ****   tmppos = (u32)0x01 << tmppos;
+ 1119              		.loc 1 565 10 is_stmt 0 view .LVU321
+ 1120 02a0 0123     		movs	r3, #1
+ 566:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 567:cpu/STM32F103/stm32f10x_nvic.c ****   tmp = SCB->SHCSR & tmppos;
+ 1121              		.loc 1 567 12 view .LVU322
+ 1122 02a2 054A     		ldr	r2, .L74
+ 563:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 1123              		.loc 1 563 10 view .LVU323
+ 1124 02a4 C0F38320 		ubfx	r0, r0, #10, #4
+ 1125              	.LVL69:
+ 565:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 1126              		.loc 1 565 3 is_stmt 1 view .LVU324
+ 1127              		.loc 1 567 12 is_stmt 0 view .LVU325
+ 1128 02a8 526A     		ldr	r2, [r2, #36]
+ 565:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 1129              		.loc 1 565 10 view .LVU326
+ 1130 02aa 8340     		lsls	r3, r3, r0
+ 1131              	.LVL70:
+ 1132              		.loc 1 567 3 is_stmt 1 view .LVU327
+ 568:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 569:cpu/STM32F103/stm32f10x_nvic.c ****   if (tmp == tmppos)
+ 1133              		.loc 1 569 3 view .LVU328
+ 570:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 571:cpu/STM32F103/stm32f10x_nvic.c ****     bitstatus = SET;
+ 572:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 573:cpu/STM32F103/stm32f10x_nvic.c ****   else
+ 574:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 575:cpu/STM32F103/stm32f10x_nvic.c ****     bitstatus = RESET;
+ 576:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 577:cpu/STM32F103/stm32f10x_nvic.c ****   return bitstatus;
+ 1134              		.loc 1 577 3 view .LVU329
+ 569:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 1135              		.loc 1 569 6 is_stmt 0 view .LVU330
+ 1136 02ac 9343     		bics	r3, r3, r2
+ 1137              	.LVL71:
+ 578:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 1138              		.loc 1 578 1 view .LVU331
+ 1139 02ae 0CBF     		ite	eq
+ 1140 02b0 0120     		moveq	r0, #1
+ 1141              	.LVL72:
+ 1142              		.loc 1 578 1 view .LVU332
+ 1143 02b2 0020     		movne	r0, #0
+ 1144 02b4 7047     		bx	lr
+ 1145              	.L75:
+ 1146 02b6 00BF     		.align	2
+ 1147              	.L74:
+ 1148 02b8 00ED00E0 		.word	-536810240
+ 1149              		.cfi_endproc
+ 1150              	.LFE24:
+ 1152              		.align	1
+ 1153              		.p2align 2,,3
+ 1154              		.global	NVIC_SetSystemHandlerPendingBit
+ 1155              		.syntax unified
+ 1156              		.thumb
+ 1157              		.thumb_func
+ 1159              	NVIC_SetSystemHandlerPendingBit:
+ 1160              	.LVL73:
+ 1161              	.LFB25:
+ 579:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 580:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 581:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_SetSystemHandlerPendingBit
+ 582:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Sets System Handler pending bit.
+ 583:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - SystemHandler: specifies the system handler pending bit
+ 584:cpu/STM32F103/stm32f10x_nvic.c **** *                    to be set.
+ 585:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 586:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_NMI
+ 587:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_PSV
+ 588:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_SysTick
+ 589:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 590:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 591:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 592:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_SetSystemHandlerPendingBit(u32 SystemHandler)
+ 593:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 1162              		.loc 1 593 1 is_stmt 1 view -0
+ 1163              		.cfi_startproc
+ 1164              		@ args = 0, pretend = 0, frame = 0
+ 1165              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1166              		@ link register save eliminated.
+ 594:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmp = 0x00;
+ 1167              		.loc 1 594 3 view .LVU334
+ 595:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 596:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 597:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_SET_PENDING_SYSTEM_HANDLER(SystemHandler));
+ 1168              		.loc 1 597 3 view .LVU335
+ 598:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 599:cpu/STM32F103/stm32f10x_nvic.c ****   /* Get the System Handler pending bit position */
+ 600:cpu/STM32F103/stm32f10x_nvic.c ****   tmp = SystemHandler & (u32)0x1F;
+ 1169              		.loc 1 600 3 view .LVU336
+ 601:cpu/STM32F103/stm32f10x_nvic.c ****   /* Set the corresponding System Handler pending bit */
+ 602:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->ICSR |= ((u32)0x01 << tmp);
+ 1170              		.loc 1 602 3 view .LVU337
+ 1171              		.loc 1 602 27 is_stmt 0 view .LVU338
+ 1172 02bc 0123     		movs	r3, #1
+ 1173              		.loc 1 602 13 view .LVU339
+ 1174 02be 044A     		ldr	r2, .L77
+ 600:cpu/STM32F103/stm32f10x_nvic.c ****   /* Set the corresponding System Handler pending bit */
+ 1175              		.loc 1 600 7 view .LVU340
+ 1176 02c0 00F01F00 		and	r0, r0, #31
+ 1177              	.LVL74:
+ 1178              		.loc 1 602 13 view .LVU341
+ 1179 02c4 5168     		ldr	r1, [r2, #4]
+ 1180              		.loc 1 602 27 view .LVU342
+ 1181 02c6 8340     		lsls	r3, r3, r0
+ 1182              		.loc 1 602 13 view .LVU343
+ 1183 02c8 0B43     		orrs	r3, r3, r1
+ 1184 02ca 5360     		str	r3, [r2, #4]
+ 603:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 1185              		.loc 1 603 1 view .LVU344
+ 1186 02cc 7047     		bx	lr
+ 1187              	.L78:
+ 1188 02ce 00BF     		.align	2
+ 1189              	.L77:
+ 1190 02d0 00ED00E0 		.word	-536810240
+ 1191              		.cfi_endproc
+ 1192              	.LFE25:
+ 1194              		.align	1
+ 1195              		.p2align 2,,3
+ 1196              		.global	NVIC_ClearSystemHandlerPendingBit
+ 1197              		.syntax unified
+ 1198              		.thumb
+ 1199              		.thumb_func
+ 1201              	NVIC_ClearSystemHandlerPendingBit:
+ 1202              	.LVL75:
+ 1203              	.LFB26:
+ 604:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 605:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 606:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_ClearSystemHandlerPendingBit
+ 607:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Clears System Handler pending bit.
+ 608:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - SystemHandler: specifies the system handler pending bit to
+ 609:cpu/STM32F103/stm32f10x_nvic.c **** *                    be clear.
+ 610:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 611:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_PSV
+ 612:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_SysTick
+ 613:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 614:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : None
+ 615:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 616:cpu/STM32F103/stm32f10x_nvic.c **** void NVIC_ClearSystemHandlerPendingBit(u32 SystemHandler)
+ 617:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 1204              		.loc 1 617 1 is_stmt 1 view -0
+ 1205              		.cfi_startproc
+ 1206              		@ args = 0, pretend = 0, frame = 0
+ 1207              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1208              		@ link register save eliminated.
+ 618:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmp = 0x00;
+ 1209              		.loc 1 618 3 view .LVU346
+ 619:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 620:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 621:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_CLEAR_SYSTEM_HANDLER(SystemHandler));
+ 1210              		.loc 1 621 3 view .LVU347
+ 622:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 623:cpu/STM32F103/stm32f10x_nvic.c ****   /* Get the System Handler pending bit position */
+ 624:cpu/STM32F103/stm32f10x_nvic.c ****   tmp = SystemHandler & (u32)0x1F;
+ 1211              		.loc 1 624 3 view .LVU348
+ 625:cpu/STM32F103/stm32f10x_nvic.c ****   /* Clear the corresponding System Handler pending bit */
+ 626:cpu/STM32F103/stm32f10x_nvic.c ****   SCB->ICSR |= ((u32)0x01 << (tmp - 0x01));
+ 1212              		.loc 1 626 3 view .LVU349
+ 1213              		.loc 1 626 27 is_stmt 0 view .LVU350
+ 1214 02d4 0123     		movs	r3, #1
+ 1215              		.loc 1 626 13 view .LVU351
+ 1216 02d6 044A     		ldr	r2, .L80
+ 624:cpu/STM32F103/stm32f10x_nvic.c ****   /* Clear the corresponding System Handler pending bit */
+ 1217              		.loc 1 624 7 view .LVU352
+ 1218 02d8 00F01F00 		and	r0, r0, #31
+ 1219              	.LVL76:
+ 1220              		.loc 1 626 13 view .LVU353
+ 1221 02dc 5168     		ldr	r1, [r2, #4]
+ 1222              		.loc 1 626 35 view .LVU354
+ 1223 02de 0138     		subs	r0, r0, #1
+ 1224              	.LVL77:
+ 1225              		.loc 1 626 27 view .LVU355
+ 1226 02e0 8340     		lsls	r3, r3, r0
+ 1227              		.loc 1 626 13 view .LVU356
+ 1228 02e2 0B43     		orrs	r3, r3, r1
+ 1229 02e4 5360     		str	r3, [r2, #4]
+ 627:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 1230              		.loc 1 627 1 view .LVU357
+ 1231 02e6 7047     		bx	lr
+ 1232              	.L81:
+ 1233              		.align	2
+ 1234              	.L80:
+ 1235 02e8 00ED00E0 		.word	-536810240
+ 1236              		.cfi_endproc
+ 1237              	.LFE26:
+ 1239              		.align	1
+ 1240              		.p2align 2,,3
+ 1241              		.global	NVIC_GetSystemHandlerActiveBitStatus
+ 1242              		.syntax unified
+ 1243              		.thumb
+ 1244              		.thumb_func
+ 1246              	NVIC_GetSystemHandlerActiveBitStatus:
+ 1247              	.LVL78:
+ 1248              	.LFB27:
+ 628:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 629:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 630:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetSystemHandlerActiveBitStatus
+ 631:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Checks whether the specified System handlers active bit is
+ 632:cpu/STM32F103/stm32f10x_nvic.c **** *                  set or not.
+ 633:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - SystemHandler: specifies the system handler active bit to
+ 634:cpu/STM32F103/stm32f10x_nvic.c **** *                    check.
+ 635:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 636:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_MemoryManage
+ 637:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_BusFault
+ 638:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_UsageFault
+ 639:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_SVCall
+ 640:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_DebugMonitor
+ 641:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_PSV
+ 642:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_SysTick
+ 643:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 644:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : The new state of System Handler active bit(SET or RESET).
+ 645:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 646:cpu/STM32F103/stm32f10x_nvic.c **** ITStatus NVIC_GetSystemHandlerActiveBitStatus(u32 SystemHandler)
+ 647:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 1249              		.loc 1 647 1 is_stmt 1 view -0
+ 1250              		.cfi_startproc
+ 1251              		@ args = 0, pretend = 0, frame = 0
+ 1252              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1253              		@ link register save eliminated.
+ 648:cpu/STM32F103/stm32f10x_nvic.c ****   ITStatus bitstatus  = RESET;
+ 1254              		.loc 1 648 3 view .LVU359
+ 649:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 650:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmp = 0x00, tmppos = 0x00;
+ 1255              		.loc 1 650 3 view .LVU360
+ 651:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 652:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 653:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_GET_ACTIVE_SYSTEM_HANDLER(SystemHandler));
+ 1256              		.loc 1 653 3 view .LVU361
+ 654:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 655:cpu/STM32F103/stm32f10x_nvic.c ****   tmppos = (SystemHandler >> 0x0E) & (u32)0x0F;
+ 1257              		.loc 1 655 3 view .LVU362
+ 656:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 657:cpu/STM32F103/stm32f10x_nvic.c ****   tmppos = (u32)0x01 << tmppos;
+ 1258              		.loc 1 657 10 is_stmt 0 view .LVU363
+ 1259 02ec 0123     		movs	r3, #1
+ 658:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 659:cpu/STM32F103/stm32f10x_nvic.c ****   tmp = SCB->SHCSR & tmppos;
+ 1260              		.loc 1 659 12 view .LVU364
+ 1261 02ee 054A     		ldr	r2, .L83
+ 655:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 1262              		.loc 1 655 10 view .LVU365
+ 1263 02f0 C0F38330 		ubfx	r0, r0, #14, #4
+ 1264              	.LVL79:
+ 657:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 1265              		.loc 1 657 3 is_stmt 1 view .LVU366
+ 1266              		.loc 1 659 12 is_stmt 0 view .LVU367
+ 1267 02f4 526A     		ldr	r2, [r2, #36]
+ 657:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 1268              		.loc 1 657 10 view .LVU368
+ 1269 02f6 8340     		lsls	r3, r3, r0
+ 1270              	.LVL80:
+ 1271              		.loc 1 659 3 is_stmt 1 view .LVU369
+ 660:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 661:cpu/STM32F103/stm32f10x_nvic.c ****   if (tmp == tmppos)
+ 1272              		.loc 1 661 3 view .LVU370
+ 662:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 663:cpu/STM32F103/stm32f10x_nvic.c ****     bitstatus = SET;
+ 664:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 665:cpu/STM32F103/stm32f10x_nvic.c ****   else
+ 666:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 667:cpu/STM32F103/stm32f10x_nvic.c ****     bitstatus = RESET;
+ 668:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 669:cpu/STM32F103/stm32f10x_nvic.c ****   return bitstatus;
+ 1273              		.loc 1 669 3 view .LVU371
+ 661:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 1274              		.loc 1 661 6 is_stmt 0 view .LVU372
+ 1275 02f8 9343     		bics	r3, r3, r2
+ 1276              	.LVL81:
+ 670:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 1277              		.loc 1 670 1 view .LVU373
+ 1278 02fa 0CBF     		ite	eq
+ 1279 02fc 0120     		moveq	r0, #1
+ 1280              	.LVL82:
+ 1281              		.loc 1 670 1 view .LVU374
+ 1282 02fe 0020     		movne	r0, #0
+ 1283 0300 7047     		bx	lr
+ 1284              	.L84:
+ 1285 0302 00BF     		.align	2
+ 1286              	.L83:
+ 1287 0304 00ED00E0 		.word	-536810240
+ 1288              		.cfi_endproc
+ 1289              	.LFE27:
+ 1291              		.align	1
+ 1292              		.p2align 2,,3
+ 1293              		.global	NVIC_GetFaultHandlerSources
+ 1294              		.syntax unified
+ 1295              		.thumb
+ 1296              		.thumb_func
+ 1298              	NVIC_GetFaultHandlerSources:
+ 1299              	.LVL83:
+ 1300              	.LFB28:
+ 671:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 672:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 673:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetFaultHandlerSources
+ 674:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Returns the system fault handlers sources.
+ 675:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - SystemHandler: specifies the system handler to get its fault
+ 676:cpu/STM32F103/stm32f10x_nvic.c **** *                    sources.
+ 677:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 678:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_HardFault
+ 679:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_MemoryManage
+ 680:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_BusFault
+ 681:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_UsageFault
+ 682:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_DebugMonitor
+ 683:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 684:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : Source of the fault handler.
+ 685:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 686:cpu/STM32F103/stm32f10x_nvic.c **** u32 NVIC_GetFaultHandlerSources(u32 SystemHandler)
+ 687:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 1301              		.loc 1 687 1 is_stmt 1 view -0
+ 1302              		.cfi_startproc
+ 1303              		@ args = 0, pretend = 0, frame = 0
+ 1304              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1305              		@ link register save eliminated.
+ 688:cpu/STM32F103/stm32f10x_nvic.c ****   u32 faultsources = 0x00;
+ 1306              		.loc 1 688 3 view .LVU376
+ 689:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmpreg = 0x00, tmppos = 0x00;
+ 1307              		.loc 1 689 3 view .LVU377
+ 690:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 691:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 692:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_FAULT_SOURCE_SYSTEM_HANDLER(SystemHandler));
+ 1308              		.loc 1 692 3 view .LVU378
+ 693:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 694:cpu/STM32F103/stm32f10x_nvic.c ****   tmpreg = (SystemHandler >> 0x12) & (u32)0x03;
+ 1309              		.loc 1 694 3 view .LVU379
+ 695:cpu/STM32F103/stm32f10x_nvic.c ****   tmppos = (SystemHandler >> 0x14) & (u32)0x03;
+ 696:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 697:cpu/STM32F103/stm32f10x_nvic.c ****   if (tmpreg == 0x00)
+ 1310              		.loc 1 697 6 is_stmt 0 view .LVU380
+ 1311 0308 10F4402F 		tst	r0, #786432
+ 694:cpu/STM32F103/stm32f10x_nvic.c ****   tmppos = (SystemHandler >> 0x14) & (u32)0x03;
+ 1312              		.loc 1 694 10 view .LVU381
+ 1313 030c C0F38143 		ubfx	r3, r0, #18, #2
+ 1314              	.LVL84:
+ 695:cpu/STM32F103/stm32f10x_nvic.c ****   tmppos = (SystemHandler >> 0x14) & (u32)0x03;
+ 1315              		.loc 1 695 3 is_stmt 1 view .LVU382
+ 1316              		.loc 1 697 3 view .LVU383
+ 1317              		.loc 1 697 6 is_stmt 0 view .LVU384
+ 1318 0310 02D1     		bne	.L86
+ 698:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 699:cpu/STM32F103/stm32f10x_nvic.c ****     faultsources = SCB->HFSR;
+ 1319              		.loc 1 699 5 is_stmt 1 view .LVU385
+ 1320              		.loc 1 699 18 is_stmt 0 view .LVU386
+ 1321 0312 094B     		ldr	r3, .L91
+ 1322              	.LVL85:
+ 1323              		.loc 1 699 18 view .LVU387
+ 1324 0314 D86A     		ldr	r0, [r3, #44]
+ 1325              	.LVL86:
+ 1326              		.loc 1 699 18 view .LVU388
+ 1327 0316 7047     		bx	lr
+ 1328              	.LVL87:
+ 1329              	.L86:
+ 700:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 701:cpu/STM32F103/stm32f10x_nvic.c ****   else if (tmpreg == 0x01)
+ 1330              		.loc 1 701 8 is_stmt 1 view .LVU389
+ 1331              		.loc 1 701 11 is_stmt 0 view .LVU390
+ 1332 0318 012B     		cmp	r3, #1
+ 702:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 703:cpu/STM32F103/stm32f10x_nvic.c ****     faultsources = SCB->CFSR >> (tmppos * 0x08);
+ 1333              		.loc 1 703 23 view .LVU391
+ 1334 031a 074B     		ldr	r3, .L91
+ 1335              	.LVL88:
+ 701:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 1336              		.loc 1 701 11 view .LVU392
+ 1337 031c 01D0     		beq	.L90
+ 704:cpu/STM32F103/stm32f10x_nvic.c ****     if (tmppos != 0x02)
+ 705:cpu/STM32F103/stm32f10x_nvic.c ****     {
+ 706:cpu/STM32F103/stm32f10x_nvic.c ****       faultsources &= (u32)0x0F;
+ 707:cpu/STM32F103/stm32f10x_nvic.c ****     }
+ 708:cpu/STM32F103/stm32f10x_nvic.c ****     else
+ 709:cpu/STM32F103/stm32f10x_nvic.c ****     {
+ 710:cpu/STM32F103/stm32f10x_nvic.c ****       faultsources &= (u32)0xFF;
+ 711:cpu/STM32F103/stm32f10x_nvic.c ****     }
+ 712:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 713:cpu/STM32F103/stm32f10x_nvic.c ****   else
+ 714:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 715:cpu/STM32F103/stm32f10x_nvic.c ****     faultsources = SCB->DFSR;
+ 1338              		.loc 1 715 5 is_stmt 1 view .LVU393
+ 1339              		.loc 1 715 18 is_stmt 0 view .LVU394
+ 1340 031e 186B     		ldr	r0, [r3, #48]
+ 1341              	.LVL89:
+ 716:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 717:cpu/STM32F103/stm32f10x_nvic.c ****   return faultsources;
+ 1342              		.loc 1 717 3 is_stmt 1 view .LVU395
+ 718:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 1343              		.loc 1 718 1 is_stmt 0 view .LVU396
+ 1344 0320 7047     		bx	lr
+ 1345              	.LVL90:
+ 1346              	.L90:
+ 695:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 1347              		.loc 1 695 10 view .LVU397
+ 1348 0322 C0F30150 		ubfx	r0, r0, #20, #2
+ 1349              	.LVL91:
+ 703:cpu/STM32F103/stm32f10x_nvic.c ****     if (tmppos != 0x02)
+ 1350              		.loc 1 703 5 is_stmt 1 view .LVU398
+ 703:cpu/STM32F103/stm32f10x_nvic.c ****     if (tmppos != 0x02)
+ 1351              		.loc 1 703 23 is_stmt 0 view .LVU399
+ 1352 0326 9B6A     		ldr	r3, [r3, #40]
+ 703:cpu/STM32F103/stm32f10x_nvic.c ****     if (tmppos != 0x02)
+ 1353              		.loc 1 703 41 view .LVU400
+ 1354 0328 C200     		lsls	r2, r0, #3
+ 703:cpu/STM32F103/stm32f10x_nvic.c ****     if (tmppos != 0x02)
+ 1355              		.loc 1 703 18 view .LVU401
+ 1356 032a D340     		lsrs	r3, r3, r2
+ 1357              	.LVL92:
+ 704:cpu/STM32F103/stm32f10x_nvic.c ****     {
+ 1358              		.loc 1 704 5 is_stmt 1 view .LVU402
+ 704:cpu/STM32F103/stm32f10x_nvic.c ****     {
+ 1359              		.loc 1 704 8 is_stmt 0 view .LVU403
+ 1360 032c 0228     		cmp	r0, #2
+ 706:cpu/STM32F103/stm32f10x_nvic.c ****     }
+ 1361              		.loc 1 706 7 is_stmt 1 view .LVU404
+ 706:cpu/STM32F103/stm32f10x_nvic.c ****     }
+ 1362              		.loc 1 706 20 is_stmt 0 view .LVU405
+ 1363 032e 14BF     		ite	ne
+ 1364 0330 03F00F00 		andne	r0, r3, #15
+ 1365              	.LVL93:
+ 710:cpu/STM32F103/stm32f10x_nvic.c ****     }
+ 1366              		.loc 1 710 7 is_stmt 1 view .LVU406
+ 710:cpu/STM32F103/stm32f10x_nvic.c ****     }
+ 1367              		.loc 1 710 20 is_stmt 0 view .LVU407
+ 1368 0334 D8B2     		uxtbeq	r0, r3
+ 1369              	.LVL94:
+ 710:cpu/STM32F103/stm32f10x_nvic.c ****     }
+ 1370              		.loc 1 710 20 view .LVU408
+ 1371 0336 7047     		bx	lr
+ 1372              	.L92:
+ 1373              		.align	2
+ 1374              	.L91:
+ 1375 0338 00ED00E0 		.word	-536810240
+ 1376              		.cfi_endproc
+ 1377              	.LFE28:
+ 1379              		.align	1
+ 1380              		.p2align 2,,3
+ 1381              		.global	NVIC_GetFaultAddress
+ 1382              		.syntax unified
+ 1383              		.thumb
+ 1384              		.thumb_func
+ 1386              	NVIC_GetFaultAddress:
+ 1387              	.LVL95:
+ 1388              	.LFB29:
+ 719:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 720:cpu/STM32F103/stm32f10x_nvic.c **** /*******************************************************************************
+ 721:cpu/STM32F103/stm32f10x_nvic.c **** * Function Name  : NVIC_GetFaultAddress
+ 722:cpu/STM32F103/stm32f10x_nvic.c **** * Description    : Returns the address of the location that generated a fault
+ 723:cpu/STM32F103/stm32f10x_nvic.c **** *                  handler.
+ 724:cpu/STM32F103/stm32f10x_nvic.c **** * Input          : - SystemHandler: specifies the system handler to get its
+ 725:cpu/STM32F103/stm32f10x_nvic.c **** *                    fault address.
+ 726:cpu/STM32F103/stm32f10x_nvic.c **** *                    This parameter can be one of the following values:
+ 727:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_MemoryManage
+ 728:cpu/STM32F103/stm32f10x_nvic.c **** *                       - SystemHandler_BusFault
+ 729:cpu/STM32F103/stm32f10x_nvic.c **** * Output         : None
+ 730:cpu/STM32F103/stm32f10x_nvic.c **** * Return         : Fault address.
+ 731:cpu/STM32F103/stm32f10x_nvic.c **** *******************************************************************************/
+ 732:cpu/STM32F103/stm32f10x_nvic.c **** u32 NVIC_GetFaultAddress(u32 SystemHandler)
+ 733:cpu/STM32F103/stm32f10x_nvic.c **** {
+ 1389              		.loc 1 733 1 is_stmt 1 view -0
+ 1390              		.cfi_startproc
+ 1391              		@ args = 0, pretend = 0, frame = 0
+ 1392              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1393              		@ link register save eliminated.
+ 734:cpu/STM32F103/stm32f10x_nvic.c ****   u32 faultaddress = 0x00;
+ 1394              		.loc 1 734 3 view .LVU410
+ 735:cpu/STM32F103/stm32f10x_nvic.c ****   u32 tmp = 0x00;
+ 1395              		.loc 1 735 3 view .LVU411
+ 736:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 737:cpu/STM32F103/stm32f10x_nvic.c ****   /* Check the parameters */
+ 738:cpu/STM32F103/stm32f10x_nvic.c ****   assert_param(IS_FAULT_ADDRESS_SYSTEM_HANDLER(SystemHandler));
+ 1396              		.loc 1 738 3 view .LVU412
+ 739:cpu/STM32F103/stm32f10x_nvic.c ****   
+ 740:cpu/STM32F103/stm32f10x_nvic.c ****   tmp = (SystemHandler >> 0x16) & (u32)0x01;
+ 1397              		.loc 1 740 3 view .LVU413
+ 741:cpu/STM32F103/stm32f10x_nvic.c **** 
+ 742:cpu/STM32F103/stm32f10x_nvic.c ****   if (tmp == 0x00)
+ 1398              		.loc 1 742 3 view .LVU414
+ 743:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 744:cpu/STM32F103/stm32f10x_nvic.c ****     faultaddress = SCB->MMFAR;
+ 1399              		.loc 1 744 18 is_stmt 0 view .LVU415
+ 1400 033c 024B     		ldr	r3, .L96
+ 742:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 1401              		.loc 1 742 6 view .LVU416
+ 1402 033e 4202     		lsls	r2, r0, #9
+ 1403              		.loc 1 744 5 is_stmt 1 view .LVU417
+ 1404              		.loc 1 744 18 is_stmt 0 view .LVU418
+ 1405 0340 54BF     		ite	pl
+ 1406 0342 586B     		ldrpl	r0, [r3, #52]
+ 1407              	.LVL96:
+ 745:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 746:cpu/STM32F103/stm32f10x_nvic.c ****   else
+ 747:cpu/STM32F103/stm32f10x_nvic.c ****   {
+ 748:cpu/STM32F103/stm32f10x_nvic.c ****     faultaddress = SCB->BFAR;
+ 1408              		.loc 1 748 5 is_stmt 1 view .LVU419
+ 1409              		.loc 1 748 18 is_stmt 0 view .LVU420
+ 1410 0344 986B     		ldrmi	r0, [r3, #56]
+ 1411              	.LVL97:
+ 749:cpu/STM32F103/stm32f10x_nvic.c ****   }
+ 750:cpu/STM32F103/stm32f10x_nvic.c ****   return faultaddress;
+ 1412              		.loc 1 750 3 is_stmt 1 view .LVU421
+ 751:cpu/STM32F103/stm32f10x_nvic.c **** }
+ 1413              		.loc 1 751 1 is_stmt 0 view .LVU422
+ 1414 0346 7047     		bx	lr
+ 1415              	.L97:
+ 1416              		.align	2
+ 1417              	.L96:
+ 1418 0348 00ED00E0 		.word	-536810240
+ 1419              		.cfi_endproc
+ 1420              	.LFE29:
+ 1422              	.Letext0:
+ 1423              		.file 2 "cpu/STM32F103/stm32f10x_type.h"
+ 1424              		.file 3 "cpu/STM32F103/stm32f10x_map.h"
+ 1425              		.file 4 "cpu/STM32F103/stm32f10x_nvic.h"
+ 1426              		.file 5 "cpu/STM32F103/cortexm3_macro.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f10x_nvic.c
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:24     .text:00000000 NVIC_DeInit
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:88     .text:00000034 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:92     .text:00000038 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:99     .text:00000038 NVIC_SCBDeInit
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:179    .text:00000064 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:184    .text:0000006c $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:191    .text:0000006c NVIC_PriorityGroupConfig
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:215    .text:0000007c $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:219    .text:00000080 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:226    .text:00000080 NVIC_Init
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:377    .text:00000110 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:382    .text:00000118 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:389    .text:00000118 NVIC_StructInit
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:422    .text:00000124 NVIC_SETPRIMASK
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:442    .text:00000128 NVIC_RESETPRIMASK
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:462    .text:0000012c NVIC_SETFAULTMASK
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:482    .text:00000130 NVIC_RESETFAULTMASK
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:502    .text:00000134 NVIC_BASEPRICONFIG
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:527    .text:0000013c NVIC_GetBASEPRI
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:548    .text:00000140 NVIC_GetCurrentPendingIRQChannel
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:565    .text:0000014c $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:569    .text:00000150 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:576    .text:00000150 NVIC_GetIRQChannelPendingBitStatus
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:617    .text:00000170 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:621    .text:00000174 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:628    .text:00000174 NVIC_SetIRQChannelPendingBit
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:653    .text:00000180 NVIC_ClearIRQChannelPendingBit
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:682    .text:00000198 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:686    .text:0000019c $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:693    .text:0000019c NVIC_GetCurrentActiveHandler
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:710    .text:000001a8 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:714    .text:000001ac $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:721    .text:000001ac NVIC_GetIRQChannelActiveBitStatus
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:762    .text:000001cc $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:766    .text:000001d0 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:773    .text:000001d0 NVIC_GetCPUID
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:789    .text:000001d8 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:793    .text:000001dc $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:800    .text:000001dc NVIC_SetVectorTable
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:827    .text:000001ec $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:831    .text:000001f0 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:838    .text:000001f0 NVIC_GenerateSystemReset
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:855    .text:000001f8 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:860    .text:00000200 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:867    .text:00000200 NVIC_GenerateCoreReset
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:884    .text:00000208 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:889    .text:00000210 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:896    .text:00000210 NVIC_SystemLPConfig
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:933    .text:00000228 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:937    .text:0000022c $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:944    .text:0000022c NVIC_SystemHandlerConfig
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:991    .text:00000248 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:995    .text:0000024c $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1002   .text:0000024c NVIC_SystemHandlerPriorityConfig
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1095   .text:0000029c $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1099   .text:000002a0 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1106   .text:000002a0 NVIC_GetSystemHandlerPendingBitStatus
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1148   .text:000002b8 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1152   .text:000002bc $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1159   .text:000002bc NVIC_SetSystemHandlerPendingBit
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1190   .text:000002d0 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1194   .text:000002d4 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1201   .text:000002d4 NVIC_ClearSystemHandlerPendingBit
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1235   .text:000002e8 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1239   .text:000002ec $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1246   .text:000002ec NVIC_GetSystemHandlerActiveBitStatus
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1287   .text:00000304 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1291   .text:00000308 $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1298   .text:00000308 NVIC_GetFaultHandlerSources
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1375   .text:00000338 $d
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1379   .text:0000033c $t
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1386   .text:0000033c NVIC_GetFaultAddress
+C:\Users\forre\AppData\Local\Temp\ccGmGpCo.s:1418   .text:00000348 $d
+
+UNDEFINED SYMBOLS
+__SETPRIMASK
+__RESETPRIMASK
+__SETFAULTMASK
+__RESETFAULTMASK
+__BASEPRICONFIG
+__GetBASEPRI

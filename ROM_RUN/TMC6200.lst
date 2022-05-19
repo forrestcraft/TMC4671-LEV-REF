@@ -1,0 +1,257 @@
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"TMC6200.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	1
+  18              		.p2align 2,,3
+  19              		.global	tmc6200_readInt
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	tmc6200_readInt:
+  25              	.LVL0:
+  26              	.LFB0:
+  27              		.file 1 "TMC-API/tmc/ic/TMC6200/TMC6200.c"
+   1:TMC-API/tmc/ic/TMC6200/TMC6200.c **** /*
+   2:TMC-API/tmc/ic/TMC6200/TMC6200.c ****  * TMC6200.c
+   3:TMC-API/tmc/ic/TMC6200/TMC6200.c ****  *
+   4:TMC-API/tmc/ic/TMC6200/TMC6200.c ****  *  Created on: 14.03.2018
+   5:TMC-API/tmc/ic/TMC6200/TMC6200.c ****  *      Author: ED
+   6:TMC-API/tmc/ic/TMC6200/TMC6200.c ****  */
+   7:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 
+   8:TMC-API/tmc/ic/TMC6200/TMC6200.c **** #include "TMC6200.h"
+   9:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 
+  10:TMC-API/tmc/ic/TMC6200/TMC6200.c **** // => SPI wrapper
+  11:TMC-API/tmc/ic/TMC6200/TMC6200.c **** extern uint8_t tmc6200_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer);
+  12:TMC-API/tmc/ic/TMC6200/TMC6200.c **** // <= SPI wrapper
+  13:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 
+  14:TMC-API/tmc/ic/TMC6200/TMC6200.c **** // spi access
+  15:TMC-API/tmc/ic/TMC6200/TMC6200.c **** int32_t tmc6200_readInt(uint8_t motor, uint8_t address)
+  16:TMC-API/tmc/ic/TMC6200/TMC6200.c **** {
+  28              		.loc 1 16 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  17:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	// clear write bit
+  18:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	address = TMC_ADDRESS(address);
+  32              		.loc 1 18 2 view .LVU1
+  19:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 
+  20:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	// write address
+  21:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	tmc6200_readwriteByte(motor, address, false);
+  33              		.loc 1 21 2 view .LVU2
+  16:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	// clear write bit
+  34              		.loc 1 16 1 is_stmt 0 view .LVU3
+  35 0000 70B5     		push	{r4, r5, r6, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 16
+  38              		.cfi_offset 4, -16
+  39              		.cfi_offset 5, -12
+  40              		.cfi_offset 6, -8
+  41              		.cfi_offset 14, -4
+  42              		.loc 1 21 2 view .LVU4
+  43 0002 0022     		movs	r2, #0
+  44 0004 01F07F01 		and	r1, r1, #127
+  45              	.LVL1:
+  16:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	// clear write bit
+  46              		.loc 1 16 1 view .LVU5
+  47 0008 0446     		mov	r4, r0
+  48              		.loc 1 21 2 view .LVU6
+  49 000a FFF7FEFF 		bl	tmc6200_readwriteByte
+  50              	.LVL2:
+  22:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 
+  23:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	// read data
+  24:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	int value = tmc6200_readwriteByte(motor, 0, false);
+  51              		.loc 1 24 2 is_stmt 1 view .LVU7
+  52              		.loc 1 24 14 is_stmt 0 view .LVU8
+  53 000e 0022     		movs	r2, #0
+  54 0010 2046     		mov	r0, r4
+  55 0012 1146     		mov	r1, r2
+  56 0014 FFF7FEFF 		bl	tmc6200_readwriteByte
+  57              	.LVL3:
+  25:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  26:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value |= tmc6200_readwriteByte(motor, 0, false);
+  58              		.loc 1 26 11 view .LVU9
+  59 0018 0022     		movs	r2, #0
+  24:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  60              		.loc 1 24 14 view .LVU10
+  61 001a 0646     		mov	r6, r0
+  62              	.LVL4:
+  25:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  63              		.loc 1 25 2 is_stmt 1 view .LVU11
+  64              		.loc 1 26 11 is_stmt 0 view .LVU12
+  65 001c 1146     		mov	r1, r2
+  66 001e 2046     		mov	r0, r4
+  67              	.LVL5:
+  68              		.loc 1 26 11 view .LVU13
+  69 0020 FFF7FEFF 		bl	tmc6200_readwriteByte
+  70              	.LVL6:
+  27:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  28:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value |= tmc6200_readwriteByte(motor, 0, false);
+  71              		.loc 1 28 11 view .LVU14
+  72 0024 0022     		movs	r2, #0
+  26:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  73              		.loc 1 26 11 view .LVU15
+  74 0026 0546     		mov	r5, r0
+  75              		.loc 1 28 11 view .LVU16
+  76 0028 1146     		mov	r1, r2
+  77 002a 2046     		mov	r0, r4
+  78 002c FFF7FEFF 		bl	tmc6200_readwriteByte
+  79              	.LVL7:
+  80 0030 0346     		mov	r3, r0
+  25:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value |= tmc6200_readwriteByte(motor, 0, false);
+  81              		.loc 1 25 8 view .LVU17
+  82 0032 3602     		lsls	r6, r6, #8
+  83              	.LVL8:
+  26:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  84              		.loc 1 26 2 is_stmt 1 view .LVU18
+  26:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  85              		.loc 1 26 8 is_stmt 0 view .LVU19
+  86 0034 3543     		orrs	r5, r5, r6
+  87              	.LVL9:
+  27:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  88              		.loc 1 27 2 is_stmt 1 view .LVU20
+  29:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  30:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value |= tmc6200_readwriteByte(motor, 0, true);
+  89              		.loc 1 30 11 is_stmt 0 view .LVU21
+  90 0036 0122     		movs	r2, #1
+  91 0038 0021     		movs	r1, #0
+  92 003a 2046     		mov	r0, r4
+  27:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value |= tmc6200_readwriteByte(motor, 0, false);
+  93              		.loc 1 27 8 view .LVU22
+  94 003c 2D02     		lsls	r5, r5, #8
+  95              	.LVL10:
+  28:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  96              		.loc 1 28 2 is_stmt 1 view .LVU23
+  28:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+  97              		.loc 1 28 8 is_stmt 0 view .LVU24
+  98 003e 43EA0504 		orr	r4, r3, r5
+  99              	.LVL11:
+  29:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+ 100              		.loc 1 29 2 is_stmt 1 view .LVU25
+ 101              		.loc 1 30 11 is_stmt 0 view .LVU26
+ 102 0042 FFF7FEFF 		bl	tmc6200_readwriteByte
+ 103              	.LVL12:
+  29:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	value <<= 8;
+ 104              		.loc 1 29 8 view .LVU27
+ 105 0046 2402     		lsls	r4, r4, #8
+ 106              	.LVL13:
+ 107              		.loc 1 30 2 is_stmt 1 view .LVU28
+  31:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 
+  32:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	return value;
+ 108              		.loc 1 32 2 view .LVU29
+  33:TMC-API/tmc/ic/TMC6200/TMC6200.c **** }
+ 109              		.loc 1 33 1 is_stmt 0 view .LVU30
+ 110 0048 2043     		orrs	r0, r0, r4
+ 111              	.LVL14:
+ 112              		.loc 1 33 1 view .LVU31
+ 113 004a 70BD     		pop	{r4, r5, r6, pc}
+ 114              		.cfi_endproc
+ 115              	.LFE0:
+ 117              		.align	1
+ 118              		.p2align 2,,3
+ 119              		.global	tmc6200_writeInt
+ 120              		.syntax unified
+ 121              		.thumb
+ 122              		.thumb_func
+ 124              	tmc6200_writeInt:
+ 125              	.LVL15:
+ 126              	.LFB1:
+  34:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 
+  35:TMC-API/tmc/ic/TMC6200/TMC6200.c **** void tmc6200_writeInt(uint8_t motor, uint8_t address, int32_t value)
+  36:TMC-API/tmc/ic/TMC6200/TMC6200.c **** {
+ 127              		.loc 1 36 1 is_stmt 1 view -0
+ 128              		.cfi_startproc
+ 129              		@ args = 0, pretend = 0, frame = 0
+ 130              		@ frame_needed = 0, uses_anonymous_args = 0
+  37:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	// write address
+  38:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	tmc6200_readwriteByte(motor, address | TMC6200_WRITE_BIT, false);
+ 131              		.loc 1 38 2 view .LVU33
+  36:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	// write address
+ 132              		.loc 1 36 1 is_stmt 0 view .LVU34
+ 133 004c 38B5     		push	{r3, r4, r5, lr}
+ 134              	.LCFI1:
+ 135              		.cfi_def_cfa_offset 16
+ 136              		.cfi_offset 3, -16
+ 137              		.cfi_offset 4, -12
+ 138              		.cfi_offset 5, -8
+ 139              		.cfi_offset 14, -4
+  36:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	// write address
+ 140              		.loc 1 36 1 view .LVU35
+ 141 004e 1446     		mov	r4, r2
+ 142 0050 0546     		mov	r5, r0
+ 143              		.loc 1 38 2 view .LVU36
+ 144 0052 0022     		movs	r2, #0
+ 145              	.LVL16:
+ 146              		.loc 1 38 2 view .LVU37
+ 147 0054 41F08001 		orr	r1, r1, #128
+ 148              	.LVL17:
+ 149              		.loc 1 38 2 view .LVU38
+ 150 0058 FFF7FEFF 		bl	tmc6200_readwriteByte
+ 151              	.LVL18:
+  39:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 
+  40:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	// write value
+  41:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	tmc6200_readwriteByte(motor, 0xFF & (value>>24), false);
+ 152              		.loc 1 41 2 is_stmt 1 view .LVU39
+ 153 005c 210E     		lsrs	r1, r4, #24
+ 154 005e 0022     		movs	r2, #0
+ 155 0060 2846     		mov	r0, r5
+ 156 0062 FFF7FEFF 		bl	tmc6200_readwriteByte
+ 157              	.LVL19:
+  42:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	tmc6200_readwriteByte(motor, 0xFF & (value>>16), false);
+ 158              		.loc 1 42 2 view .LVU40
+ 159 0066 C4F30741 		ubfx	r1, r4, #16, #8
+ 160 006a 0022     		movs	r2, #0
+ 161 006c 2846     		mov	r0, r5
+ 162 006e FFF7FEFF 		bl	tmc6200_readwriteByte
+ 163              	.LVL20:
+  43:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	tmc6200_readwriteByte(motor, 0xFF & (value>>8), false);
+ 164              		.loc 1 43 2 view .LVU41
+ 165 0072 C4F30721 		ubfx	r1, r4, #8, #8
+ 166 0076 0022     		movs	r2, #0
+ 167 0078 2846     		mov	r0, r5
+ 168 007a FFF7FEFF 		bl	tmc6200_readwriteByte
+ 169              	.LVL21:
+  44:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	tmc6200_readwriteByte(motor, 0xFF & (value>>0), true);
+ 170              		.loc 1 44 2 view .LVU42
+ 171 007e 2846     		mov	r0, r5
+ 172 0080 E1B2     		uxtb	r1, r4
+ 173 0082 0122     		movs	r2, #1
+  45:TMC-API/tmc/ic/TMC6200/TMC6200.c **** }
+ 174              		.loc 1 45 1 is_stmt 0 view .LVU43
+ 175 0084 BDE83840 		pop	{r3, r4, r5, lr}
+ 176              	.LCFI2:
+ 177              		.cfi_restore 14
+ 178              		.cfi_restore 5
+ 179              		.cfi_restore 4
+ 180              		.cfi_restore 3
+ 181              		.cfi_def_cfa_offset 0
+ 182              	.LVL22:
+  44:TMC-API/tmc/ic/TMC6200/TMC6200.c **** 	tmc6200_readwriteByte(motor, 0xFF & (value>>0), true);
+ 183              		.loc 1 44 2 view .LVU44
+ 184 0088 FFF7FEBF 		b	tmc6200_readwriteByte
+ 185              	.LVL23:
+ 186              		.cfi_endproc
+ 187              	.LFE1:
+ 189              	.Letext0:
+ 190              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 191              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+DEFINED SYMBOLS
+                            *ABS*:00000000 TMC6200.c
+C:\Users\forre\AppData\Local\Temp\cceBVr07.s:17     .text:00000000 $t
+C:\Users\forre\AppData\Local\Temp\cceBVr07.s:24     .text:00000000 tmc6200_readInt
+C:\Users\forre\AppData\Local\Temp\cceBVr07.s:124    .text:0000004c tmc6200_writeInt
+
+UNDEFINED SYMBOLS
+tmc6200_readwriteByte
