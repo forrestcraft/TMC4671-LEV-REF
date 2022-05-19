@@ -18,7 +18,7 @@
 	#include "cpu/STM32F103/stm32f10x_can.h"
 
 	#define USE_16_MHZ_CLOCK
-	//#define USE_ALIVE_LED
+	#define USE_ALIVE_LED
 
 	#define USE_CAN_INTERFACE
 	#define USE_CAN_PB8_PB9			// used CAN-Pins
@@ -49,8 +49,8 @@
 	#include "TMC-API/tmc/ramp/LinearRamp.h"
 
 	// for temperature monitoring
-	#define MIN_CRITICAL_TEMP    	100		// 100°C
-	#define MAX_CRITICAL_TEMP     	110		// 110°C
+	#define MIN_CRITICAL_TEMP    	100		// 100ï¿½C
+	#define MAX_CRITICAL_TEMP     	110		// 110ï¿½C
 
 	// for supply monitoring
 	#define MAX_SUPPLY_VOLTAGE		560  	// 56.0V
@@ -62,7 +62,7 @@
 	#define VOLTAGE_FACTOR_6V		62		// IC702 output 5V at the moment
 	#define VOLTAGE_FACTOR_5V		62
 
-	TMC_LinearRamp rampGenerator;
+	extern TMC_LinearRamp rampGenerator;
 
 #endif /* DEVICE==TMC4671_LEV_REF_V10 */
 

@@ -116,8 +116,8 @@
 		u16 pidVelocity_I_param;
 	} TMotorConfig;
 
-	TMotorConfig motorConfig;
-	TModuleConfig moduleConfig;
+	extern TMotorConfig motorConfig;
+	extern TModuleConfig moduleConfig;
 
 	// SPI chip selects
 	extern void tmcm_enableCsWeasel();

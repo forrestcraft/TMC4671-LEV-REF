@@ -19,6 +19,11 @@ const char *VersionString="1634V100";
 #define ADC1_CHANNELS		6
 static volatile uint16_t ADC1Value[ADC1_CHANNELS];	// array for analog values (filled by DMA)
 
+TMotorConfig motorConfig;
+TModuleConfig moduleConfig;
+TMC_LinearRamp rampGenerator;
+
+
 // ADC inputs
 uint8_t ADC_VOLTAGE_5V 		= 6;
 uint8_t ADC_VOLTAGE_6V 		= 5;
@@ -249,7 +254,7 @@ void tmcm_initModuleSpecificIO()
 
 	// port D
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_PD01, DISABLE);  // PD0 und PD1 bleiben Oszillatoranschlüsse
+	GPIO_PinRemapConfig(GPIO_Remap_PD01, DISABLE);  // PD0 und PD1 bleiben Oszillatoranschlï¿½sse
 }
 
 void tmcm_interruptConfig()
