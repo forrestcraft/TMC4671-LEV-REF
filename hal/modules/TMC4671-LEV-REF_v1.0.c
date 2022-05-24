@@ -13,6 +13,8 @@
 
 // general module settings
 const char *VersionString="1634V100";
+//const char *VersionString = "0022V100";
+
 
 // ADC configuration
 #define ADC1_DR_Address    ((uint32_t)0x4001244C)
@@ -178,6 +180,8 @@ void tmcm_initMotorConfig()
 	motorConfig.pidTorque_I_param			= 1000;
 	motorConfig.pidVelocity_P_param			= 100;
 	motorConfig.pidVelocity_I_param			= 100;
+	motorConfig.pidPosition_P_param			= 0;
+	motorConfig.pidPosition_I_param			= 0;
 
 	// init ramp generator
 	tmc_linearRamp_init(&rampGenerator);

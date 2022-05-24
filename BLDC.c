@@ -27,6 +27,7 @@
 
 	// velocity regulation
 	int	gDesiredVelocity = 0;				// requested target velocity
+	int	gDesiredPosition = 0;				// requested target velocity
 
 	// torque ramp
 	int32_t gRampTargetTorque = 0;
@@ -58,6 +59,11 @@ void bldc_switchToMotionMode(uint32_t mode)
 			flags_setStatusFlag(VELOCITY_MODE);
 			gMotionMode = VELOCITY_MODE;
 			tmc4671_switchToMotionMode(DEFAULT_MC, TMC4671_MOTION_MODE_VELOCITY);
+			break;
+        case POSITION_MODE:
+			flags_setStatusFlag(POSITION_MODE);
+			gMotionMode = POSITION_MODE;
+			tmc4671_switchToMotionMode(DEFAULT_MC, TMC4671_MOTION_MODE_POSITION);
 			break;
 	}
 }
@@ -99,6 +105,10 @@ int bldc_getTargetVelocity()
 {
 	return (motorConfig.commutationMode == COMM_MODE_FOC_OPEN_LOOP) ? tmc4671_readInt(DEFAULT_MC, TMC4671_OPENLOOP_VELOCITY_TARGET) : gDesiredVelocity;
 }
+int bldc_getTargetPosition()
+{
+	return gDesiredPosition;
+}
 
 /* set target velocity [rpm] (x{>0:CW | 0:Stop | <0: CCW} */
 void bldc_setTargetVelocity(int velocity)
@@ -114,6 +124,17 @@ void bldc_setTargetVelocity(int velocity)
 		bldc_switchToMotionMode(VELOCITY_MODE);
 	}
 }
+void bldc_setTargetPosition(int position)
+{
+	if (motorConfig.commutationMode == COMM_MODE_FOC_DISABLED)
+		return;
+
+    gDesiredPosition = position;
+
+    // switch to velocity motion mode
+    bldc_switchToMotionMode(POSITION_MODE);
+
+}
 
 /* actual ramp generator velocity */
 int bldc_getRampGeneratorVelocity()
@@ -128,6 +149,17 @@ int bldc_getRampGeneratorVelocity()
 int bldc_getActualVelocity()
 {
 	return tmc4671_readInt(DEFAULT_MC, (motorConfig.commutationMode == COMM_MODE_FOC_OPEN_LOOP) ? TMC4671_OPENLOOP_VELOCITY_ACTUAL : TMC4671_PID_VELOCITY_ACTUAL);
+}
+
+/* actual Position? in rpm */
+int bldc_getActualPosition()
+{
+    return tmc4671_readInt(DEFAULT_MC, TMC4671_PID_POSITION_ACTUAL);
+}
+
+void bldc_setActualPosition(int position)
+{
+    tmc4671_writeInt(DEFAULT_MC, TMC4671_PID_POSITION_ACTUAL, position);
 }
 
 int bldc_getMaxVelocity()
@@ -282,9 +314,18 @@ void bldc_checkCommutationMode()
 				tmc4671_switchToMotionMode(DEFAULT_MC, TMC4671_MOTION_MODE_TORQUE);
 				break;
 			case COMM_MODE_FOC_DIGITAL_HALL:
-			case COMM_MODE_FOC_DIGITAL_HALL_PEDAL_ASSIST:
-				tmc4671_writeInt(DEFAULT_MC, TMC4671_VELOCITY_SELECTION, TMC4671_VELOCITY_PHI_M_HAL);
-				tmc4671_writeInt(DEFAULT_MC, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_HALL);
+                tmc4671_writeInt(DEFAULT_MC, TMC4671_ABN_2_DECODER_PPR, 4096);
+                tmc4671_writeInt(DEFAULT_MC, TMC4671_ABN_2_DECODER_MODE, 0x1000);
+                tmc4671_writeInt(DEFAULT_MC, TMC4671_VELOCITY_SELECTION, TMC4671_VELOCITY_PHI_M_ABN_2);
+                tmc4671_writeInt(DEFAULT_MC, TMC4671_POSITION_SELECTION, TMC4671_VELOCITY_PHI_M_ABN_2);
+                tmc4671_writeInt(DEFAULT_MC, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_HALL);
+                break;
+            case COMM_MODE_FOC_DIGITAL_HALL_PEDAL_ASSIST:
+                tmc4671_writeInt(DEFAULT_MC, TMC4671_ABN_2_DECODER_PPR, 4096);
+                tmc4671_writeInt(DEFAULT_MC, TMC4671_ABN_2_DECODER_MODE, 0x1000);
+				tmc4671_writeInt(DEFAULT_MC, TMC4671_VELOCITY_SELECTION, TMC4671_VELOCITY_PHI_M_ABN_2);
+                tmc4671_writeInt(DEFAULT_MC, TMC4671_POSITION_SELECTION, TMC4671_VELOCITY_PHI_M_ABN_2);
+                tmc4671_writeInt(DEFAULT_MC, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_HALL);
 				break;
 		}
 		gLastSetCommutationMode = motorConfig.commutationMode;
@@ -385,6 +426,11 @@ void bldc_processBLDC()
 
 				// set new target velocity
 				tmc4671_writeInt(DEFAULT_MC, TMC4671_PID_VELOCITY_TARGET, rampGenerator.rampVelocity);
+			}
+            else if (gMotionMode == POSITION_MODE)
+			{
+				// set new target velocity
+				tmc4671_writeInt(DEFAULT_MC, TMC4671_PID_POSITION_TARGET, gDesiredPosition);
 			}
 		}
 		else if (motorConfig.commutationMode == COMM_MODE_FOC_DIGITAL_HALL_PEDAL_ASSIST)

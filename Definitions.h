@@ -114,6 +114,8 @@
 		u16 pidTorque_I_param;
 		u16 pidVelocity_P_param;
 		u16 pidVelocity_I_param;
+		u16 pidPosition_P_param;
+		u16 pidPosition_I_param;
 	} TMotorConfig;
 
 	extern TMotorConfig motorConfig;

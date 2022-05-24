@@ -38,6 +38,7 @@
 
 	// velocity mode
 	int bldc_getTargetVelocity();
+	int bldc_getTargetPosition();
 	void bldc_setTargetVelocity(int velocity);
 	void bldc_stopMotor();
 	int bldc_getRampGeneratorVelocity();
@@ -46,6 +47,11 @@
 	bool bldc_setMaxVelocity(int maxVelocity);
 	bool bldc_setAcceleration(int acceleration);
 	bool bldc_setRampEnabled(int enableRamp);
+
+    // position mode
+    void bldc_setTargetPosition(int position);
+    void bldc_setActualPosition(int position);
+    int bldc_getActualPosition();
 
 	// ADC configuration
 	bool bldc_setDualShuntFactor(u16 factor);

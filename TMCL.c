@@ -531,8 +531,31 @@ void tmcl_handleAxisParameter(uint8_t command)
 						(u8 *)&motorConfig.pidVelocity_I_param, sizeof(motorConfig.pidVelocity_I_param));
 				}
 				break;
+            case 24: // Position P
+                if (command == TMCL_SAP)
+                {
+                    motorConfig.pidPosition_P_param = ActualCommand.Value.Int32;
+                    TMC4671_FIELD_UPDATE(0, TMC4671_PID_POSITION_P_POSITION_I, TMC4671_PID_POSITION_P_MASK, TMC4671_PID_POSITION_P_SHIFT, motorConfig.pidPosition_P_param);
+                }
+                else if (command == TMCL_GAP)
+                {
+                    ActualReply.Value.Int32 = motorConfig.pidPosition_P_param;
+                }
+                break;
 
-			// ===== torque mode settings =====
+            case 25: // Position P
+                if (command == TMCL_SAP)
+                {
+                    motorConfig.pidPosition_I_param = ActualCommand.Value.Int32;
+                    TMC4671_FIELD_UPDATE(0, TMC4671_PID_POSITION_P_POSITION_I, TMC4671_PID_POSITION_I_MASK, TMC4671_PID_POSITION_I_SHIFT, motorConfig.pidPosition_I_param);
+                }
+                else if (command == TMCL_GAP)
+                {
+                    ActualReply.Value.Int32 = motorConfig.pidPosition_I_param;
+                }
+                break;
+
+                // ===== torque mode settings =====
 
 			case 30: // target torque
 				if (command == TMCL_SAP) {
@@ -619,38 +642,21 @@ void tmcl_handleAxisParameter(uint8_t command)
 				// ===== pedal sensor settings =====
 
 			case 50: // pedal pulses per rotation
-				if (command == TMCL_SAP)
-				{
-					if ((ActualCommand.Value.Int32 >= 0) && (ActualCommand.Value.Int32 <= MAX_PEDAL_POSITIONS))
-						motorConfig.pedalPulsesPerRotation = ActualCommand.Value.Int32;
-					else
-						ActualReply.Status = REPLY_INVALID_VALUE;
-				} else if (command == TMCL_GAP)
-				{
-					ActualReply.Value.Int32 = motorConfig.pedalPulsesPerRotation;
-				} else if (command == TMCL_STAP) {
-					eeprom_writeConfigBlock(TMCM_ADDR_MOTOR_CONFIG+(u32)&motorConfig.pedalPulsesPerRotation-(u32)&motorConfig,
-						(u8 *)&motorConfig.pedalPulsesPerRotation, sizeof(motorConfig.pedalPulsesPerRotation));
-				} else if (command == TMCL_RSAP) {
-					eeprom_readConfigBlock(TMCM_ADDR_MOTOR_CONFIG+(u32)&motorConfig.pedalPulsesPerRotation-(u32)&motorConfig,
-						(u8 *)&motorConfig.pedalPulsesPerRotation, sizeof(motorConfig.pedalPulsesPerRotation));
-				}
-				break;
+                if (command == TMCL_SAP)
+                {
+                    bldc_setTargetPosition(ActualCommand.Value.Int32);
+                } else if (command == TMCL_GAP) {
+                    ActualReply.Value.Int32 = bldc_getTargetPosition();
+                }
+                break;
 			case 52: // pedal sense delay
-				if (command == TMCL_SAP)
-				{
-					motorConfig.pedalSenseDelay = ActualCommand.Value.Int32;
-				} else if (command == TMCL_GAP)
-				{
-					ActualReply.Value.Int32 = motorConfig.pedalSenseDelay;
-				} else if (command == TMCL_STAP) {
-					eeprom_writeConfigBlock(TMCM_ADDR_MOTOR_CONFIG+(u32)&motorConfig.pedalSenseDelay-(u32)&motorConfig,
-						(u8 *)&motorConfig.pedalSenseDelay, sizeof(motorConfig.pedalSenseDelay));
-				} else if (command == TMCL_RSAP) {
-					eeprom_readConfigBlock(TMCM_ADDR_MOTOR_CONFIG+(u32)&motorConfig.pedalSenseDelay-(u32)&motorConfig,
-						(u8 *)&motorConfig.pedalSenseDelay, sizeof(motorConfig.pedalSenseDelay));
-				}
-				break;
+                if (command == TMCL_SAP)
+                {
+                    bldc_setActualPosition(ActualCommand.Value.Int32);
+                } else if (command == TMCL_GAP) {
+                    ActualReply.Value.Int32 = bldc_getActualPosition();
+                }
+                break;
 			case 53: // torque sensor gain
 				if (command == TMCL_SAP)
 				{
@@ -1101,6 +1107,7 @@ void tmcl_handleAxisParameter(uint8_t command)
 				{
 					motorConfig.maximumSpeed = ActualCommand.Value.Int32;
 					sensor_updateCutOffTime();
+                    tmc4671_writeInt(DEFAULT_MC, TMC4671_PID_VELOCITY_LIMIT, motorConfig.maximumSpeed);
 				} else if (command == TMCL_GAP)
 				{
 					ActualReply.Value.Int32 = motorConfig.maximumSpeed;
@@ -1715,7 +1722,8 @@ void tmcl_getInput()
 void tmcl_getVersion()
 {
 	uint32_t i;
-
+//    const char *VersionString = "0019V100";
+    uint8_t tmpVal;
 	switch(ActualCommand.Type)
 	{
 		case 0:
@@ -1725,11 +1733,33 @@ void tmcl_getVersion()
 				SpecialReply[i+1]=VersionString[i];
 			break;
 		case 1:
-			ActualReply.Value.Byte[3] = SW_TYPE_HIGH;
-			ActualReply.Value.Byte[2] = SW_TYPE_LOW;
-			ActualReply.Value.Byte[1] = SW_VERSION_HIGH;
-			ActualReply.Value.Byte[0] = SW_VERSION_LOW;
-			break;
+//			ActualReply.Value.Byte[3] = SW_TYPE_HIGH;
+//			ActualReply.Value.Byte[2] = SW_TYPE_LOW;
+//			ActualReply.Value.Byte[1] = SW_VERSION_HIGH;
+//			ActualReply.Value.Byte[0] = SW_VERSION_LOW;
+
+
+            // module version high
+            tmpVal = (uint8_t) VersionString[0] - '0';	// Ascii digit - '0' = digit value
+            tmpVal *= 10;
+            tmpVal += (uint8_t) VersionString[1] - '0';
+            ActualReply.Value.Byte[3] = tmpVal;
+
+            // module version low
+            tmpVal = (uint8_t) VersionString[2] - '0';
+            tmpVal *= 10;
+            tmpVal += (uint8_t) VersionString[3] - '0';
+            ActualReply.Value.Byte[2] = tmpVal;
+
+            // fw version high
+            ActualReply.Value.Byte[1] = (uint8_t) VersionString[5] - '0';
+
+            // fw version low
+            tmpVal = (uint8_t) VersionString[6] - '0';
+            tmpVal *= 10;
+            tmpVal += (uint8_t) VersionString[7] - '0';
+            ActualReply.Value.Byte[0] = tmpVal;
+            break;
 	    default:
 	      ActualReply.Status = REPLY_WRONG_TYPE;
 	      break;
