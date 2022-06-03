@@ -69,6 +69,6 @@ void cpu_init()
 #endif
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
-	asm volatile("CPSID I\n");
-	asm volatile("CPSIE I\n");
+	__asm__ volatile("CPSID I\n");
+	__asm__ volatile("CPSIE I\n");
 }

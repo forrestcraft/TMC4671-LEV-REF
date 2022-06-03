@@ -9,7 +9,7 @@ Modified for use with Trinamic TMCM Boot Loader by OK, 29-May-2009.
 
 
 /* include the common STM32F10x sub-script */
-INCLUDE "cpu/STM32F103/STM32_COMMON.ld"
+INCLUDE "../cpu/STM32F103/STM32_COMMON.ld"
 
 /* Memory Spaces Definitions */
 MEMORY
@@ -28,4 +28,4 @@ _estack = 0x20005000;
 
 /* include the section management sub-script */
 /* (either "STM32_SEC_FLASH.ld" or "STM32_SEC_RAM.ld") */
-INCLUDE "cpu/STM32F103/STM32_SEC_FLASH.ld"
+INCLUDE "../cpu/STM32F103/STM32_SEC_FLASH.ld"

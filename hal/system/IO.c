@@ -19,11 +19,11 @@ void io_resetCPU(uint8_t resetPeripherals)
 /* enable interrupts globally */
 void io_enableInterrupts(void)
 {
-	asm volatile("CPSIE I\n");
+	__asm__ volatile("CPSIE I\n");
 }
 
 /* disable interrupts globally */
 void io_disableInterrupts(void)
 {
-	asm volatile("CPSID I\n");
+	__asm__ volatile("CPSID I\n");
 }
